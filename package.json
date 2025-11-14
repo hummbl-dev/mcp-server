@@ -1,0 +1,48 @@
+{
+  "name": "@hummbl/mcp-server",
+  "version": "1.0.0-beta.1",
+  "description": "Model Context Protocol server for HUMMBL Base120 mental models framework",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "hummbl-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mental-models",
+    "hummbl",
+    "cognitive-framework",
+    "problem-solving"
+  ],
+  "author": "Reuben <reuben@hummbl.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hummbl-dev/mcp-server.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
