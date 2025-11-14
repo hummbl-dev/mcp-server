@@ -2,6 +2,10 @@
 
 Model Context Protocol server providing access to the HUMMBL Base120 mental models framework.
 
+<a href="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server/badge" alt="HUMMBL Server MCP server" />
+</a>
+
 ## Overview
 
 HUMMBL Base120 is a comprehensive cognitive framework consisting of 120 validated mental models organized across 6 transformations:
