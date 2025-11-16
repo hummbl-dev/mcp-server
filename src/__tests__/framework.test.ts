@@ -103,17 +103,13 @@ describe("Framework Utilities", () => {
     it("should find models by name", () => {
       const results = searchModels("principle");
       expect(results.length).toBeGreaterThan(0);
-      expect(
-        results.some((m) => m.name.toLowerCase().includes("principle"))
-      ).toBe(true);
+      expect(results.some((m) => m.name.toLowerCase().includes("principle"))).toBe(true);
     });
 
     it("should find models by definition", () => {
       const results = searchModels("fundamental");
       expect(results.length).toBeGreaterThan(0);
-      expect(
-        results.some((m) => m.definition.toLowerCase().includes("fundamental"))
-      ).toBe(true);
+      expect(results.some((m) => m.definition.toLowerCase().includes("fundamental"))).toBe(true);
     });
 
     it("should find models by code", () => {

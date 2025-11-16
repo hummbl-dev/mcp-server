@@ -48,6 +48,7 @@ export function sanitizeText(input: string, maxLength: number = MAX_PROBLEM_LENG
   }
 
   // Remove null bytes and control characters (except newlines, tabs, carriage returns)
+  // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, "");
 
   return sanitized;
@@ -115,9 +116,7 @@ export function validateTransformationKey(key: string): string {
   const validKeys = ["P", "IN", "CO", "DE", "RE", "SY"];
 
   if (!validKeys.includes(normalized)) {
-    throw new Error(
-      `Invalid transformation key: '${key}'. Valid keys: ${validKeys.join(", ")}`
-    );
+    throw new Error(`Invalid transformation key: '${key}'. Valid keys: ${validKeys.join(", ")}`);
   }
 
   return normalized;

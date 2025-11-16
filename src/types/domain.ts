@@ -42,9 +42,7 @@ export interface AnalysisGuide {
 /**
  * Result type for type-safe error handling (Railway-Oriented Programming).
  */
-export type Result<T, E = Error> =
-  | { success: true; value: T }
-  | { success: false; error: E };
+export type Result<T, E = Error> = { success: true; value: T } | { success: false; error: E };
 
 export const ok = <T>(value: T): Result<T, never> => ({
   success: true,

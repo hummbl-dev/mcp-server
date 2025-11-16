@@ -8,10 +8,7 @@ import { Result, ok, err } from "../types/domain.js";
 /**
  * Maps a Result's success value through a transformation function.
  */
-export function mapResult<T, U, E>(
-  result: Result<T, E>,
-  fn: (value: T) => U
-): Result<U, E> {
+export function mapResult<T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
   if (result.success) {
     return ok(fn(result.value));
   }

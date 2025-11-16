@@ -5,11 +5,7 @@
 
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-import {
-  getAllModels,
-  getModelByCode,
-  getTransformationByKey,
-} from "../framework/base120.js";
+import { getAllModels, getModelByCode, getTransformationByKey } from "../framework/base120.js";
 
 /**
  * Register HUMMBL resources with the MCP server.
@@ -21,8 +17,7 @@ export function registerModelResources(server: McpServer): void {
     new ResourceTemplate("hummbl://model/{code}", { list: undefined }),
     {
       title: "HUMMBL Mental Model",
-      description:
-        "Access individual mental model by code (e.g., hummbl://model/P1)",
+      description: "Access individual mental model by code (e.g., hummbl://model/P1)",
       mimeType: "application/json",
     },
     async (uri: URL, variables: Record<string, string | string[]>) => {
@@ -33,7 +28,7 @@ export function registerModelResources(server: McpServer): void {
 
       if (!model) {
         throw new Error(
-          `Model code '${code}' not found. Use valid HUMMBL Base120 codes like P1, IN3, CO5.`,
+          `Model code '${code}' not found. Use valid HUMMBL Base120 codes like P1, IN3, CO5.`
         );
       }
 
@@ -46,7 +41,7 @@ export function registerModelResources(server: McpServer): void {
           },
         ],
       };
-    },
+    }
   );
 
   // Resource: All models in a transformation
@@ -55,8 +50,7 @@ export function registerModelResources(server: McpServer): void {
     new ResourceTemplate("hummbl://transformation/{type}", { list: undefined }),
     {
       title: "HUMMBL Transformation Models",
-      description:
-        "Access all models in a transformation (e.g., hummbl://transformation/P)",
+      description: "Access all models in a transformation (e.g., hummbl://transformation/P)",
       mimeType: "application/json",
     },
     async (uri: URL, variables: Record<string, string | string[]>) => {
@@ -67,7 +61,7 @@ export function registerModelResources(server: McpServer): void {
 
       if (!transformation) {
         throw new Error(
-          `Transformation '${type}' not found. Valid transformations are: P, IN, CO, DE, RE, SY.`,
+          `Transformation '${type}' not found. Valid transformations are: P, IN, CO, DE, RE, SY.`
         );
       }
 
@@ -80,7 +74,7 @@ export function registerModelResources(server: McpServer): void {
           },
         ],
       };
-    },
+    }
   );
 
   // Resource: All models (complete framework)
@@ -89,8 +83,7 @@ export function registerModelResources(server: McpServer): void {
     "hummbl://models",
     {
       title: "All HUMMBL Models",
-      description:
-        "Complete Base120 framework with all 120 mental models.",
+      description: "Complete Base120 framework with all 120 mental models.",
       mimeType: "application/json",
     },
     async (uri: URL) => {
@@ -111,6 +104,6 @@ export function registerModelResources(server: McpServer): void {
           },
         ],
       };
-    },
+    }
   );
 }

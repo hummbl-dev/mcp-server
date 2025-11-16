@@ -58,7 +58,7 @@ export function registerModelTools(server: McpServer): void {
       }
 
       const transformation = Object.values(TRANSFORMATIONS).find((t) =>
-        t.models.some((m) => m.code === model.code),
+        t.models.some((m) => m.code === model.code)
       );
 
       const payload = {
@@ -78,7 +78,7 @@ export function registerModelTools(server: McpServer): void {
         ],
         structuredContent: payload,
       } as const;
-    },
+    }
   );
 
   // Tool: List all models
@@ -86,8 +86,7 @@ export function registerModelTools(server: McpServer): void {
     "list_all_models",
     {
       title: "List All Mental Models",
-      description:
-        "Retrieve complete list of all 120 HUMMBL mental models with basic information.",
+      description: "Retrieve complete list of all 120 HUMMBL mental models with basic information.",
       inputSchema: z.object({
         transformation_filter: z
           .enum(["P", "IN", "CO", "DE", "RE", "SY"])
@@ -103,7 +102,7 @@ export function registerModelTools(server: McpServer): void {
             definition: z.string(),
             priority: z.number(),
             transformation: z.string(),
-          }),
+          })
         ),
       }),
     },
@@ -116,7 +115,7 @@ export function registerModelTools(server: McpServer): void {
 
       const enriched = models.map((m) => {
         const trans = Object.values(TRANSFORMATIONS).find((t) =>
-          t.models.some((model) => model.code === m.code),
+          t.models.some((model) => model.code === m.code)
         );
 
         return {
@@ -142,7 +141,7 @@ export function registerModelTools(server: McpServer): void {
         ],
         structuredContent: payload,
       } as const;
-    },
+    }
   );
 
   // Tool: Search models
@@ -150,8 +149,7 @@ export function registerModelTools(server: McpServer): void {
     "search_models",
     {
       title: "Search Mental Models",
-      description:
-        "Search HUMMBL mental models by keyword across codes, names, and definitions.",
+      description: "Search HUMMBL mental models by keyword across codes, names, and definitions.",
       inputSchema: z.object({
         query: z.string().min(2).describe("Search query (minimum 2 characters)"),
       }),
@@ -165,7 +163,7 @@ export function registerModelTools(server: McpServer): void {
             definition: z.string(),
             priority: z.number(),
             transformation: z.string(),
-          }),
+          })
         ),
       }),
     },
@@ -174,7 +172,7 @@ export function registerModelTools(server: McpServer): void {
 
       const enriched = results.map((m) => {
         const trans = Object.values(TRANSFORMATIONS).find((t) =>
-          t.models.some((model) => model.code === m.code),
+          t.models.some((model) => model.code === m.code)
         );
         return {
           code: m.code,
@@ -200,7 +198,7 @@ export function registerModelTools(server: McpServer): void {
         ],
         structuredContent: payload,
       } as const;
-    },
+    }
   );
 
   // Tool: Recommend models based on problem description
@@ -208,13 +206,9 @@ export function registerModelTools(server: McpServer): void {
     "recommend_models",
     {
       title: "Recommend Models for Problem",
-      description:
-        "Get recommended mental models based on a natural language problem description.",
+      description: "Get recommended mental models based on a natural language problem description.",
       inputSchema: z.object({
-        problem: z
-          .string()
-          .min(10)
-          .describe("Detailed description of the problem or challenge"),
+        problem: z.string().min(10).describe("Detailed description of the problem or challenge"),
       }),
       outputSchema: z.object({
         problem: z.string(),
@@ -227,7 +221,7 @@ export function registerModelTools(server: McpServer): void {
                 key: z.string(),
                 name: z.string(),
                 description: z.string(),
-              }),
+              })
             ),
             topModels: z.array(
               z.object({
@@ -235,9 +229,9 @@ export function registerModelTools(server: McpServer): void {
                 name: z.string(),
                 definition: z.string(),
                 priority: z.number(),
-              }),
+              })
             ),
-          }),
+          })
         ),
       }),
     },
@@ -249,8 +243,7 @@ export function registerModelTools(server: McpServer): void {
         return patternWords.some((word) => problemLower.includes(word));
       });
 
-      const recommendations =
-        matchedPatterns.length > 0 ? matchedPatterns : PROBLEM_PATTERNS;
+      const recommendations = matchedPatterns.length > 0 ? matchedPatterns : PROBLEM_PATTERNS;
 
       const enrichedRecommendations = recommendations.map((rec) => ({
         pattern: rec.pattern,
@@ -292,7 +285,7 @@ export function registerModelTools(server: McpServer): void {
         ],
         structuredContent: payload,
       } as const;
-    },
+    }
   );
 
   // Tool: Get transformation details
@@ -300,12 +293,9 @@ export function registerModelTools(server: McpServer): void {
     "get_transformation",
     {
       title: "Get Transformation Details",
-      description:
-        "Retrieve detailed information about a specific transformation and its models.",
+      description: "Retrieve detailed information about a specific transformation and its models.",
       inputSchema: z.object({
-        key: z
-          .enum(["P", "IN", "CO", "DE", "RE", "SY"])
-          .describe("Transformation key"),
+        key: z.enum(["P", "IN", "CO", "DE", "RE", "SY"]).describe("Transformation key"),
       }),
       outputSchema: z.object({
         key: z.string(),
@@ -318,7 +308,7 @@ export function registerModelTools(server: McpServer): void {
             name: z.string(),
             definition: z.string(),
             priority: z.number(),
-          }),
+          })
         ),
       }),
     },
@@ -354,7 +344,7 @@ export function registerModelTools(server: McpServer): void {
         ],
         structuredContent: payload,
       } as const;
-    },
+    }
   );
 
   // Tool: Search predefined problem patterns
@@ -365,10 +355,7 @@ export function registerModelTools(server: McpServer): void {
       description:
         "Find predefined HUMMBL problem patterns with recommended transformations and top models.",
       inputSchema: z.object({
-        query: z
-          .string()
-          .min(3)
-          .describe("Problem pattern keyword or description"),
+        query: z.string().min(3).describe("Problem pattern keyword or description"),
       }),
       outputSchema: z.object({
         query: z.string(),
@@ -378,15 +365,13 @@ export function registerModelTools(server: McpServer): void {
             pattern: z.string(),
             transformations: z.array(z.string()),
             topModels: z.array(z.string()),
-          }),
+          })
         ),
       }),
     },
     async ({ query }) => {
       const lower = query.toLowerCase();
-      const patterns = PROBLEM_PATTERNS.filter((p) =>
-        p.pattern.toLowerCase().includes(lower),
-      );
+      const patterns = PROBLEM_PATTERNS.filter((p) => p.pattern.toLowerCase().includes(lower));
 
       const payload = {
         query,
@@ -415,6 +400,6 @@ export function registerModelTools(server: McpServer): void {
         ],
         structuredContent: payload,
       } as const;
-    },
+    }
   );
 }
