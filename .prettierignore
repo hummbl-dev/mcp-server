@@ -1,0 +1,7 @@
+dist
+node_modules
+coverage
+*.config.js
+CHANGELOG.md
+LICENSE
+README.md
