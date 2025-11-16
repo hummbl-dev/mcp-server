@@ -71,5 +71,9 @@
       "prettier --write",
       "eslint --fix"
     ]
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/hummbl-dev/mcp-server/issues"
+  },
+  "homepage": "https://github.com/hummbl-dev/mcp-server#readme"
 }

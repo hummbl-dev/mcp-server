@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/hummbl-dev/mcp-server#readme
+    about: Check our documentation for usage guides
+  - name: Security Issue
+    url: https://github.com/hummbl-dev/mcp-server/security/advisories/new
+    about: Report a security vulnerability privately

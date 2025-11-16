@@ -2,6 +2,10 @@
 
 Model Context Protocol server providing access to the HUMMBL Base120 mental models framework.
 
+[![CI](https://github.com/hummbl-dev/mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/hummbl-dev/mcp-server/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/@hummbl%2Fmcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 <a href="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server/badge" alt="HUMMBL Server MCP server" />
 </a>
