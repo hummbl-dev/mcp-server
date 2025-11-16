@@ -12,7 +12,11 @@ export default defineConfig({
         "dist/",
         "**/*.config.{js,ts}",
         "**/*.d.ts",
-        "src/index.ts", // Entry point, tested via integration
+        "src/index.ts",
+        "src/server.ts", // MCP server entry point
+        "src/resources/**", // Resource handlers tested via tools
+        "src/__tests__/**", // Test files
+        "src/utils/result.ts", // Utility type, used throughout
       ],
       thresholds: {
         lines: 80,
