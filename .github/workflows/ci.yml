@@ -22,12 +22,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: ${{ matrix.node-version != '22.x' && 'npm' || '' }}
+          cache: "npm"
+          cache-dependency-path: package-lock.json
 
       - name: Clean install (Node 22.x workaround for Rollup)
         if: matrix.node-version == '22.x'
         run: |
-          rm -rf node_modules package-lock.json
+          rm -rf node_modules
           npm cache clean --force
           npm install --force
 
