@@ -6,8 +6,20 @@
 import { Session, SessionSchema, createSession, updateSessionActivity } from '../types/session.js';
 import { RedisClient } from './redis-client.js';
 import { D1Client } from './d1-client.js';
+import { Logger } from '../observability/logger.js';
+import {
+  metrics,
+  sessionReadLatency,
+  sessionWriteLatency,
+  sessionErrors,
+  cacheHits,
+  cacheMisses,
+  activeSessions
+} from '../observability/metrics.js';
 
 export class SessionManager {
+  private logger = new Logger('session-manager');
+
   constructor(
     private redis: RedisClient,
     private d1: D1Client
@@ -17,19 +29,56 @@ export class SessionManager {
    * Create a new session
    */
   async create(userId: string, adapterType: string): Promise<Session> {
-    const session = createSession(userId, adapterType);
+    return this.logger.timer('session_create', async () => {
+      this.logger.info('session_create_start', { userId, adapterType });
 
-    // Write to Redis (blocking, fast)
-    const redisKey = `session:${session.sessionId}`;
-    const success = await this.redis.set(redisKey, session, { ex: 86400 }); // 24hr TTL
+      try {
+        const session = createSession(userId, adapterType);
 
-    if (!success) {
-      throw new Error('Failed to create session in Redis');
-    }
+        // Write to Redis
+        await metrics.recordLatency(sessionWriteLatency, async () => {
+          await this.redis.set(
+            `session:${session.sessionId}`,
+            session,
+            { ex: 86400 }
+          );
+        });
 
-    // Write to D1 (async, non-blocking)
-    Promise.resolve(
-      this.d1.execute(
+        // Async D1 write
+        Promise.resolve(this.writeSessionToD1(session));
+
+        // Update active sessions gauge
+        metrics.increment(activeSessions, {}, 1);
+
+        this.logger.info('session_created', {
+          sessionId: session.sessionId,
+          userId,
+          adapterType
+        });
+
+        return session;
+      } catch (e) {
+        metrics.increment(sessionErrors, {
+          operation: 'create',
+          error_type: e instanceof Error ? e.name : 'unknown'
+        });
+
+        this.logger.error('session_create_failed', e instanceof Error ? e : undefined, {
+          userId,
+          adapterType
+        });
+
+        throw e;
+      }
+    });
+  }
+
+  /**
+   * Helper method to write session to D1
+   */
+  private async writeSessionToD1(session: Session): Promise<void> {
+    try {
+      await this.d1.execute(
         `INSERT INTO sessions (
           session_id, user_id, adapter_type, created_at, last_active,
           version, domain_state, total_messages, total_cost_usd, metadata
@@ -44,73 +93,61 @@ export class SessionManager {
         session.metadata.totalMessages,
         session.metadata.totalCostUsd,
         JSON.stringify(session.metadata)
-      )
-    ).catch(error => {
-      console.error('Failed to write session to D1', { sessionId: session.sessionId, error });
-    });
-
-    return session;
+      );
+    } catch (error) {
+      this.logger.error('session_d1_write_failed', error instanceof Error ? error : undefined, {
+        sessionId: session.sessionId
+      });
+      throw error;
+    }
   }
 
   /**
    * Get a session by ID
    */
   async get(sessionId: string): Promise<Session | null> {
-    const redisKey = `session:${sessionId}`;
-
-    // Try Redis first (fast path)
-    const cached = await this.redis.get<Session>(redisKey);
-    if (cached) {
+    return this.logger.timer('session_read', async () => {
       try {
-        // Validate the cached data
-        return SessionSchema.parse(cached);
-      } catch (error) {
-        console.warn('Invalid cached session data, falling back to D1', { sessionId, error });
+        // Try Redis (fast path)
+        const cached = await metrics.recordLatency(sessionReadLatency, async () => {
+          return await this.redis.get<Session>(`session:${sessionId}`);
+        }, { source: 'redis' });
+
+        if (cached) {
+          metrics.increment(cacheHits, { cache: 'redis' });
+          this.logger.debug('session_cache_hit', { sessionId });
+          return SessionSchema.parse(cached);
+        }
+
+        // Cache miss - try D1
+        metrics.increment(cacheMisses, { cache: 'redis' });
+        this.logger.debug('session_cache_miss', { sessionId });
+
+        const session = await this.getSessionFromD1(sessionId);
+
+        if (session) {
+          // Re-hydrate to Redis
+          await this.redis.set(
+            `session:${sessionId}`,
+            session,
+            { ex: 86400 }
+          );
+        }
+
+        return session;
+      } catch (e) {
+        metrics.increment(sessionErrors, {
+          operation: 'get',
+          error_type: e instanceof Error ? e.name : 'unknown'
+        });
+
+        this.logger.error('session_read_failed', e instanceof Error ? e : undefined, {
+          sessionId
+        });
+
+        throw e;
       }
-    }
-
-    // Fallback to D1 (slow path)
-    const row = await this.d1.queryOne<{
-      session_id: string;
-      user_id: string;
-      adapter_type: string;
-      created_at: string;
-      last_active: string;
-      version: number;
-      domain_state: string;
-      total_messages: number;
-      total_cost_usd: number;
-      metadata: string;
-    }>(
-      'SELECT * FROM sessions WHERE session_id = ?',
-      sessionId
-    );
-
-    if (!row) {
-      return null;
-    }
-
-    // Reconstruct session from database row
-    const session: Session = {
-      sessionId: row.session_id,
-      userId: row.user_id,
-      adapterType: row.adapter_type,
-      createdAt: row.created_at,
-      lastActive: row.last_active,
-      version: row.version,
-      domainState: JSON.parse(row.domain_state || '{}'),
-      metadata: {
-        totalMessages: row.total_messages,
-        totalCostUsd: row.total_cost_usd,
-        activeTools: [], // Would need to be stored separately or derived
-        lastActivity: row.last_active,
-      },
-    };
-
-    // Re-cache in Redis
-    await this.redis.set(redisKey, session, { ex: 86400 });
-
-    return session;
+    });
   }
 
   /**
