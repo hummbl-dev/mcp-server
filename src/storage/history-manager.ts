@@ -355,7 +355,6 @@ export class HistoryManager {
    * Reserved for future compression implementation
    */
   // @ts-expect-error - Unused method, reserved for future compression implementation
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private async _decompressMessage(_compressed: string): Promise<Message> {
     // TODO: Implement decompression
     return JSON.parse(_compressed);
