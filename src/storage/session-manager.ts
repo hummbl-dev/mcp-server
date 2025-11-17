@@ -64,7 +64,13 @@ export class SessionManager {
         }
 
         // Write to D1 (async, non-blocking)
-        this.writeSessionToD1(session);
+        this.writeSessionToD1(session).catch((error) => {
+          // Silently handle errors from fire-and-forget D1 write
+          this.logger.error("Unhandled error in fire-and-forget D1 write", {
+            sessionId: session.sessionId,
+            error,
+          });
+        });
 
         sessionCreateCounter.increment({ result: "success" });
         sessionCreateDuration.observe(redisDuration, { result: "success" });
