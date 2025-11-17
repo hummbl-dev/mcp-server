@@ -1,35 +1,97 @@
 /**
  * Session manager for MCP server state persistence
  * Ported from Python Phase 1C session_manager.py
+ * Phase 1D: Added observability instrumentation
  */
 
-import { Session, SessionSchema, createSession, updateSessionActivity } from '../types/session.js';
-import { RedisClient } from './redis-client.js';
-import { D1Client } from './d1-client.js';
+import type { Session } from "../types/session.js";
+import { SessionSchema, createSession, updateSessionActivity } from "../types/session.js";
+import { RedisClient } from "./redis-client.js";
+import { D1Client } from "./d1-client.js";
+import { Logger } from "../observability/logger.js";
+import {
+  sessionCreateCounter,
+  sessionCreateDuration,
+  sessionGetCounter,
+  sessionGetDuration,
+  sessionUpdateCounter,
+  sessionEndCounter,
+  cacheHitCounter,
+  cacheMissCounter,
+  activeSessionsGauge,
+  d1WriteCounter,
+  d1ReadCounter,
+} from "../observability/metrics.js";
+import { trace } from "../observability/tracing.js";
 
 export class SessionManager {
   constructor(
     private redis: RedisClient,
-    private d1: D1Client
+    private d1: D1Client,
+    private logger: Logger = new Logger()
   ) {}
 
   /**
-   * Create a new session
+   * Create a new session with observability instrumentation
    */
+  @trace("session.create")
   async create(userId: string, adapterType: string): Promise<Session> {
-    const session = createSession(userId, adapterType);
+    return this.logger.timer("session.create", { userId, adapterType }, async () => {
+      const session = createSession(userId, adapterType);
 
-    // Write to Redis (blocking, fast)
-    const redisKey = `session:${session.sessionId}`;
-    const success = await this.redis.set(redisKey, session, { ex: 86400 }); // 24hr TTL
+      this.logger.info("Creating new session", {
+        sessionId: session.sessionId,
+        userId,
+        adapterType,
+      });
 
-    if (!success) {
-      throw new Error('Failed to create session in Redis');
-    }
+      try {
+        // Write to Redis (blocking, fast)
+        const redisKey = `session:${session.sessionId}`;
+        const startTime = Date.now();
+        const success = await this.redis.set(redisKey, session, { ex: 86400 }); // 24hr TTL
+        const redisDuration = Date.now() - startTime;
 
-    // Write to D1 (async, non-blocking)
-    Promise.resolve(
-      this.d1.execute(
+        if (!success) {
+          this.logger.error("Failed to create session in Redis", { sessionId: session.sessionId });
+          sessionCreateCounter.increment({ result: "redis_error" });
+          sessionCreateDuration.observe(redisDuration, { result: "redis_error" });
+          // Continue with D1 write - Redis failure is not fatal
+        } else {
+          // Update active sessions gauge only if Redis succeeded
+          activeSessionsGauge.increment();
+        }
+
+        // Write to D1 (async, non-blocking)
+        this.writeSessionToD1(session);
+
+        sessionCreateCounter.increment({ result: "success" });
+        sessionCreateDuration.observe(redisDuration, { result: "success" });
+
+        this.logger.info("Session created successfully", {
+          sessionId: session.sessionId,
+          duration: redisDuration,
+        });
+
+        return session;
+      } catch (error) {
+        sessionCreateCounter.increment({ result: "error" });
+        this.logger.error(
+          "Failed to create session",
+          { sessionId: session.sessionId },
+          error as Error
+        );
+        throw error;
+      }
+    });
+  }
+
+  /**
+   * Helper method to write session to D1 with observability
+   */
+  private async writeSessionToD1(session: Session): Promise<void> {
+    try {
+      await this.d1.execute(
         `INSERT INTO sessions (
           session_id, user_id, adapter_type, created_at, last_active,
           version, domain_state, total_messages, total_cost_usd, metadata
@@ -44,173 +106,301 @@ export class SessionManager {
         session.metadata.totalMessages,
         session.metadata.totalCostUsd,
         JSON.stringify(session.metadata)
-      )
-    ).catch(error => {
-      console.error('Failed to write session to D1', { sessionId: session.sessionId, error });
-    });
-
-    return session;
+      );
+      d1WriteCounter.increment({ table: "sessions", result: "success" });
+    } catch (error) {
+      d1WriteCounter.increment({ table: "sessions", result: "error" });
+      this.logger.error(
+        "Failed to write session to D1",
+        { sessionId: session.sessionId },
+        error as Error
+      );
+      throw error;
+    }
   }
 
   /**
-   * Get a session by ID
+   * Get a session by ID with observability instrumentation
    */
+  @trace("session.get")
   async get(sessionId: string): Promise<Session | null> {
-    const redisKey = `session:${sessionId}`;
+    return this.logger.timer("session.get", { sessionId }, async () => {
+      const redisKey = `session:${sessionId}`;
 
-    // Try Redis first (fast path)
-    const cached = await this.redis.get<Session>(redisKey);
-    if (cached) {
+      this.logger.debug("Retrieving session", { sessionId });
+
       try {
-        // Validate the cached data
-        return SessionSchema.parse(cached);
+        // Try Redis first (fast path)
+        const startTime = Date.now();
+        let cached: Session | null = null;
+        let redisDuration = 0;
+        try {
+          cached = await this.redis.get<Session>(redisKey);
+          redisDuration = Date.now() - startTime;
+        } catch (redisError) {
+          // Redis failure - fall back to D1
+          this.logger.warn("Redis error, falling back to D1", {
+            sessionId,
+            error: (redisError as Error).message,
+          });
+          redisDuration = Date.now() - startTime;
+        }
+
+        if (cached) {
+          try {
+            // Validate the cached data
+            const session = SessionSchema.parse(cached);
+            cacheHitCounter.increment({ operation: "session.get" });
+            sessionGetCounter.increment({ result: "cache_hit" });
+            sessionGetDuration.observe(redisDuration, { result: "cache_hit" });
+
+            this.logger.debug("Session retrieved from cache", {
+              sessionId,
+              duration: redisDuration,
+            });
+
+            return session;
+          } catch (error) {
+            this.logger.warn("Invalid cached session data, falling back to D1", {
+              sessionId,
+              error: (error as Error).message,
+            });
+          }
+        }
+
+        // Cache miss - fallback to D1 (slow path)
+        cacheMissCounter.increment({ operation: "session.get" });
+        const d1StartTime = Date.now();
+
+        const row = await this.d1.queryOne<{
+          session_id: string;
+          user_id: string;
+          adapter_type: string;
+          created_at: string;
+          last_active: string;
+          version: number;
+          domain_state: string;
+          total_messages: number;
+          total_cost_usd: number;
+          metadata: string;
+        }>("SELECT * FROM sessions WHERE session_id = ?", sessionId);
+
+        const d1Duration = Date.now() - d1StartTime;
+        d1ReadCounter.increment({ table: "sessions", result: row ? "success" : "not_found" });
+
+        if (!row) {
+          sessionGetCounter.increment({ result: "not_found" });
+          sessionGetDuration.observe(d1Duration + redisDuration, { result: "not_found" });
+
+          this.logger.info("Session not found", {
+            sessionId,
+            totalDuration: d1Duration + redisDuration,
+          });
+          return null;
+        }
+
+        // Reconstruct session from database row
+        const session: Session = {
+          sessionId: row.session_id,
+          userId: row.user_id,
+          adapterType: row.adapter_type,
+          createdAt: row.created_at,
+          lastActive: row.last_active,
+          version: row.version,
+          domainState: JSON.parse(row.domain_state || "{}"),
+          metadata: {
+            totalMessages: row.total_messages,
+            totalCostUsd: row.total_cost_usd,
+            activeTools: [], // Would need to be stored separately or derived
+            lastActivity: row.last_active,
+          },
+        };
+
+        // Re-cache in Redis
+        await this.redis.set(redisKey, session, { ex: 86400 });
+
+        sessionGetCounter.increment({ result: "cache_miss" });
+        sessionGetDuration.observe(d1Duration + redisDuration, { result: "cache_miss" });
+
+        this.logger.info("Session retrieved from database and cached", {
+          sessionId,
+          redisDuration,
+          d1Duration,
+          totalDuration: d1Duration + redisDuration,
+        });
+
+        return session;
       } catch (error) {
-        console.warn('Invalid cached session data, falling back to D1', { sessionId, error });
+        sessionGetCounter.increment({ result: "error" });
+        this.logger.error("Failed to retrieve session", { sessionId }, error as Error);
+        throw error;
       }
-    }
-
-    // Fallback to D1 (slow path)
-    const row = await this.d1.queryOne<{
-      session_id: string;
-      user_id: string;
-      adapter_type: string;
-      created_at: string;
-      last_active: string;
-      version: number;
-      domain_state: string;
-      total_messages: number;
-      total_cost_usd: number;
-      metadata: string;
-    }>(
-      'SELECT * FROM sessions WHERE session_id = ?',
-      sessionId
-    );
-
-    if (!row) {
-      return null;
-    }
-
-    // Reconstruct session from database row
-    const session: Session = {
-      sessionId: row.session_id,
-      userId: row.user_id,
-      adapterType: row.adapter_type,
-      createdAt: row.created_at,
-      lastActive: row.last_active,
-      version: row.version,
-      domainState: JSON.parse(row.domain_state || '{}'),
-      metadata: {
-        totalMessages: row.total_messages,
-        totalCostUsd: row.total_cost_usd,
-        activeTools: [], // Would need to be stored separately or derived
-        lastActivity: row.last_active,
-      },
-    };
-
-    // Re-cache in Redis
-    await this.redis.set(redisKey, session, { ex: 86400 });
-
-    return session;
+    });
   }
 
   /**
-   * Update a session with optimistic locking
+   * Update a session with optimistic locking and observability instrumentation
    */
+  @trace("session.update")
   async update(
     sessionId: string,
     updates: Partial<Session>,
     expectedVersion: number
   ): Promise<boolean> {
-    const redisKey = `session:${sessionId}`;
+    return this.logger.timer("session.update", { sessionId, expectedVersion }, async () => {
+      const redisKey = `session:${sessionId}`;
 
-    // Get current session
-    const currentSession = await this.get(sessionId);
-    if (!currentSession) {
-      return false;
-    }
+      this.logger.debug("Updating session", { sessionId, expectedVersion });
 
-    // Check version (optimistic locking)
-    if (currentSession.version !== expectedVersion) {
-      console.warn('Version conflict in session update', {
-        sessionId,
-        expectedVersion,
-        actualVersion: currentSession.version
-      });
-      return false; // Conflict detected
-    }
+      try {
+        // Get current session
+        const currentSession = await this.get(sessionId);
+        if (!currentSession) {
+          sessionUpdateCounter.increment({ result: "not_found" });
+          this.logger.info("Session not found for update", { sessionId });
+          return false;
+        }
 
-    // Apply updates
-    const updatedSession: Session = {
-      ...currentSession,
-      ...updates,
-      version: currentSession.version + 1,
-      lastActive: new Date().toISOString(),
-    };
+        // Check version (optimistic locking)
+        if (currentSession.version !== expectedVersion) {
+          sessionUpdateCounter.increment({ result: "version_conflict" });
+          this.logger.warn("Version conflict in session update", {
+            sessionId,
+            expectedVersion,
+            actualVersion: currentSession.version,
+          });
+          return false; // Conflict detected
+        }
 
-    // Update Redis (blocking)
-    const success = await this.redis.set(redisKey, updatedSession, { ex: 86400 });
-    if (!success) {
-      return false;
-    }
+        // Apply updates
+        const updatedSession: Session = {
+          ...currentSession,
+          ...updates,
+          version: currentSession.version + 1,
+          lastActive: new Date().toISOString(),
+        };
 
-    // Update D1 (async)
-    Promise.resolve(
-      this.d1.execute(
-        `UPDATE sessions SET
-          last_active = ?, version = ?, domain_state = ?,
-          total_messages = ?, total_cost_usd = ?, metadata = ?
-         WHERE session_id = ? AND version = ?`,
-        updatedSession.lastActive,
-        updatedSession.version,
-        JSON.stringify(updatedSession.domainState),
-        updatedSession.metadata.totalMessages,
-        updatedSession.metadata.totalCostUsd,
-        JSON.stringify(updatedSession.metadata),
-        sessionId,
-        expectedVersion
-      )
-    ).catch(error => {
-      console.error('Failed to update session in D1', { sessionId, error });
+        // Update Redis (blocking)
+        const redisStartTime = Date.now();
+        const success = await this.redis.set(redisKey, updatedSession, { ex: 86400 });
+        const redisDuration = Date.now() - redisStartTime;
+
+        if (!success) {
+          sessionUpdateCounter.increment({ result: "redis_error" });
+          this.logger.error("Failed to update session in Redis", { sessionId });
+          return false;
+        }
+
+        // Update D1 (async)
+        Promise.resolve(
+          this.d1.execute(
+            `UPDATE sessions SET
+              last_active = ?, version = ?, domain_state = ?,
+              total_messages = ?, total_cost_usd = ?, metadata = ?
+             WHERE session_id = ? AND version = ?`,
+            updatedSession.lastActive,
+            updatedSession.version,
+            JSON.stringify(updatedSession.domainState),
+            updatedSession.metadata.totalMessages,
+            updatedSession.metadata.totalCostUsd,
+            JSON.stringify(updatedSession.metadata),
+            sessionId,
+            expectedVersion
+          )
+        )
+          .then(() => {
+            d1WriteCounter.increment({ table: "sessions", result: "success" });
+          })
+          .catch((error) => {
+            d1WriteCounter.increment({ table: "sessions", result: "error" });
+            this.logger.error("Failed to update session in D1", { sessionId }, error as Error);
+          });
+
+        sessionUpdateCounter.increment({ result: "success" });
+        this.logger.info("Session updated successfully", {
+          sessionId,
+          newVersion: updatedSession.version,
+          redisDuration,
+        });
+
+        return true;
+      } catch (error) {
+        sessionUpdateCounter.increment({ result: "error" });
+        this.logger.error(
+          "Failed to update session",
+          { sessionId, expectedVersion },
+          error as Error
+        );
+        throw error;
+      }
     });
-
-    return true;
   }
 
   /**
-   * End a session (mark as inactive)
+   * End a session (mark as inactive) with observability instrumentation
    */
+  @trace("session.end")
   async end(sessionId: string): Promise<boolean> {
-    const redisKey = `session:${sessionId}`;
+    return this.logger.timer("session.end", { sessionId }, async () => {
+      const redisKey = `session:${sessionId}`;
 
-    // Get current session
-    const session = await this.get(sessionId);
-    if (!session) {
-      return false;
-    }
+      this.logger.debug("Ending session", { sessionId });
 
-    // Update with ended status
-    const endedSession = updateSessionActivity(session);
+      try {
+        // Get current session
+        const session = await this.get(sessionId);
+        if (!session) {
+          sessionEndCounter.increment({ result: "not_found" });
+          this.logger.info("Session not found for ending", { sessionId });
+          return false;
+        }
 
-    // Update Redis
-    const success = await this.redis.set(redisKey, endedSession, { ex: 3600 }); // 1hr TTL
-    if (!success) {
-      return false;
-    }
+        // Update with ended status
+        const endedSession = updateSessionActivity(session);
 
-    // Update D1
-    try {
-      await this.d1.execute(
-        'UPDATE sessions SET last_active = ?, metadata = ? WHERE session_id = ?',
-        endedSession.lastActive,
-        JSON.stringify(endedSession.metadata),
-        sessionId
-      );
-    } catch (error) {
-      console.error('Failed to end session in D1', { sessionId, error });
-      return false;
-    }
+        // Update Redis
+        const redisStartTime = Date.now();
+        const success = await this.redis.set(redisKey, endedSession, { ex: 3600 }); // 1hr TTL
+        const redisDuration = Date.now() - redisStartTime;
 
-    return true;
+        if (!success) {
+          sessionEndCounter.increment({ result: "redis_error" });
+          this.logger.error("Failed to end session in Redis", { sessionId });
+          return false;
+        }
+
+        // Update D1
+        try {
+          await this.d1.execute(
+            "UPDATE sessions SET last_active = ?, metadata = ? WHERE session_id = ?",
+            endedSession.lastActive,
+            JSON.stringify(endedSession.metadata),
+            sessionId
+          );
+          d1WriteCounter.increment({ table: "sessions", result: "success" });
+
+          // Update active sessions gauge
+          activeSessionsGauge.decrement();
+
+          sessionEndCounter.increment({ result: "success" });
+          this.logger.info("Session ended successfully", {
+            sessionId,
+            redisDuration,
+          });
+
+          return true;
+        } catch (error) {
+          d1WriteCounter.increment({ table: "sessions", result: "error" });
+          sessionEndCounter.increment({ result: "d1_error" });
+          this.logger.error("Failed to end session in D1", { sessionId }, error as Error);
+          return false;
+        }
+      } catch (error) {
+        sessionEndCounter.increment({ result: "error" });
+        this.logger.error("Failed to end session", { sessionId }, error as Error);
+        throw error;
+      }
+    });
   }
 
   /**

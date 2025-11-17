@@ -3,7 +3,7 @@
  * Ported from Python Phase 1C redis_client.py
  */
 
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 
 export class RedisClient {
   private client: Redis;
@@ -25,7 +25,7 @@ export class RedisClient {
       const result = await this.client.get<T>(key);
       return result;
     } catch (error) {
-      console.error('Redis GET failed', { key, error });
+      console.error("Redis GET failed", { key, error });
       return null;
     }
   }
@@ -33,11 +33,7 @@ export class RedisClient {
   /**
    * Set a value in Redis with optional expiration
    */
-  async set(
-    key: string,
-    value: unknown,
-    options?: { ex: number }
-  ): Promise<boolean> {
+  async set(key: string, value: unknown, options?: { ex: number }): Promise<boolean> {
     try {
       if (options?.ex) {
         await this.client.setex(key, options.ex, value);
@@ -46,7 +42,7 @@ export class RedisClient {
       }
       return true;
     } catch (error) {
-      console.error('Redis SET failed', { key, error });
+      console.error("Redis SET failed", { key, error });
       return false;
     }
   }
@@ -59,7 +55,7 @@ export class RedisClient {
       await this.client.del(key);
       return true;
     } catch (error) {
-      console.error('Redis DEL failed', { key, error });
+      console.error("Redis DEL failed", { key, error });
       return false;
     }
   }
@@ -72,7 +68,7 @@ export class RedisClient {
       await this.client.rpush(key, value);
       return true;
     } catch (error) {
-      console.error('Redis RPUSH failed', { key, error });
+      console.error("Redis RPUSH failed", { key, error });
       return false;
     }
   }
@@ -85,7 +81,7 @@ export class RedisClient {
       const result = await this.client.lrange<T>(key, start, end);
       return result;
     } catch (error) {
-      console.error('Redis LRANGE failed', { key, error });
+      console.error("Redis LRANGE failed", { key, error });
       return [];
     }
   }
@@ -98,7 +94,7 @@ export class RedisClient {
       await this.client.ltrim(key, start, end);
       return true;
     } catch (error) {
-      console.error('Redis LTRIM failed', { key, error });
+      console.error("Redis LTRIM failed", { key, error });
       return false;
     }
   }
@@ -111,7 +107,7 @@ export class RedisClient {
       await this.client.expire(key, seconds);
       return true;
     } catch (error) {
-      console.error('Redis EXPIRE failed', { key, error });
+      console.error("Redis EXPIRE failed", { key, error });
       return false;
     }
   }
@@ -124,7 +120,7 @@ export class RedisClient {
       const result = await this.client.exists(key);
       return result === 1;
     } catch (error) {
-      console.error('Redis EXISTS failed', { key, error });
+      console.error("Redis EXISTS failed", { key, error });
       return false;
     }
   }
@@ -137,7 +133,7 @@ export class RedisClient {
       const result = await this.client.ttl(key);
       return result;
     } catch (error) {
-      console.error('Redis TTL failed', { key, error });
+      console.error("Redis TTL failed", { key, error });
       return -1;
     }
   }

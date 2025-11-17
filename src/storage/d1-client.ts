@@ -59,13 +59,16 @@ export class D1Client {
    */
   async execute(sql: string, ...params: unknown[]): Promise<number> {
     try {
-      const result = await this.db.prepare(sql).bind(...params).run();
+      const result = await this.db
+        .prepare(sql)
+        .bind(...params)
+        .run();
       if (!result.success) {
-        throw new Error(result.error || 'D1 execution failed');
+        throw new Error(result.error || "D1 execution failed");
       }
       return result.meta.changes;
     } catch (error) {
-      console.error('D1 EXECUTE failed', { sql, params, error });
+      console.error("D1 EXECUTE failed", { sql, params, error });
       throw error;
     }
   }
@@ -75,13 +78,16 @@ export class D1Client {
    */
   async query<T>(sql: string, ...params: unknown[]): Promise<T[]> {
     try {
-      const result = await this.db.prepare(sql).bind(...params).all<T>();
+      const result = await this.db
+        .prepare(sql)
+        .bind(...params)
+        .all<T>();
       if (!result.success) {
-        throw new Error(result.error || 'D1 query failed');
+        throw new Error(result.error || "D1 query failed");
       }
       return result.results as T[];
     } catch (error) {
-      console.error('D1 QUERY failed', { sql, params, error });
+      console.error("D1 QUERY failed", { sql, params, error });
       throw error;
     }
   }
@@ -91,10 +97,13 @@ export class D1Client {
    */
   async queryOne<T>(sql: string, ...params: unknown[]): Promise<T | null> {
     try {
-      const result = await this.db.prepare(sql).bind(...params).first<T>();
+      const result = await this.db
+        .prepare(sql)
+        .bind(...params)
+        .first<T>();
       return result as T | null;
     } catch (error) {
-      console.error('D1 QUERY_ONE failed', { sql, params, error });
+      console.error("D1 QUERY_ONE failed", { sql, params, error });
       throw error;
     }
   }
@@ -104,17 +113,15 @@ export class D1Client {
    */
   async transaction(queries: Array<{ sql: string; params: unknown[] }>): Promise<boolean> {
     try {
-      const statements = queries.map(q =>
-        this.db.prepare(q.sql).bind(...q.params)
-      );
+      const statements = queries.map((q) => this.db.prepare(q.sql).bind(...q.params));
 
       const result = await this.db.batch(statements);
       if (!result.success) {
-        throw new Error(result.error || 'D1 transaction failed');
+        throw new Error(result.error || "D1 transaction failed");
       }
       return true;
     } catch (error) {
-      console.error('D1 TRANSACTION failed', { queries, error });
+      console.error("D1 TRANSACTION failed", { queries, error });
       return false;
     }
   }
@@ -164,9 +171,9 @@ export class D1Client {
     for (const migration of migrations) {
       try {
         await this.execute(migration);
-        console.log('Migration executed:', migration.split('\n')[0]);
+        console.log("Migration executed:", migration.split("\n")[0]);
       } catch (error) {
-        console.error('Migration failed:', migration, error);
+        console.error("Migration failed:", migration, error);
         throw error;
       }
     }
