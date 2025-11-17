@@ -24,7 +24,14 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
+      - name: Clean install (Node 22.x workaround for Rollup)
+        if: matrix.node-version == '22.x'
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install --force
+
       - name: Install dependencies
+        if: matrix.node-version != '22.x'
         run: npm ci
 
       - name: Run type checking
