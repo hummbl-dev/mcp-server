@@ -42,16 +42,18 @@ export function trace(
   operationName: string,
   attributes?: Record<string, string | number | boolean>
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return function (target: any, propertyKey: string, descriptor?: PropertyDescriptor) {
+  return function (
+    target: object,
+    propertyKey: string | symbol,
+    descriptor?: PropertyDescriptor
+  ): PropertyDescriptor | void {
     if (!descriptor || !descriptor.value) {
       return descriptor;
     }
     const originalMethod = descriptor.value;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    descriptor.value = async function (...args: any[]) {
-      const spanName = `${target.constructor.name}.${propertyKey}`;
+    descriptor.value = async function (this: object, ...args: unknown[]) {
+      const spanName = `${target.constructor.name}.${String(propertyKey)}`;
 
       return tracer.startActiveSpan(spanName, async (span: Span) => {
         try {
@@ -66,7 +68,7 @@ export function trace(
           }
 
           // Add method arguments as span attributes (safely)
-          span.setAttribute("method.name", propertyKey);
+          span.setAttribute("method.name", String(propertyKey));
           span.setAttribute("method.class", target.constructor.name);
 
           // If first arg looks like an ID, add it
@@ -75,9 +77,9 @@ export function trace(
               span.setAttribute("resource.id", args[0]);
             } else if (typeof args[0] === "object" && args[0] !== null) {
               // Add object keys as attributes (limited to avoid bloat)
-              const objKeys = Object.keys(args[0]).slice(0, 5);
+              const objKeys = Object.keys(args[0] as Record<string, unknown>).slice(0, 5);
               for (const key of objKeys) {
-                const value = args[0][key];
+                const value = (args[0] as Record<string, unknown>)[key];
                 if (typeof value === "string" && value.length < 50) {
                   span.setAttribute(`arg.${key}`, value);
                 } else if (typeof value === "number" || typeof value === "boolean") {

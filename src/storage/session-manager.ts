@@ -34,7 +34,6 @@ export class SessionManager {
   /**
    * Create a new session with observability instrumentation
    */
-  // @ts-expect-error - Decorator type compatibility issue with TypeScript 5.x
   @trace("session.create")
   async create(userId: string, adapterType: string): Promise<Session> {
     return this.logger.timer("session.create", { userId, adapterType }, async () => {
@@ -129,7 +128,6 @@ export class SessionManager {
   /**
    * Get a session by ID with observability instrumentation
    */
-  // @ts-expect-error - Decorator type compatibility issue with TypeScript 5.x
   @trace("session.get")
   async get(sessionId: string): Promise<Session | null> {
     return this.logger.timer("session.get", { sessionId }, async () => {
@@ -249,7 +247,6 @@ export class SessionManager {
   /**
    * Update a session with optimistic locking and observability instrumentation
    */
-  // @ts-expect-error - Decorator type compatibility issue with TypeScript 5.x
   @trace("session.update")
   async update(
     sessionId: string,
@@ -348,7 +345,6 @@ export class SessionManager {
   /**
    * End a session (mark as inactive) with observability instrumentation
    */
-  // @ts-expect-error - Decorator type compatibility issue with TypeScript 5.x
   @trace("session.end")
   async end(sessionId: string): Promise<boolean> {
     return this.logger.timer("session.end", { sessionId }, async () => {

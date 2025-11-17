@@ -27,8 +27,7 @@ interface LogContext {
   userId?: string;
   sessionId?: string;
   operation?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface LogEntry {
@@ -98,9 +97,7 @@ export class Logger {
     fn?: () => T
   ): T {
     const context = typeof contextOrFn === "function" ? {} : contextOrFn;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const callback = typeof contextOrFn === "function" ? contextOrFn : fn!;
+    const callback = typeof contextOrFn === "function" ? contextOrFn : (fn ?? (() => ({}) as T));
 
     context.correlationId = correlationId;
     const currentContext = this.getCurrentContext();
@@ -113,8 +110,7 @@ export class Logger {
   timer<T>(operation: string, context: Partial<LogContext>, fn: () => T): T;
   timer<T>(operation: string, contextOrFn: Partial<LogContext> | (() => T), fn?: () => T): T {
     const context = typeof contextOrFn === "function" ? {} : contextOrFn;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const callback = typeof contextOrFn === "function" ? contextOrFn : fn!;
+    const callback = typeof contextOrFn === "function" ? contextOrFn : (fn ?? (() => ({}) as T));
 
     const startTime = Date.now();
     const currentContext = this.getCurrentContext();
