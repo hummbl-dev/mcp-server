@@ -27,6 +27,7 @@ interface LogContext {
   userId?: string;
   sessionId?: string;
   operation?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -72,9 +73,11 @@ export class Logger {
         console.warn(formatted);
         break;
       case "debug":
+        // eslint-disable-next-line no-console
         console.debug(formatted);
         break;
       default:
+        // eslint-disable-next-line no-console
         console.log(formatted);
     }
   }
@@ -95,6 +98,8 @@ export class Logger {
     fn?: () => T
   ): T {
     const context = typeof contextOrFn === "function" ? {} : contextOrFn;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const callback = typeof contextOrFn === "function" ? contextOrFn : fn!;
 
     context.correlationId = correlationId;
@@ -108,6 +113,7 @@ export class Logger {
   timer<T>(operation: string, context: Partial<LogContext>, fn: () => T): T;
   timer<T>(operation: string, contextOrFn: Partial<LogContext> | (() => T), fn?: () => T): T {
     const context = typeof contextOrFn === "function" ? {} : contextOrFn;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const callback = typeof contextOrFn === "function" ? contextOrFn : fn!;
 
     const startTime = Date.now();

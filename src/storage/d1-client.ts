@@ -171,6 +171,7 @@ export class D1Client {
     for (const migration of migrations) {
       try {
         await this.execute(migration);
+        // eslint-disable-next-line no-console
         console.log("Migration executed:", migration.split("\n")[0]);
       } catch (error) {
         console.error("Migration failed:", migration, error);

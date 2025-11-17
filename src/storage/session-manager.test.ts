@@ -175,7 +175,12 @@ describe("SessionManager", () => {
   describe("updateSession", () => {
     it("should update session successfully", async () => {
       const session = createSession("user123", "discord");
-      const updates = { metadata: { key: "value" } };
+      const updates = {
+        metadata: {
+          ...session.metadata,
+          clientInfo: { key: "value" },
+        },
+      };
 
       vi.spyOn(redisClient, "get").mockResolvedValue(session);
       vi.spyOn(d1Client, "execute").mockResolvedValue(1);
@@ -204,7 +209,12 @@ describe("SessionManager", () => {
 
       await sessionManager.update(
         session.sessionId,
-        { metadata: { updated: true } },
+        {
+          metadata: {
+            ...session.metadata,
+            clientInfo: { updated: true },
+          },
+        },
         session.version
       );
 

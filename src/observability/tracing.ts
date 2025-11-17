@@ -42,12 +42,14 @@ export function trace(
   operationName: string,
   attributes?: Record<string, string | number | boolean>
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function (target: any, propertyKey: string, descriptor?: PropertyDescriptor) {
     if (!descriptor || !descriptor.value) {
-      return;
+      return descriptor;
     }
     const originalMethod = descriptor.value;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     descriptor.value = async function (...args: any[]) {
       const spanName = `${target.constructor.name}.${propertyKey}`;
 

@@ -24,9 +24,9 @@ export class Counter {
   private values: MetricValue[] = [];
 
   constructor(
-    private _name: string,
-    public _help: string,
-    private _labels: string[] = []
+    public readonly _name: string,
+    public readonly _help: string,
+    public readonly _labels: string[] = []
   ) {}
 
   increment(labels?: Record<string, string>): void {
@@ -59,9 +59,9 @@ export class Gauge {
   private labels?: Record<string, string>;
 
   constructor(
-    private _name: string,
-    public _help: string,
-    private _labelNames: string[] = []
+    public readonly _name: string,
+    public readonly _help: string,
+    public readonly _labelNames: string[] = []
   ) {}
 
   set(value: number, labels?: Record<string, string>): void {
@@ -98,9 +98,9 @@ export class Histogram {
   private buckets: number[];
 
   constructor(
-    private _name: string,
-    private _help: string,
-    private _labelNames: string[] = [],
+    public readonly _name: string,
+    public readonly _help: string,
+    public readonly _labelNames: string[] = [],
     buckets: number[] = [0.1, 0.5, 1, 2.5, 5, 10]
   ) {
     this.buckets = buckets;
