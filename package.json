@@ -57,7 +57,7 @@
     "@opentelemetry/semantic-conventions": "^1.38.0",
     "@upstash/redis": "^1.35.6",
     "nanoid": "^5.1.6",
-    "zod": "^3.25.76"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251117.0",
