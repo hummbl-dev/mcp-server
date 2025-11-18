@@ -25,6 +25,8 @@ jobs:
           cache: "npm"
           cache-dependency-path: package-lock.json
 
+      # Workaround for Rollup native dependency issue on Node.js 22.x
+      # See: https://github.com/npm/cli/issues/4828
       - name: Clean install (Node 22.x workaround for Rollup)
         if: matrix.node-version == '22.x'
         run: |
