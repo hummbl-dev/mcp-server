@@ -22,8 +22,7 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: ${{ matrix.node-version != '22.x' && 'npm' || '' }}
-          cache-dependency-path: ${{ matrix.node-version != '22.x' && 'package-lock.json' || '' }}
+          ${{ matrix.node-version != '22.x' && format('cache: npm\n          cache-dependency-path: package-lock.json') || '' }}
 
       # Workaround for Rollup native dependency issue on Node.js 22.x
       # See: https://github.com/npm/cli/issues/4828
@@ -33,6 +32,7 @@ jobs:
         run: |
           rm -rf node_modules package-lock.json
           npm cache clean --force
+          npm install --force --package-lock-only
           npm install --force
 
       - name: Install dependencies
