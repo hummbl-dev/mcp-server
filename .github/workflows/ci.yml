@@ -18,11 +18,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js ${{ matrix.node-version }} (with cache)
+        if: matrix.node-version != '22.x'
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          ${{ matrix.node-version != '22.x' && format('cache: npm\n          cache-dependency-path: package-lock.json') || '' }}
+          cache: "npm"
+          cache-dependency-path: "package-lock.json"
+
+      - name: Setup Node.js ${{ matrix.node-version }} (no cache)
+        if: matrix.node-version == '22.x'
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
 
       # Workaround for Rollup native dependency issue on Node.js 22.x
       # See: https://github.com/npm/cli/issues/4828
