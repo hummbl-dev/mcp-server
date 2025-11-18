@@ -22,15 +22,16 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
-          cache-dependency-path: package-lock.json
+          cache: ${{ matrix.node-version != '22.x' && 'npm' || '' }}
+          cache-dependency-path: ${{ matrix.node-version != '22.x' && 'package-lock.json' || '' }}
 
       # Workaround for Rollup native dependency issue on Node.js 22.x
       # See: https://github.com/npm/cli/issues/4828
+      # Disable cache and use --force to ensure all optional dependencies are installed
       - name: Clean install (Node 22.x workaround for Rollup)
         if: matrix.node-version == '22.x'
         run: |
-          rm -rf node_modules
+          rm -rf node_modules package-lock.json
           npm cache clean --force
           npm install --force
 
