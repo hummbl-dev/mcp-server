@@ -263,6 +263,45 @@ describe("SessionManager", () => {
 
       expect(result).toBe(false);
     });
+
+    it("returns false when Redis set fails", async () => {
+      const session = createSession("user123", "discord");
+      vi.spyOn(redisClient, "get").mockResolvedValue(session);
+      vi.spyOn(redisClient, "set").mockResolvedValueOnce(false);
+
+      const result = await sessionManager.end(session.sessionId);
+
+      expect(result).toBe(false);
+    });
+
+    it("returns false when D1 update fails", async () => {
+      const session = createSession("user123", "discord");
+      vi.spyOn(redisClient, "get").mockResolvedValue(session);
+      vi.spyOn(d1Client, "execute").mockRejectedValueOnce(new Error("D1 down"));
+
+      const result = await sessionManager.end(session.sessionId);
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe("exists", () => {
+    it("returns false when Redis key missing", async () => {
+      vi.spyOn(redisClient, "exists").mockResolvedValue(false);
+
+      const exists = await sessionManager.exists("missing");
+
+      expect(exists).toBe(false);
+    });
+
+    it("returns true when Redis key exists", async () => {
+      vi.spyOn(redisClient, "exists").mockResolvedValue(true);
+
+      const session = createSession("user123", "discord");
+      const result = await sessionManager.exists(session.sessionId);
+
+      expect(result).toBe(true);
+    });
   });
 
   // Note: listSessions and cleanupExpiredSessions methods don't exist in current implementation

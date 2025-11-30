@@ -14,7 +14,9 @@
   ],
   "scripts": {
     "build": "tsc",
+    "build:api": "tsc --outDir dist --target es2022 --module es2022 --moduleResolution bundler src/api.ts",
     "dev": "tsx src/index.ts",
+    "dev:api": "wrangler dev src/api.ts",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
@@ -28,7 +30,13 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "prepare": "husky",
     "validate": "npm run typecheck && npm run lint && npm run test",
-    "deploy": "wrangler deploy"
+    "deploy": "npm run build:api && wrangler deploy",
+    "deploy:staging": "npm run build:api && wrangler deploy --env staging",
+    "provision": "node scripts/provision-infra.js",
+    "seed": "wrangler d1 execute hummbl-api --file=seed.sql",
+    "create-key": "tsx scripts/create-api-key.ts",
+    "import-relationships": "tsx scripts/import-relationships-csv.ts",
+    "ship": "node scripts/deploy.js"
   },
   "keywords": [
     "mcp",
@@ -56,12 +64,13 @@
     "@opentelemetry/sdk-trace-node": "^2.2.0",
     "@opentelemetry/semantic-conventions": "^1.38.0",
     "@upstash/redis": "^1.35.6",
+    "hono": "^4.6.12",
     "nanoid": "^5.1.6",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251117.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^22.19.1",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.47.0",
     "@vitest/coverage-v8": "^4.0.10",

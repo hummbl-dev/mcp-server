@@ -1,0 +1,36 @@
+name: "Process: Coverage targets & documentation"
+description: "Define and enforce initial coverage thresholds plus documentation"
+title: "[Process] Coverage target definition"
+labels:
+  - process
+  - week1
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Owner**: ChatGPT-5 (product/QA).
+
+        Set coverage thresholds (70% overall, 80% for `src/framework` + `src/tools`), enforce via Vitest/nyc, and document expectations in CONTRIBUTING.md + CI notes.
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      options:
+        - label: Coverage config fails CI below 70% overall
+        - label: Directory-level gate (framework/tools) enforces ≥ 80%
+        - label: CONTRIBUTING.md updated with testing expectations + ratchet plan
+        - label: CI workflow description references coverage gate
+  - type: textarea
+    id: plan
+    attributes:
+      label: Implementation Plan
+      description: Outline steps to update Vitest/nyc config, workflows, and docs.
+      placeholder: "1. Update vitest.config.ts...
+2. Modify workflow ..."
+  - type: input
+    id: pr
+    attributes:
+      label: Tracking PR
+      placeholder: "https://github.com/hummbl-dev/mcp-server/pull/..."
+    validations:
+      required: false

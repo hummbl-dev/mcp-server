@@ -3,10 +3,14 @@
  * Ported from Python Phase 1C d1_client.py
  */
 
-interface D1Database {
-  prepare(query: string): D1PreparedStatement;
-  batch(statements: D1PreparedStatement[]): Promise<D1Batch>;
-}
+import type {
+  SimpleRelationship,
+  RelationshipInput,
+  SimpleRelationshipResult,
+  ModelRelationship,
+  GraphNode,
+  GraphEdge
+} from "../types/relationships.js";
 
 interface D1PreparedStatement {
   bind(...values: unknown[]): D1PreparedStatement;
@@ -42,15 +46,10 @@ interface D1Response {
   };
 }
 
-interface D1Batch {
-  success: boolean;
-  error?: string;
-}
-
 export class D1Client {
-  private db: D1Database;
+  private db: any;
 
-  constructor(db: D1Database) {
+  constructor(db: any) {
     this.db = db;
   }
 
@@ -115,10 +114,9 @@ export class D1Client {
     try {
       const statements = queries.map((q) => this.db.prepare(q.sql).bind(...q.params));
 
-      const result = await this.db.batch(statements);
-      if (!result.success) {
-        throw new Error(result.error || "D1 transaction failed");
-      }
+      await this.db.batch(statements);
+      
+      // If batch completes without throwing, consider it successful
       return true;
     } catch (error) {
       console.error("D1 TRANSACTION failed", { queries, error });
@@ -161,6 +159,20 @@ export class D1Client {
         FOREIGN KEY (session_id) REFERENCES sessions(session_id)
       )`,
 
+      // Mental models table
+      `CREATE TABLE IF NOT EXISTS mental_models (
+        code TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        transformation TEXT NOT NULL,
+        definition TEXT NOT NULL,
+        example TEXT NOT NULL,
+        when_to_use TEXT NOT NULL,
+        how_to_apply TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        version INTEGER NOT NULL DEFAULT 1
+      )`,
+
       // Indexes for performance
       `CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`,
       `CREATE INDEX IF NOT EXISTS idx_sessions_active ON sessions(last_active)`,
@@ -179,4 +191,244 @@ export class D1Client {
       }
     }
   }
+
+  /**
+   * Get enriched mental model data from database
+   */
+  async getMentalModel(code: string) {
+    const sql = `
+      SELECT code, name, transformation, definition, example, when_to_use, how_to_apply
+      FROM mental_models
+      WHERE code = ?
+    `;
+
+    const result = await this.queryOne<{
+      code: string;
+      name: string;
+      transformation: string;
+      definition: string;
+      example: string;
+      when_to_use: string;
+      how_to_apply: string;
+    }>(sql, code);
+
+    if (!result) {
+      return { ok: false, error: { type: "NOT_FOUND", message: `Model ${code} not found in database` } } as const;
+    }
+
+    return { ok: true, value: result } as const;
+  }
+
+  /**
+   * Get relationships for a specific model (simplified)
+   */
+  async getRelationships(code: string): Promise<SimpleRelationshipResult<SimpleRelationship[]>> {
+    try {
+      const sql = `
+        SELECT id, source_code, target_code, relationship_type, confidence, evidence, created_at
+        FROM model_relationships
+        WHERE source_code = ? OR target_code = ?
+        ORDER BY confidence DESC, created_at DESC
+      `;
+
+      const relationships = await this.query(sql, code, code) as SimpleRelationship[];
+      return { ok: true, value: relationships };
+    } catch (error) {
+      return { ok: false, error: `Failed to get relationships: ${error}` };
+    }
+  }
+
+  /**
+   * Create a new relationship (simplified)
+   */
+  async createSimpleRelationship(rel: RelationshipInput): Promise<SimpleRelationshipResult> {
+    try {
+      const sql = `
+        INSERT INTO model_relationships (source_code, target_code, relationship_type, confidence, evidence)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+
+      const result = await this.query(sql, [
+        rel.source_code,
+        rel.target_code,
+        rel.relationship_type,
+        rel.confidence,
+        rel.evidence || null,
+      ]);
+
+      return { ok: true, value: result };
+    } catch (error) {
+      return { ok: false, error: `Failed to create relationship: ${error}` };
+    }
+  }
+
+  /**
+   * Get all relationships with optional filters
+   */
+  async getRelationships(filters?: {
+    model?: string;
+    type?: string;
+    confidence?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<ModelRelationship[]> {
+    try {
+      let whereClause = 'WHERE 1=1';
+      const params: unknown[] = [];
+
+      if (filters?.model) {
+        whereClause += ' AND (source_code = ? OR target_code = ?)';
+        params.push(filters.model, filters.model);
+      }
+
+      if (filters?.type) {
+        whereClause += ' AND relationship_type = ?';
+        params.push(filters.type);
+      }
+
+      if (filters?.confidence) {
+        whereClause += ' AND confidence = ?';
+        params.push(filters.confidence);
+      }
+
+      const limit = filters?.limit || 50;
+      const offset = filters?.offset || 0;
+
+      const sql = `
+        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
+               confidence, evidence as logical_derivation, NULL as has_literature_support,
+               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
+               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
+               NULL as notes, created_at, updated_at
+        FROM model_relationships
+        ${whereClause}
+        ORDER BY confidence DESC, created_at DESC
+        LIMIT ? OFFSET ?
+      `;
+
+      return await this.query(sql, [...params, limit, offset]) as ModelRelationship[];
+    } catch (error) {
+      console.error("Failed to get relationships:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get single relationship by ID
+   */
+  async getRelationship(id: string): Promise<ModelRelationship | null> {
+    try {
+      const sql = `
+        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
+               confidence, evidence as logical_derivation, NULL as has_literature_support,
+               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
+               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
+               NULL as notes, created_at, updated_at
+        FROM model_relationships
+        WHERE id = ?
+      `;
+
+      const results = await this.query(sql, id) as ModelRelationship[];
+      return results.length > 0 ? results[0] : null;
+    } catch (error) {
+      console.error("Failed to get relationship:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get all relationships for a specific model
+   */
+  async getRelationshipsForModel(code: string): Promise<ModelRelationship[]> {
+    return this.getRelationships({ model: code });
+  }
+
+  /**
+   * Create new relationship
+   */
+  async createRelationship(input: RelationshipInput): Promise<ModelRelationship> {
+    try {
+      const sql = `
+        INSERT INTO model_relationships (source_code, target_code, relationship_type, confidence, evidence)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+
+      await this.query(sql, [
+        input.source_code,
+        input.target_code,
+        input.relationship_type,
+        input.confidence,
+        input.evidence || null,
+      ]);
+
+      // Get the created relationship
+      const selectSql = `
+        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
+               confidence, evidence as logical_derivation, NULL as has_literature_support,
+               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
+               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
+               NULL as notes, created_at, updated_at
+        FROM model_relationships
+        WHERE source_code = ? AND target_code = ? AND relationship_type = ?
+        ORDER BY created_at DESC LIMIT 1
+      `;
+
+      const results = await this.query(selectSql,
+        input.source_code, input.target_code, input.relationship_type) as ModelRelationship[];
+      return results[0];
+    } catch (error) {
+      console.error("Failed to create relationship:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update existing relationship (partial update)
+   */
+  async updateRelationship(id: string, updates: Partial<ModelRelationship>): Promise<ModelRelationship> {
+    try {
+      const setParts: string[] = [];
+      const params: unknown[] = [];
+
+      // Map the simple relationship fields to the complex ones
+      if (updates.relationship_type) {
+        setParts.push('relationship_type = ?');
+        params.push(updates.relationship_type);
+      }
+      if (updates.confidence) {
+        setParts.push('confidence = ?');
+        params.push(updates.confidence);
+      }
+      if (updates.logical_derivation) {
+        setParts.push('evidence = ?');
+        params.push(updates.logical_derivation);
+      }
+
+      if (setParts.length === 0) {
+        throw new Error('No valid updates provided');
+      }
+
+      params.push(id);
+
+      const sql = `UPDATE model_relationships SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+      await this.query(sql, params);
+
+      // Return the updated relationship
+      const result = await this.getRelationship(id);
+      if (!result) {
+        throw new Error('Relationship not found after update');
+      }
+      return result;
+    } catch (error) {
+      console.error("Failed to update relationship:", error);
+      throw error;
+    }
+  }
+
+/**
+ * Create a D1Client instance from a D1Database
+ */
+export function createD1Client(db: any): D1Client {
+  return new D1Client(db);
 }

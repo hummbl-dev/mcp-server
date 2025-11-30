@@ -9,6 +9,7 @@ import { SessionSchema, createSession, updateSessionActivity } from "../types/se
 import { RedisClient } from "./redis-client.js";
 import { D1Client } from "./d1-client.js";
 import { Logger } from "../observability/logger.js";
+import { parseJsonSafe, safeD1Call, safeRedisCall } from "./storage-utils.js";
 import {
   sessionCreateCounter,
   sessionCreateDuration,
@@ -48,27 +49,25 @@ export class SessionManager {
       try {
         // Write to Redis (blocking, fast)
         const redisKey = `session:${session.sessionId}`;
-        const startTime = Date.now();
-        const success = await this.redis.set(redisKey, session, { ex: 86400 }); // 24hr TTL
-        const redisDuration = Date.now() - startTime;
+        const redisStart = Date.now();
+        const redisSuccess = await safeRedisCall(this.logger, {
+          operation: "session.create.redis_set",
+          context: { sessionId: session.sessionId },
+          fn: () => this.redis.set(redisKey, session, { ex: 86400 }),
+          fallbackValue: false,
+        });
+        const redisDuration = Date.now() - redisStart;
 
-        if (!success) {
-          this.logger.error("Failed to create session in Redis", { sessionId: session.sessionId });
+        if (!redisSuccess) {
           sessionCreateCounter.increment({ result: "redis_error" });
           sessionCreateDuration.observe(redisDuration, { result: "redis_error" });
-          // Continue with D1 write - Redis failure is not fatal
         } else {
-          // Update active sessions gauge only if Redis succeeded
           activeSessionsGauge.increment();
         }
 
         // Write to D1 (async, non-blocking)
-        this.writeSessionToD1(session).catch((error) => {
-          // Silently handle errors from fire-and-forget D1 write
-          this.logger.error("Unhandled error in fire-and-forget D1 write", {
-            sessionId: session.sessionId,
-            error,
-          });
+        this.writeSessionToD1(session).catch(() => {
+          /* Errors logged inside helper */
         });
 
         sessionCreateCounter.increment({ result: "success" });
@@ -96,33 +95,30 @@ export class SessionManager {
    * Helper method to write session to D1 with observability
    */
   private async writeSessionToD1(session: Session): Promise<void> {
-    try {
-      await this.d1.execute(
-        `INSERT INTO sessions (
-          session_id, user_id, adapter_type, created_at, last_active,
-          version, domain_state, total_messages, total_cost_usd, metadata
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        session.sessionId,
-        session.userId,
-        session.adapterType,
-        session.createdAt,
-        session.lastActive,
-        session.version,
-        JSON.stringify(session.domainState),
-        session.metadata.totalMessages,
-        session.metadata.totalCostUsd,
-        JSON.stringify(session.metadata)
-      );
-      d1WriteCounter.increment({ table: "sessions", result: "success" });
-    } catch (error) {
-      d1WriteCounter.increment({ table: "sessions", result: "error" });
-      this.logger.error(
-        "Failed to write session to D1",
-        { sessionId: session.sessionId },
-        error as Error
-      );
-      throw error;
-    }
+    await safeD1Call(this.logger, {
+      operation: "session.create.d1_insert",
+      context: { sessionId: session.sessionId },
+      rethrow: false,
+      fn: () =>
+        this.d1.execute(
+          `INSERT INTO sessions (
+            session_id, user_id, adapter_type, created_at, last_active,
+            version, domain_state, total_messages, total_cost_usd, metadata
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          session.sessionId,
+          session.userId,
+          session.adapterType,
+          session.createdAt,
+          session.lastActive,
+          session.version,
+          JSON.stringify(session.domainState),
+          session.metadata.totalMessages,
+          session.metadata.totalCostUsd,
+          JSON.stringify(session.metadata)
+        ),
+      onSuccess: () => d1WriteCounter.increment({ table: "sessions", result: "success" }),
+      onError: () => d1WriteCounter.increment({ table: "sessions", result: "error" }),
+    });
   }
 
   /**
@@ -140,17 +136,13 @@ export class SessionManager {
         const startTime = Date.now();
         let cached: Session | null = null;
         let redisDuration = 0;
-        try {
-          cached = await this.redis.get<Session>(redisKey);
-          redisDuration = Date.now() - startTime;
-        } catch (redisError) {
-          // Redis failure - fall back to D1
-          this.logger.warn("Redis error, falling back to D1", {
-            sessionId,
-            error: (redisError as Error).message,
-          });
-          redisDuration = Date.now() - startTime;
-        }
+        cached = await safeRedisCall(this.logger, {
+          operation: "session.get.redis_get",
+          context: { sessionId },
+          fn: () => this.redis.get<Session>(redisKey),
+          fallbackValue: null,
+        });
+        redisDuration = Date.now() - startTime;
 
         if (cached) {
           try {
@@ -178,21 +170,30 @@ export class SessionManager {
         cacheMissCounter.increment({ operation: "session.get" });
         const d1StartTime = Date.now();
 
-        const row = await this.d1.queryOne<{
-          session_id: string;
-          user_id: string;
-          adapter_type: string;
-          created_at: string;
-          last_active: string;
-          version: number;
-          domain_state: string;
-          total_messages: number;
-          total_cost_usd: number;
-          metadata: string;
-        }>("SELECT * FROM sessions WHERE session_id = ?", sessionId);
+        const row = await safeD1Call(this.logger, {
+          operation: "session.get.d1_query",
+          context: { sessionId },
+          rethrow: false,
+          fn: () =>
+            this.d1.queryOne<{
+              session_id: string;
+              user_id: string;
+              adapter_type: string;
+              created_at: string;
+              last_active: string;
+              version: number;
+              domain_state: string;
+              total_messages: number;
+              total_cost_usd: number;
+              metadata: string;
+            }>("SELECT * FROM sessions WHERE session_id = ?", sessionId),
+          fallbackValue: null,
+          onSuccess: (result) =>
+            d1ReadCounter.increment({ table: "sessions", result: result ? "success" : "not_found" }),
+          onError: () => d1ReadCounter.increment({ table: "sessions", result: "error" }),
+        });
 
         const d1Duration = Date.now() - d1StartTime;
-        d1ReadCounter.increment({ table: "sessions", result: row ? "success" : "not_found" });
 
         if (!row) {
           sessionGetCounter.increment({ result: "not_found" });
@@ -206,6 +207,23 @@ export class SessionManager {
         }
 
         // Reconstruct session from database row
+        const domainState =
+          parseJsonSafe<Record<string, unknown>>(
+            row.domain_state,
+            "session domain_state",
+            this.logger,
+            { sessionId }
+          ) ?? {};
+        const metadata =
+          parseJsonSafe<Session["metadata"]>(row.metadata, "session metadata", this.logger, {
+            sessionId,
+          }) ?? {
+            totalMessages: row.total_messages,
+            totalCostUsd: row.total_cost_usd,
+            activeTools: [],
+            lastActivity: row.last_active,
+          };
+
         const session: Session = {
           sessionId: row.session_id,
           userId: row.user_id,
@@ -213,17 +231,22 @@ export class SessionManager {
           createdAt: row.created_at,
           lastActive: row.last_active,
           version: row.version,
-          domainState: JSON.parse(row.domain_state || "{}"),
+          domainState,
           metadata: {
-            totalMessages: row.total_messages,
-            totalCostUsd: row.total_cost_usd,
-            activeTools: [], // Would need to be stored separately or derived
-            lastActivity: row.last_active,
+            totalMessages: metadata.totalMessages ?? row.total_messages,
+            totalCostUsd: metadata.totalCostUsd ?? row.total_cost_usd,
+            activeTools: metadata.activeTools ?? [],
+            lastActivity: metadata.lastActivity ?? row.last_active,
           },
         };
 
         // Re-cache in Redis
-        await this.redis.set(redisKey, session, { ex: 86400 });
+        await safeRedisCall(this.logger, {
+          operation: "session.get.redis_set_cache",
+          context: { sessionId },
+          fn: () => this.redis.set(redisKey, session, { ex: 86400 }),
+          fallbackValue: false,
+        });
 
         sessionGetCounter.increment({ result: "cache_miss" });
         sessionGetDuration.observe(d1Duration + redisDuration, { result: "cache_miss" });
@@ -288,7 +311,12 @@ export class SessionManager {
 
         // Update Redis (blocking)
         const redisStartTime = Date.now();
-        const success = await this.redis.set(redisKey, updatedSession, { ex: 86400 });
+        const success = await safeRedisCall(this.logger, {
+          operation: "session.update.redis_set",
+          context: { sessionId },
+          fn: () => this.redis.set(redisKey, updatedSession, { ex: 86400 }),
+          fallbackValue: false,
+        });
         const redisDuration = Date.now() - redisStartTime;
 
         if (!success) {
@@ -299,28 +327,31 @@ export class SessionManager {
 
         // Update D1 (async)
         Promise.resolve(
-          this.d1.execute(
-            `UPDATE sessions SET
-              last_active = ?, version = ?, domain_state = ?,
-              total_messages = ?, total_cost_usd = ?, metadata = ?
-             WHERE session_id = ? AND version = ?`,
-            updatedSession.lastActive,
-            updatedSession.version,
-            JSON.stringify(updatedSession.domainState),
-            updatedSession.metadata.totalMessages,
-            updatedSession.metadata.totalCostUsd,
-            JSON.stringify(updatedSession.metadata),
-            sessionId,
-            expectedVersion
-          )
-        )
-          .then(() => {
-            d1WriteCounter.increment({ table: "sessions", result: "success" });
+          safeD1Call(this.logger, {
+            operation: "session.update.d1",
+            context: { sessionId },
+            rethrow: false,
+            fn: () =>
+              this.d1.execute(
+                `UPDATE sessions SET
+                  last_active = ?, version = ?, domain_state = ?,
+                  total_messages = ?, total_cost_usd = ?, metadata = ?
+                 WHERE session_id = ? AND version = ?`,
+                updatedSession.lastActive,
+                updatedSession.version,
+                JSON.stringify(updatedSession.domainState),
+                updatedSession.metadata.totalMessages,
+                updatedSession.metadata.totalCostUsd,
+                JSON.stringify(updatedSession.metadata),
+                sessionId,
+                expectedVersion
+              ),
+            onSuccess: () => d1WriteCounter.increment({ table: "sessions", result: "success" }),
+            onError: () => d1WriteCounter.increment({ table: "sessions", result: "error" }),
           })
-          .catch((error) => {
-            d1WriteCounter.increment({ table: "sessions", result: "error" });
-            this.logger.error("Failed to update session in D1", { sessionId }, error as Error);
-          });
+        ).catch(() => {
+          /* Errors already logged */
+        });
 
         sessionUpdateCounter.increment({ result: "success" });
         this.logger.info("Session updated successfully", {
@@ -366,7 +397,12 @@ export class SessionManager {
 
         // Update Redis
         const redisStartTime = Date.now();
-        const success = await this.redis.set(redisKey, endedSession, { ex: 3600 }); // 1hr TTL
+        const success = await safeRedisCall(this.logger, {
+          operation: "session.end.redis_set",
+          context: { sessionId },
+          fn: () => this.redis.set(redisKey, endedSession, { ex: 3600 }),
+          fallbackValue: false,
+        });
         const redisDuration = Date.now() - redisStartTime;
 
         if (!success) {
@@ -376,31 +412,35 @@ export class SessionManager {
         }
 
         // Update D1
-        try {
-          await this.d1.execute(
-            "UPDATE sessions SET last_active = ?, metadata = ? WHERE session_id = ?",
-            endedSession.lastActive,
-            JSON.stringify(endedSession.metadata),
-            sessionId
-          );
-          d1WriteCounter.increment({ table: "sessions", result: "success" });
+        const d1Result = await safeD1Call(this.logger, {
+          operation: "session.end.d1",
+          context: { sessionId },
+          rethrow: false,
+          fn: () =>
+            this.d1.execute(
+              "UPDATE sessions SET last_active = ?, metadata = ? WHERE session_id = ?",
+              endedSession.lastActive,
+              JSON.stringify(endedSession.metadata),
+              sessionId
+            ),
+          onSuccess: () => d1WriteCounter.increment({ table: "sessions", result: "success" }),
+          onError: () => d1WriteCounter.increment({ table: "sessions", result: "error" }),
+        });
 
-          // Update active sessions gauge
-          activeSessionsGauge.decrement();
-
-          sessionEndCounter.increment({ result: "success" });
-          this.logger.info("Session ended successfully", {
-            sessionId,
-            redisDuration,
-          });
-
-          return true;
-        } catch (error) {
-          d1WriteCounter.increment({ table: "sessions", result: "error" });
+        if (d1Result === undefined) {
           sessionEndCounter.increment({ result: "d1_error" });
-          this.logger.error("Failed to end session in D1", { sessionId }, error as Error);
           return false;
         }
+
+        activeSessionsGauge.decrement();
+
+        sessionEndCounter.increment({ result: "success" });
+        this.logger.info("Session ended successfully", {
+          sessionId,
+          redisDuration,
+        });
+
+        return true;
       } catch (error) {
         sessionEndCounter.increment({ result: "error" });
         this.logger.error("Failed to end session", { sessionId }, error as Error);
