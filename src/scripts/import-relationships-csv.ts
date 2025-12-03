@@ -4,7 +4,12 @@
 // Bulk imports relationships from CSV for validation workflow
 
 import { createD1Client } from "../storage/d1-client.js";
-import { isRelationshipType, isDirection, isConfidence, isReviewStatus } from "../types/relationships.js";
+import {
+  isRelationshipType,
+  isDirection,
+  isConfidence,
+  isReviewStatus,
+} from "../types/relationships.js";
 import type { D1Database } from "@cloudflare/workers-types";
 
 interface Env {
@@ -31,19 +36,19 @@ interface CSVRelationship {
 
 // Simple CSV parser (for basic CSV format)
 function parseCSV(csvText: string): CSVRelationship[] {
-  const lines = csvText.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
+  const lines = csvText.trim().split("\n");
+  const headers = lines[0].split(",").map((h) => h.trim());
 
   const relationships: CSVRelationship[] = [];
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim());
+    const values = lines[i].split(",").map((v) => v.trim());
     if (values.length !== headers.length) continue;
 
     const relationship: any = {};
     headers.forEach((header, index) => {
       const value = values[index];
-      relationship[header] = value === '' ? undefined : value;
+      relationship[header] = value === "" ? undefined : value;
     });
 
     relationships.push(relationship as CSVRelationship);
@@ -69,9 +74,15 @@ async function importRelationshipsFromCSV(env: Env, csvText: string, dryRun = fa
   for (const relationship of relationships) {
     try {
       // Validate required fields
-      if (!relationship.id || !relationship.model_a || !relationship.model_b ||
-          !relationship.relationship_type || !relationship.direction ||
-          !relationship.logical_derivation || !relationship.validated_by) {
+      if (
+        !relationship.id ||
+        !relationship.model_a ||
+        !relationship.model_b ||
+        !relationship.relationship_type ||
+        !relationship.direction ||
+        !relationship.logical_derivation ||
+        !relationship.validated_by
+      ) {
         throw new Error("Missing required fields");
       }
 
@@ -93,48 +104,36 @@ async function importRelationshipsFromCSV(env: Env, csvText: string, dryRun = fa
       }
 
       if (!dryRun) {
-        const result = await db.createRelationship({
-          id: relationship.id,
-          model_a: relationship.model_a.toUpperCase(),
-          model_b: relationship.model_b.toUpperCase(),
+        // Convert to RelationshipInput format
+        const relationshipInput = {
+          source_code: relationship.model_a.toUpperCase(),
+          target_code: relationship.model_b.toUpperCase(),
           relationship_type: relationship.relationship_type,
-          direction: relationship.direction,
-          confidence: relationship.confidence || 'U',
-          logical_derivation: relationship.logical_derivation,
-          has_literature_support: relationship.has_literature_support === '1' ||
-                                  relationship.has_literature_support?.toLowerCase() === 'true' ? 1 : 0,
-          literature_citation: relationship.literature_citation,
-          literature_url: relationship.literature_url,
-          empirical_observation: relationship.empirical_observation,
-          validated_by: relationship.validated_by,
-          validated_at: relationship.validated_at,
-          review_status: relationship.review_status || 'draft',
-          notes: relationship.notes,
-        });
-
-        if (!result.ok) {
-          throw new Error(result.error);
-        }
+          confidence: (relationship.confidence || "C") as "A" | "B" | "C",
+          evidence: relationship.logical_derivation,
+        };
+        await db.createRelationship(relationshipInput);
       }
 
       successCount++;
-      console.log(`✅ ${dryRun ? 'Validated' : 'Imported'} relationship ${relationship.id}: ${relationship.model_a} ${relationship.relationship_type} ${relationship.model_b}`);
-
+      console.log(
+        `✅ ${dryRun ? "Validated" : "Imported"} relationship ${relationship.id}: ${relationship.model_a} ${relationship.relationship_type} ${relationship.model_b}`
+      );
     } catch (error) {
       errorCount++;
-      const errorMsg = `❌ Failed to ${dryRun ? 'validate' : 'import'} relationship ${relationship.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      const errorMsg = `❌ Failed to ${dryRun ? "validate" : "import"} relationship ${relationship.id}: ${error instanceof Error ? error.message : "Unknown error"}`;
       errors.push(errorMsg);
       console.error(errorMsg);
     }
   }
 
   console.log(`\n📊 Import complete:`);
-  console.log(`   ✅ ${successCount} relationships ${dryRun ? 'validated' : 'imported'}`);
+  console.log(`   ✅ ${successCount} relationships ${dryRun ? "validated" : "imported"}`);
   console.log(`   ❌ ${errorCount} errors`);
 
   if (errors.length > 0) {
     console.log("\n🚨 Errors:");
-    errors.forEach(error => console.log(`   ${error}`));
+    errors.forEach((error) => console.log(`   ${error}`));
   }
 
   return { successCount, errorCount, errors };
@@ -150,7 +149,9 @@ export default { importRelationshipsFromCSV, CSV_TEMPLATE };
 if (import.meta.main) {
   console.log("🚀 HUMMBL CSV Relationship Importer");
   console.log("Usage: Read CSV from stdin and pipe to this script");
-  console.log("Example: cat relationships.csv | npx wrangler d1 execute <database> --file=./src/scripts/import-relationships-csv.ts");
+  console.log(
+    "Example: cat relationships.csv | npx wrangler d1 execute <database> --file=./src/scripts/import-relationships-csv.ts"
+  );
   console.log("\n📄 CSV Format template:");
   console.log(CSV_TEMPLATE);
 }

@@ -8,43 +8,9 @@ import type {
   RelationshipInput,
   SimpleRelationshipResult,
   ModelRelationship,
-  GraphNode,
-  GraphEdge
 } from "../types/relationships.js";
 
-interface D1PreparedStatement {
-  bind(...values: unknown[]): D1PreparedStatement;
-  first<T = unknown>(): Promise<T | null>;
-  all<T = unknown>(): Promise<D1Result<T>>;
-  run(): Promise<D1Response>;
-}
-
-interface D1Result<T> {
-  results: T[];
-  success: boolean;
-  error?: string;
-  meta: {
-    changed_db: boolean;
-    changes: number;
-    duration: number;
-    last_row_id: number;
-    rows_read: number;
-    rows_written: number;
-  };
-}
-
-interface D1Response {
-  success: boolean;
-  error?: string;
-  meta: {
-    changed_db: boolean;
-    changes: number;
-    duration: number;
-    last_row_id: number;
-    rows_read: number;
-    rows_written: number;
-  };
-}
+// D1 types are inferred from usage, interfaces removed to avoid unused variable errors
 
 export class D1Client {
   private db: any;
@@ -77,10 +43,10 @@ export class D1Client {
    */
   async query<T>(sql: string, ...params: unknown[]): Promise<T[]> {
     try {
-      const result = await this.db
+      const result = await (this.db as any)
         .prepare(sql)
         .bind(...params)
-        .all<T>();
+        .all();
       if (!result.success) {
         throw new Error(result.error || "D1 query failed");
       }
@@ -96,10 +62,10 @@ export class D1Client {
    */
   async queryOne<T>(sql: string, ...params: unknown[]): Promise<T | null> {
     try {
-      const result = await this.db
+      const result = await (this.db as any)
         .prepare(sql)
         .bind(...params)
-        .first<T>();
+        .first();
       return result as T | null;
     } catch (error) {
       console.error("D1 QUERY_ONE failed", { sql, params, error });
@@ -115,7 +81,7 @@ export class D1Client {
       const statements = queries.map((q) => this.db.prepare(q.sql).bind(...q.params));
 
       await this.db.batch(statements);
-      
+
       // If batch completes without throwing, consider it successful
       return true;
     } catch (error) {
@@ -213,7 +179,10 @@ export class D1Client {
     }>(sql, code);
 
     if (!result) {
-      return { ok: false, error: { type: "NOT_FOUND", message: `Model ${code} not found in database` } } as const;
+      return {
+        ok: false,
+        error: { type: "NOT_FOUND", message: `Model ${code} not found in database` },
+      } as const;
     }
 
     return { ok: true, value: result } as const;
@@ -222,7 +191,9 @@ export class D1Client {
   /**
    * Get relationships for a specific model (simplified)
    */
-  async getRelationships(code: string): Promise<SimpleRelationshipResult<SimpleRelationship[]>> {
+  async getRelationshipsForModel(
+    code: string
+  ): Promise<SimpleRelationshipResult<SimpleRelationship[]>> {
     try {
       const sql = `
         SELECT id, source_code, target_code, relationship_type, confidence, evidence, created_at
@@ -231,8 +202,8 @@ export class D1Client {
         ORDER BY confidence DESC, created_at DESC
       `;
 
-      const relationships = await this.query(sql, code, code) as SimpleRelationship[];
-      return { ok: true, value: relationships };
+      const relationships = await this.query<SimpleRelationship>(sql, code, code);
+      return { ok: true as const, value: relationships };
     } catch (error) {
       return { ok: false, error: `Failed to get relationships: ${error}` };
     }
@@ -248,7 +219,7 @@ export class D1Client {
         VALUES (?, ?, ?, ?, ?)
       `;
 
-      const result = await this.query(sql, [
+      await this.query(sql, [
         rel.source_code,
         rel.target_code,
         rel.relationship_type,
@@ -256,7 +227,16 @@ export class D1Client {
         rel.evidence || null,
       ]);
 
-      return { ok: true, value: result };
+      // Return a simple success result - the actual created relationship would need to be fetched
+      return {
+        ok: true as const,
+        value: {
+          source_code: rel.source_code,
+          target_code: rel.target_code,
+          relationship_type: rel.relationship_type,
+          confidence: rel.confidence,
+        } as SimpleRelationship,
+      };
     } catch (error) {
       return { ok: false, error: `Failed to create relationship: ${error}` };
     }
@@ -274,21 +254,21 @@ export class D1Client {
     offset?: number;
   }): Promise<ModelRelationship[]> {
     try {
-      let whereClause = 'WHERE 1=1';
+      let whereClause = "WHERE 1=1";
       const params: unknown[] = [];
 
       if (filters?.model) {
-        whereClause += ' AND (source_code = ? OR target_code = ?)';
+        whereClause += " AND (source_code = ? OR target_code = ?)";
         params.push(filters.model, filters.model);
       }
 
       if (filters?.type) {
-        whereClause += ' AND relationship_type = ?';
+        whereClause += " AND relationship_type = ?";
         params.push(filters.type);
       }
 
       if (filters?.confidence) {
-        whereClause += ' AND confidence = ?';
+        whereClause += " AND confidence = ?";
         params.push(filters.confidence);
       }
 
@@ -307,7 +287,7 @@ export class D1Client {
         LIMIT ? OFFSET ?
       `;
 
-      return await this.query(sql, [...params, limit, offset]) as ModelRelationship[];
+      return (await this.query(sql, [...params, limit, offset])) as ModelRelationship[];
     } catch (error) {
       console.error("Failed to get relationships:", error);
       throw error;
@@ -329,7 +309,7 @@ export class D1Client {
         WHERE id = ?
       `;
 
-      const results = await this.query(sql, id) as ModelRelationship[];
+      const results = (await this.query(sql, id)) as ModelRelationship[];
       return results.length > 0 ? results[0] : null;
     } catch (error) {
       console.error("Failed to get relationship:", error);
@@ -338,9 +318,9 @@ export class D1Client {
   }
 
   /**
-   * Get all relationships for a specific model
+   * Get all relationships for a specific model (using filters)
    */
-  async getRelationshipsForModel(code: string): Promise<ModelRelationship[]> {
+  async getRelationshipsForModelWithFilters(code: string): Promise<ModelRelationship[]> {
     return this.getRelationships({ model: code });
   }
 
@@ -374,8 +354,12 @@ export class D1Client {
         ORDER BY created_at DESC LIMIT 1
       `;
 
-      const results = await this.query(selectSql,
-        input.source_code, input.target_code, input.relationship_type) as ModelRelationship[];
+      const results = (await this.query(
+        selectSql,
+        input.source_code,
+        input.target_code,
+        input.relationship_type
+      )) as ModelRelationship[];
       return results[0];
     } catch (error) {
       console.error("Failed to create relationship:", error);
@@ -386,38 +370,41 @@ export class D1Client {
   /**
    * Update existing relationship (partial update)
    */
-  async updateRelationship(id: string, updates: Partial<ModelRelationship>): Promise<ModelRelationship> {
+  async updateRelationship(
+    id: string,
+    updates: Partial<ModelRelationship>
+  ): Promise<ModelRelationship> {
     try {
       const setParts: string[] = [];
       const params: unknown[] = [];
 
       // Map the simple relationship fields to the complex ones
       if (updates.relationship_type) {
-        setParts.push('relationship_type = ?');
+        setParts.push("relationship_type = ?");
         params.push(updates.relationship_type);
       }
       if (updates.confidence) {
-        setParts.push('confidence = ?');
+        setParts.push("confidence = ?");
         params.push(updates.confidence);
       }
       if (updates.logical_derivation) {
-        setParts.push('evidence = ?');
+        setParts.push("evidence = ?");
         params.push(updates.logical_derivation);
       }
 
       if (setParts.length === 0) {
-        throw new Error('No valid updates provided');
+        throw new Error("No valid updates provided");
       }
 
       params.push(id);
 
-      const sql = `UPDATE model_relationships SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+      const sql = `UPDATE model_relationships SET ${setParts.join(", ")}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
       await this.query(sql, params);
 
       // Return the updated relationship
       const result = await this.getRelationship(id);
       if (!result) {
-        throw new Error('Relationship not found after update');
+        throw new Error("Relationship not found after update");
       }
       return result;
     } catch (error) {
@@ -425,6 +412,7 @@ export class D1Client {
       throw error;
     }
   }
+}
 
 /**
  * Create a D1Client instance from a D1Database

@@ -43,7 +43,7 @@ describe("storage utils", () => {
     const logger = createLogger();
     const warnSpy = vi.spyOn(logger, "warn");
 
-    const parsed = parseJsonSafe<{ value: number }>("{\"value\":42}", "payload", logger);
+    const parsed = parseJsonSafe<{ value: number }>('{"value":42}', "payload", logger);
     expect(parsed).toEqual({ value: 42 });
 
     const fallback = parseJsonSafe("not json", "payload", logger, undefined, { value: 0 });

@@ -102,10 +102,7 @@ describe("HistoryManager", () => {
 
       await historyManager.addMessage(sessionId, largePayload);
 
-      expect(redisClient.rpush).toHaveBeenCalledWith(
-        `history:${sessionId}`,
-        expect.any(String)
-      );
+      expect(redisClient.rpush).toHaveBeenCalledWith(`history:${sessionId}`, expect.any(String));
     });
   });
 

@@ -12,7 +12,9 @@ interface SafeCallOptions<T> {
   onSuccess?: (result: T) => void;
 }
 
-const hasFallbackValue = <T>(options: SafeCallOptions<T>): options is SafeCallOptions<T> & {
+const hasFallbackValue = <T>(
+  options: SafeCallOptions<T>
+): options is SafeCallOptions<T> & {
   fallbackValue: T;
 } => Object.prototype.hasOwnProperty.call(options, "fallbackValue");
 
@@ -58,10 +60,7 @@ async function executeSafeCall<T>(
   }
 }
 
-export async function safeRedisCall<T>(
-  logger: Logger,
-  options: SafeCallOptions<T>
-): Promise<T> {
+export async function safeRedisCall<T>(logger: Logger, options: SafeCallOptions<T>): Promise<T> {
   return executeSafeCall("redis", logger, {
     logLevel: "warn",
     rethrow: false,

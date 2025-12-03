@@ -22,7 +22,8 @@ import { isOk, isTransformationType } from "./types/domain.js";
 import { validateApiKey } from "./auth/api-keys.js";
 import { createD1Client } from "./storage/d1-client.js";
 import relationshipsRoutes from "./routes/relationships.js";
-import type { SimpleRelationship, RelationshipInput } from "./types/relationships.js";
+import type { ModelRelationship } from "./types/relationships.js";
+import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 
 type Bindings = {
   DB: D1Database;
@@ -34,7 +35,7 @@ type Variables = {
   user?: ApiKeyInfo;
 };
 
-type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
+export type AppContext = Context<{ Bindings: Bindings; Variables: Variables }>;
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
@@ -113,7 +114,7 @@ app.get("/v1/models/:code/relationships", async (c: AppContext) => {
     const code = c.req.param("code").toUpperCase();
     const db = createD1Client(c.env.DB as any);
 
-    const result = await db.getRelationships(code);
+    const result = await db.getRelationshipsForModel(code);
     if (!result.ok) {
       return c.json({ error: result.error }, 500);
     }
@@ -122,7 +123,7 @@ app.get("/v1/models/:code/relationships", async (c: AppContext) => {
       model: code,
       relationships: result.value,
     });
-  } catch (error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -135,11 +136,16 @@ app.post("/v1/relationships", authenticate, async (c: AppContext) => {
 
     // Validate required fields
     if (!body.source_code || !body.target_code || !body.relationship_type || !body.confidence) {
-      return c.json({ error: "Missing required fields: source_code, target_code, relationship_type, confidence" }, 400);
+      return c.json(
+        {
+          error: "Missing required fields: source_code, target_code, relationship_type, confidence",
+        },
+        400
+      );
     }
 
     // Validate confidence
-    if (!['A', 'B', 'C'].includes(body.confidence)) {
+    if (!["A", "B", "C"].includes(body.confidence)) {
       return c.json({ error: "Confidence must be A, B, or C" }, 400);
     }
 
@@ -154,7 +160,7 @@ app.post("/v1/relationships", authenticate, async (c: AppContext) => {
     const result = await db.createRelationship(relationshipInput);
 
     return c.json({ success: true, relationship: result }, 201);
-  } catch (error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -189,9 +195,9 @@ app.post("/v1/relationships/seed", authenticate, async (c: AppContext) => {
       success: true,
       message: `Seeded ${successCount} relationships, ${errorCount} failed`,
       seeded: successCount,
-      failed: errorCount
+      failed: errorCount,
     });
-  } catch (error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -204,7 +210,7 @@ app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
     const db = createD1Client(c.env.DB as any);
 
     // Validate confidence if provided
-    if (body.confidence && !['A', 'B', 'C'].includes(body.confidence)) {
+    if (body.confidence && !["A", "B", "C"].includes(body.confidence)) {
       return c.json({ error: "Confidence must be A, B, or C" }, 400);
     }
 
@@ -216,7 +222,7 @@ app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
     const result = await db.updateRelationship(id, updates);
 
     return c.json({ success: true, relationship: result });
-  } catch (error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -233,7 +239,7 @@ app.get("/v1/relationships/:id", async (c: AppContext) => {
     }
 
     return c.json(result);
-  } catch (error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -260,7 +266,7 @@ app.get("/v1/relationships", async (c: AppContext) => {
       limit: filters.limit || 50,
       offset: filters.offset || 0,
     });
-  } catch (error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });

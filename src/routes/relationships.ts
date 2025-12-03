@@ -11,12 +11,23 @@ import type {
   RelationshipQuery,
   ModelRelationshipsResponse,
   GraphExport,
+  GraphNode,
+  GraphEdge,
   CytoscapeGraph,
-  CytoscapeElement
+  CytoscapeElement,
+  Confidence,
+  ReviewStatus,
 } from "../types/relationships.js";
-import { isRelationshipType, isDirection, isConfidence, isReviewStatus } from "../types/relationships.js";
+import {
+  isRelationshipType,
+  isDirection,
+  isConfidence,
+  isReviewStatus,
+} from "../types/relationships.js";
 
-const router = new Hono<{ Bindings: { DB: D1Database; API_KEYS: KVNamespace; SESSIONS: KVNamespace } }>();
+const router = new Hono<{
+  Bindings: { DB: D1Database; API_KEYS: KVNamespace; SESSIONS: KVNamespace };
+}>();
 
 /**
  * GET /v1/relationships
@@ -25,27 +36,29 @@ const router = new Hono<{ Bindings: { DB: D1Database; API_KEYS: KVNamespace; SES
 router.get("/relationships", async (c: AppContext) => {
   try {
     const db = createD1Client(c.env.DB);
+    const typeParam = c.req.query("type");
+    const confidenceParam = c.req.query("confidence");
+    const statusParam = c.req.query("status");
+
     const query: RelationshipQuery = {
       model: c.req.query("model"),
-      type: c.req.query("type"),
-      confidence: c.req.query("confidence"),
-      status: c.req.query("status"),
+      type: typeParam && isRelationshipType(typeParam) ? typeParam : undefined,
+      confidence: confidenceParam && isConfidence(confidenceParam) ? confidenceParam : undefined,
+      status: statusParam && isReviewStatus(statusParam) ? statusParam : undefined,
       limit: c.req.query("limit") ? parseInt(c.req.query("limit")!) : undefined,
       offset: c.req.query("offset") ? parseInt(c.req.query("offset")!) : undefined,
     };
 
-    const result = await db.getRelationships(query);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
-    }
+    const relationships = await db.getRelationships(query);
+    const total = relationships.length;
 
     return c.json({
-      relationships: result.value.relationships,
-      total: result.value.total,
+      relationships,
+      total,
       limit: query.limit || 50,
       offset: query.offset || 0,
     });
-  } catch (_error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -60,12 +73,12 @@ router.get("/relationships/:id", async (c: AppContext) => {
     const id = c.req.param("id");
 
     const result = await db.getRelationship(id);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 404);
+    if (!result) {
+      return c.json({ error: "Relationship not found" }, 404);
     }
 
-    return c.json(result.value);
-  } catch (_error) {
+    return c.json(result);
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -79,28 +92,26 @@ router.get("/models/:code/relationships", async (c: AppContext) => {
     const db = createD1Client(c.env.DB);
     const code = c.req.param("code").toUpperCase();
 
-    const result = await db.getModelRelationships(code);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
-    }
-
-    const relationships: ModelRelationshipsResponse["relationships"] = result.value.map(rel => {
-      const isModelA = rel.model_a === code;
-      return {
-        related_model: isModelA ? rel.model_b : rel.model_a,
-        type: rel.relationship_type,
-        direction: isModelA ? "outgoing" : "incoming",
-        confidence: rel.confidence,
-        logical_derivation: rel.logical_derivation,
-        relationship_id: rel.id,
-      };
-    });
+    const relationshipsData = await db.getRelationships({ model: code });
+    const relationships: ModelRelationshipsResponse["relationships"] = relationshipsData.map(
+      (rel) => {
+        const isModelA = rel.model_a === code;
+        return {
+          related_model: isModelA ? rel.model_b : rel.model_a,
+          type: rel.relationship_type,
+          direction: isModelA ? "outgoing" : "incoming",
+          confidence: rel.confidence,
+          logical_derivation: rel.logical_derivation,
+          relationship_id: rel.id,
+        };
+      }
+    );
 
     return c.json({
       model: code,
       relationships,
     });
-  } catch (_error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -121,7 +132,13 @@ router.post("/relationships", async (c: AppContext) => {
     const body: CreateRelationshipRequest = await c.req.json();
 
     // Validate required fields
-    if (!body.model_a || !body.model_b || !body.relationship_type || !body.direction || !body.logical_derivation) {
+    if (
+      !body.model_a ||
+      !body.model_b ||
+      !body.relationship_type ||
+      !body.direction ||
+      !body.logical_derivation
+    ) {
       return c.json({ error: "Missing required fields" }, 400);
     }
 
@@ -161,13 +178,19 @@ router.post("/relationships", async (c: AppContext) => {
       notes: body.notes,
     };
 
-    const result = await db.createRelationship(relationshipData);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
-    }
+    // Convert to RelationshipInput format
+    const relationshipInput = {
+      source_code: relationshipData.model_a,
+      target_code: relationshipData.model_b,
+      relationship_type: relationshipData.relationship_type,
+      confidence: relationshipData.confidence as "A" | "B" | "C",
+      evidence: relationshipData.logical_derivation,
+    };
 
-    return c.json({ id, ...relationshipData }, 201);
-  } catch (_error) {
+    const result = await db.createRelationship(relationshipInput);
+
+    return c.json(result, 201);
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -205,27 +228,15 @@ router.patch("/relationships/:id", async (c: AppContext) => {
       return c.json({ error: "Invalid review status" }, 400);
     }
 
-    const updates: Parameters<typeof db.updateRelationship>[1] = {};
+    const updates: Partial<Parameters<typeof db.updateRelationship>[1]> = {};
     if (body.relationship_type) updates.relationship_type = body.relationship_type;
-    if (body.direction) updates.direction = body.direction;
     if (body.confidence) updates.confidence = body.confidence;
     if (body.logical_derivation) updates.logical_derivation = body.logical_derivation;
-    if (body.literature_support) {
-      updates.has_literature_support = body.literature_support.has_support ? 1 : 0;
-      updates.literature_citation = body.literature_support.citation;
-      updates.literature_url = body.literature_support.url;
-    }
-    if (body.empirical_observation) updates.empirical_observation = body.empirical_observation;
-    if (body.review_status) updates.review_status = body.review_status;
-    if (body.notes !== undefined) updates.notes = body.notes;
 
     const result = await db.updateRelationship(id, updates);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
-    }
 
-    return c.json({ success: true });
-  } catch (_error) {
+    return c.json({ success: true, relationship: result });
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -245,13 +256,16 @@ router.delete("/relationships/:id", async (c: AppContext) => {
     const db = createD1Client(c.env.DB);
     const id = c.req.param("id");
 
-    const result = await db.deleteRelationship(id);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
+    // Check if relationship exists
+    const existing = await db.getRelationship(id);
+    if (!existing) {
+      return c.json({ error: "Relationship not found" }, 404);
     }
 
-    return c.json({ success: true });
-  } catch (_error) {
+    // TODO: Implement deleteRelationship method in D1Client
+    // For now, return error
+    return c.json({ error: "Delete not yet implemented" }, 501);
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
@@ -267,28 +281,49 @@ router.get("/graph", async (c: AppContext) => {
     const confidenceMin = c.req.query("confidence_min") || "C";
     const status = c.req.query("status") || "confirmed";
 
-    const result = await db.getGraphData({
-      confidence_min: confidenceMin,
+    // Get all relationships
+    const relationships = await db.getRelationships({
+      confidence: confidenceMin,
       status,
+      limit: 1000,
     });
 
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
-    }
+    // Build nodes and edges from relationships
+    const nodeSet = new Set<string>();
+    const nodes: GraphNode[] = [];
+    const edges: GraphEdge[] = [];
 
-    const { nodes, edges } = result.value;
+    relationships.forEach((rel) => {
+      nodeSet.add(rel.model_a);
+      nodeSet.add(rel.model_b);
+      edges.push({
+        source: rel.model_a,
+        target: rel.model_b,
+        type: rel.relationship_type,
+        confidence: rel.confidence,
+        direction: rel.direction || "a→b",
+        logical_derivation: rel.logical_derivation,
+      });
+    });
+
+    // Create nodes (simplified - would need model lookup for full data)
+    nodeSet.forEach((modelCode) => {
+      // Extract transformation from model code (e.g., "DE1" -> "DE")
+      const transformation = modelCode.match(/^([A-Z]+)/)?.[1] || "";
+      nodes.push({ id: modelCode, name: modelCode, transformation });
+    });
 
     if (format === "cytoscape") {
       const elements: CytoscapeElement[] = [
-        ...nodes.map(node => ({
+        ...nodes.map((node) => ({
           data: {
             id: node.id,
             label: node.name,
             type: "node",
             transformation: node.transformation,
-          }
+          },
         })),
-        ...edges.map(edge => ({
+        ...edges.map((edge) => ({
           data: {
             id: `${edge.source}-${edge.target}`,
             source: edge.source,
@@ -296,8 +331,8 @@ router.get("/graph", async (c: AppContext) => {
             type: edge.type,
             confidence: edge.confidence,
             direction: edge.direction,
-          }
-        }))
+          },
+        })),
       ];
 
       return c.json({ elements } as CytoscapeGraph);
@@ -310,14 +345,16 @@ router.get("/graph", async (c: AppContext) => {
       metadata: {
         total_nodes: nodes.length,
         total_edges: edges.length,
-        confidence_filter: confidenceMin,
-        status_filter: status,
+        confidence_filter: (confidenceMin && isConfidence(confidenceMin)
+          ? confidenceMin
+          : "C") as Confidence,
+        status_filter: (status && isReviewStatus(status) ? status : "confirmed") as ReviewStatus,
         generated_at: new Date().toISOString(),
-      }
+      },
     };
 
     return c.json(graphExport);
-  } catch (_error) {
+  } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
 });

@@ -189,7 +189,10 @@ export class SessionManager {
             }>("SELECT * FROM sessions WHERE session_id = ?", sessionId),
           fallbackValue: null,
           onSuccess: (result) =>
-            d1ReadCounter.increment({ table: "sessions", result: result ? "success" : "not_found" }),
+            d1ReadCounter.increment({
+              table: "sessions",
+              result: result ? "success" : "not_found",
+            }),
           onError: () => d1ReadCounter.increment({ table: "sessions", result: "error" }),
         });
 
@@ -214,15 +217,19 @@ export class SessionManager {
             this.logger,
             { sessionId }
           ) ?? {};
-        const metadata =
-          parseJsonSafe<Session["metadata"]>(row.metadata, "session metadata", this.logger, {
+        const metadata = parseJsonSafe<Session["metadata"]>(
+          row.metadata,
+          "session metadata",
+          this.logger,
+          {
             sessionId,
-          }) ?? {
-            totalMessages: row.total_messages,
-            totalCostUsd: row.total_cost_usd,
-            activeTools: [],
-            lastActivity: row.last_active,
-          };
+          }
+        ) ?? {
+          totalMessages: row.total_messages,
+          totalCostUsd: row.total_cost_usd,
+          activeTools: [],
+          lastActivity: row.last_active,
+        };
 
         const session: Session = {
           sessionId: row.session_id,

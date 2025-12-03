@@ -4,15 +4,16 @@
  * Hybrid architecture: Local data for fast lookups, REST API for recommendations
  */
 
+/* eslint-disable no-undef */
+// fetch is a global in Cloudflare Workers environment
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 
 import {
   TRANSFORMATIONS,
-  PROBLEM_PATTERNS,
   getAllModels,
   getModelByCode,
-  getTransformationByKey,
   searchModels,
   getModelsByTransformation,
 } from "../framework/base120.js";
@@ -241,7 +242,8 @@ export function registerModelTools(server: McpServer): void {
     "recommend_models",
     {
       title: "Recommend Models for Problem",
-      description: "Get recommended mental models based on a natural language problem description using HUMMBL REST API.",
+      description:
+        "Get recommended mental models based on a natural language problem description using HUMMBL REST API.",
       inputSchema: z.object({
         problem: z.string().min(10).describe("Detailed description of the problem or challenge"),
       }),
@@ -289,7 +291,7 @@ export function registerModelTools(server: McpServer): void {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_CONFIG.apiKey}`,
+            Authorization: `Bearer ${API_CONFIG.apiKey}`,
           },
           body: JSON.stringify({ problem }),
         });
@@ -341,11 +343,15 @@ export function registerModelTools(server: McpServer): void {
           content: [
             {
               type: "text",
-              text: `Failed to call HUMMBL API: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Failed to call HUMMBL API: ${error instanceof Error ? error.message : "Unknown error"}`,
             },
           ],
           isError: true,
           structuredContent: undefined,
+        } as const;
+      }
+    }
+  );
 
   // Tool: Get model relationships
   /*
@@ -395,7 +401,7 @@ export function registerModelTools(server: McpServer): void {
           };
         }
 
-        const payload = await response.json();
+        const payload = (await response.json()) as Record<string, unknown>;
 
         return {
           content: [
@@ -714,16 +720,19 @@ export function registerModelTools(server: McpServer): void {
       title: "Get Related Mental Models",
       description: "Get all models related to a specific model with relationship details",
       inputSchema: z.object({
-        code: z.string().describe("Model code (e.g., P1, DE7)")
-      })
+        code: z.string().describe("Model code (e.g., P1, DE7)"),
+      }),
     },
     async ({ code }) => {
       try {
-        const response = await fetch(`${API_CONFIG.baseUrl}/v1/models/${code.toUpperCase()}/relationships`, {
-          headers: {
-            "Authorization": `Bearer ${API_CONFIG.apiKey}`,
-          },
-        });
+        const response = await fetch(
+          `${API_CONFIG.baseUrl}/v1/models/${code.toUpperCase()}/relationships`,
+          {
+            headers: {
+              Authorization: `Bearer ${API_CONFIG.apiKey}`,
+            },
+          }
+        );
 
         if (!response.ok) {
           return {
@@ -737,7 +746,7 @@ export function registerModelTools(server: McpServer): void {
           };
         }
 
-        const payload = await response.json();
+        const payload = (await response.json()) as Record<string, unknown>;
 
         return {
           content: [
@@ -753,7 +762,7 @@ export function registerModelTools(server: McpServer): void {
           content: [
             {
               type: "text",
-              text: `Failed to get related models: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Failed to get related models: ${error instanceof Error ? error.message : "Unknown error"}`,
             },
           ],
           isError: true,
@@ -921,8 +930,12 @@ export function registerModelTools(server: McpServer): void {
           .string()
           .regex(/^(P|IN|CO|DE|RE|SY)\d{1,2}$/i)
           .describe("Target model code"),
-        relationship_type: z.string().describe("Type of relationship (e.g., 'enables', 'reinforces')"),
-        confidence: z.enum(["A", "B", "C"]).describe("Confidence level: A=High, B=Moderate, C=Hypothesis"),
+        relationship_type: z
+          .string()
+          .describe("Type of relationship (e.g., 'enables', 'reinforces')"),
+        confidence: z
+          .enum(["A", "B", "C"])
+          .describe("Confidence level: A=High, B=Moderate, C=Hypothesis"),
         evidence: z.string().optional().describe("Evidence supporting this relationship"),
       }),
       outputSchema: z.object({
@@ -942,7 +955,7 @@ export function registerModelTools(server: McpServer): void {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_CONFIG.apiKey}`,
+            Authorization: `Bearer ${API_CONFIG.apiKey}`,
           },
           body: JSON.stringify({
             source_code,
@@ -966,7 +979,7 @@ export function registerModelTools(server: McpServer): void {
           };
         }
 
-        const payload = await response.json();
+        const payload = (await response.json()) as Record<string, unknown>;
 
         return {
           content: [
@@ -982,7 +995,7 @@ export function registerModelTools(server: McpServer): void {
           content: [
             {
               type: "text",
-              text: `Failed to add relationship: ${error instanceof Error ? error.message : 'Unknown error'}`,
+              text: `Failed to add relationship: ${error instanceof Error ? error.message : "Unknown error"}`,
             },
           ],
           isError: true,

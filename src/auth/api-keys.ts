@@ -4,9 +4,7 @@
  */
 
 import type { ApiKeyInfo, ApiKeyTier, AuthResult } from "../types/domain.js";
-
-// Cloudflare Workers types
-declare const KVNamespace: any;
+import type { KVNamespace } from "@cloudflare/workers-types";
 
 /**
  * Rate limits by tier
@@ -32,7 +30,14 @@ const TIER_LIMITS = {
 const TIER_PERMISSIONS = {
   free: ["read:health", "read:models", "read:transformations"],
   pro: ["read:health", "read:models", "read:transformations", "read:search", "read:recommend"],
-  enterprise: ["read:health", "read:models", "read:transformations", "read:search", "read:recommend", "admin:*"],
+  enterprise: [
+    "read:health",
+    "read:models",
+    "read:transformations",
+    "read:search",
+    "read:recommend",
+    "admin:*",
+  ],
 } as const;
 
 /**
@@ -46,7 +51,8 @@ export function isValidApiKeyFormat(key: string): boolean {
  * Generate a new API key
  */
 export function generateApiKey(tier: ApiKeyTier, name: string): ApiKeyInfo {
-  const id = crypto?.randomUUID?.() || `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const id =
+    crypto?.randomUUID?.() || `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   const key = `hummbl_${crypto?.randomUUID?.().replace(/-/g, "").substring(0, 16) || Math.random().toString(36).substr(2, 16)}`;
 
   return {
@@ -65,10 +71,7 @@ export function generateApiKey(tier: ApiKeyTier, name: string): ApiKeyInfo {
 /**
  * Validate API key against KV store
  */
-export async function validateApiKey(
-  kv: KVNamespace,
-  apiKey: string
-): Promise<AuthResult> {
+export async function validateApiKey(kv: KVNamespace, apiKey: string): Promise<AuthResult> {
   try {
     if (!isValidApiKeyFormat(apiKey)) {
       return {
