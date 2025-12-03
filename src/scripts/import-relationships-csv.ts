@@ -5,6 +5,7 @@
 
 import { createD1Client } from "../storage/d1-client.js";
 import { isRelationshipType, isDirection, isConfidence, isReviewStatus } from "../types/relationships.js";
+import type { D1Database } from "@cloudflare/workers-types";
 
 interface Env {
   DB: D1Database;
