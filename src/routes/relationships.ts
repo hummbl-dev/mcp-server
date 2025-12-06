@@ -157,6 +157,13 @@ router.post("/relationships", async (c: AppContext) => {
       return c.json({ error: "Invalid confidence level" }, 400);
     }
 
+    // Ensure confidence is valid for RelationshipInput (A, B, or C)
+    // Default to "C" if not provided, or convert "U" to "C"
+    const validConfidence =
+      body.confidence && body.confidence !== "U"
+        ? (body.confidence as "A" | "B" | "C")
+        : "C";
+
     // Generate ID
     const id = `R${Date.now().toString().slice(-6)}`;
 
@@ -166,7 +173,7 @@ router.post("/relationships", async (c: AppContext) => {
       model_b: body.model_b.toUpperCase(),
       relationship_type: body.relationship_type,
       direction: body.direction,
-      confidence: body.confidence || "U",
+      confidence: body.confidence || "U", // Keep "U" for relationshipData (full ModelRelationship)
       logical_derivation: body.logical_derivation,
       has_literature_support: body.literature_support?.has_support ? 1 : 0,
       literature_citation: body.literature_support?.citation,
@@ -183,7 +190,7 @@ router.post("/relationships", async (c: AppContext) => {
       source_code: relationshipData.model_a,
       target_code: relationshipData.model_b,
       relationship_type: relationshipData.relationship_type,
-      confidence: relationshipData.confidence as "A" | "B" | "C",
+      confidence: validConfidence,
       evidence: relationshipData.logical_derivation,
     };
 

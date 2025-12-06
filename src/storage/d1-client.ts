@@ -219,13 +219,14 @@ export class D1Client {
         VALUES (?, ?, ?, ?, ?)
       `;
 
-      await this.query(sql, [
+      await this.query(
+        sql,
         rel.source_code,
         rel.target_code,
         rel.relationship_type,
         rel.confidence,
-        rel.evidence || null,
-      ]);
+        rel.evidence || null
+      );
 
       // Return a simple success result - the actual created relationship would need to be fetched
       return {
@@ -334,13 +335,14 @@ export class D1Client {
         VALUES (?, ?, ?, ?, ?)
       `;
 
-      await this.query(sql, [
+      await this.query(
+        sql,
         input.source_code,
         input.target_code,
         input.relationship_type,
         input.confidence,
-        input.evidence || null,
-      ]);
+        input.evidence || null
+      );
 
       // Get the created relationship
       const selectSql = `
@@ -399,7 +401,7 @@ export class D1Client {
       params.push(id);
 
       const sql = `UPDATE model_relationships SET ${setParts.join(", ")}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
-      await this.query(sql, params);
+      await this.query(sql, ...params);
 
       // Return the updated relationship
       const result = await this.getRelationship(id);
