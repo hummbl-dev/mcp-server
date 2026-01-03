@@ -66,7 +66,7 @@
     "@upstash/redis": "^1.36.0",
     "hono": "^4.11.3",
     "nanoid": "^5.1.6",
-    "zod": "^3.25.76"
+    "zod": "^4.3.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260103.0",
