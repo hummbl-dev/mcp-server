@@ -64,7 +64,7 @@
     "@opentelemetry/sdk-trace-node": "^2.2.0",
     "@opentelemetry/semantic-conventions": "^1.38.0",
     "@upstash/redis": "^1.36.0",
-    "hono": "^4.6.12",
+    "hono": "^4.11.3",
     "nanoid": "^5.1.6",
     "zod": "^3.25.76"
   },
