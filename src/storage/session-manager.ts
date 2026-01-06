@@ -26,6 +26,8 @@ import {
 import { trace } from "../observability/tracing.js";
 
 export class SessionManager {
+  private logger = new Logger('session-manager');
+
   constructor(
     private redis: RedisClient,
     private d1: D1Client,
