@@ -3,7 +3,7 @@
  * Ported from Python Phase 1C implementation
  */
 
-import { z } from 'zod';
+import { z } from "zod";
 
 // Domain state schema - flexible record for any domain-specific data
 export const DomainStateSchema = z.record(z.unknown());

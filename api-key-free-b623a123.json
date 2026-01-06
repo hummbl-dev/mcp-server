@@ -1,0 +1,18 @@
+{
+  "id": "b623a123-7be3-4f97-ac53-4d0d5688439e",
+  "key": "hummbl_c245c73217de48a5",
+  "tier": "free",
+  "name": "Free Test Key",
+  "createdAt": "2025-11-27T19:08:43.356Z",
+  "usageCount": 0,
+  "rateLimit": {
+    "requestsPerHour": 100,
+    "requestsPerDay": 1000
+  },
+  "permissions": [
+    "read:health",
+    "read:models",
+    "read:transformations"
+  ],
+  "isActive": true
+}

@@ -1,224 +1,201 @@
 /**
- * Structured JSON logger with correlation IDs for request tracing.
- *
- * Features:
- * - JSON output format (machine-parseable)
- * - Correlation ID injection (track requests across components)
- * - Async context propagation (AsyncLocalStorage)
- * - Timer decorator (auto-log latency)
- * - Error traceback extraction
- * - Log sampling (reduce volume in production)
- *
- * Usage:
- *   const logger = new Logger('session-manager');
- *
- *   logger.withCorrelation('req_abc123', async () => {
- *     logger.info('session_created', { sessionId: 'abc', userId: 'reuben' });
- *   });
- *
- * Output:
- *   {
- *     "timestamp": "2025-11-17T12:00:00.000Z",
- *     "level": "INFO",
- *     "logger": "session-manager",
- *     "message": "session_created",
- *     "correlationId": "req_abc123",
- *     "sessionId": "abc",
- *     "userId": "reuben"
- *   }
+ * Structured logging with correlation IDs and sampling
+ * For Phase 1D observability implementation
  */
 
-import { AsyncLocalStorage } from 'async_hooks';
+// AsyncLocalStorage is not available in Cloudflare Workers, so we'll use a simple context stack
+class SimpleAsyncLocalStorage<T> {
+  private store: T | undefined;
 
-// Context storage for correlation IDs (propagates through async calls)
-const correlationContext = new AsyncLocalStorage<string>();
+  run<R>(store: T, fn: () => R): R {
+    const previous = this.store;
+    this.store = store;
+    try {
+      return fn();
+    } finally {
+      this.store = previous;
+    }
+  }
 
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
+  getStore(): T | undefined {
+    return this.store;
+  }
+}
 
-export interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  logger: string;
-  message: string;
+interface LogContext {
   correlationId?: string;
+  userId?: string;
+  sessionId?: string;
+  operation?: string;
   [key: string]: unknown;
 }
 
-export class Logger {
-  private name: string;
-  private sampleRate: number;
+interface LogEntry {
+  timestamp: string;
+  level: "debug" | "info" | "warn" | "error";
+  message: string;
+  correlationId?: string;
+  context?: LogContext;
+  error?: {
+    name: string;
+    message: string;
+    stack?: string;
+  };
+}
 
-  /**
-   * @param name - Logger name (e.g., 'session-manager', 'history-manager')
-   * @param sampleRate - Fraction of logs to emit (0.0-1.0). Use 0.1 for 10% sampling.
-   */
-  constructor(name: string, sampleRate = 1.0) {
-    this.name = name;
+export class Logger {
+  private als = new SimpleAsyncLocalStorage<LogContext>();
+  private sampleRate: number;
+  private parentContext?: LogContext;
+
+  constructor(sampleRate: number = 1.0) {
     this.sampleRate = sampleRate;
   }
 
-  /**
-   * Execute function with correlation ID in context.
-   * ID propagates to all nested async calls automatically.
-   */
-  async withCorrelation<T>(
-    correlationId: string,
-    fn: () => Promise<T>
-  ): Promise<T> {
-    return correlationContext.run(correlationId, fn);
-  }
-
-  /**
-   * Generate new correlation ID and execute function.
-   */
-  async withNewCorrelation<T>(fn: () => Promise<T>): Promise<T> {
-    const correlationId = `req_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-    return this.withCorrelation(correlationId, fn);
-  }
-
-  /**
-   * Get current correlation ID from async context.
-   */
-  private getCorrelationId(): string | undefined {
-    return correlationContext.getStore();
-  }
-
-  /**
-   * Check if this log should be sampled (emitted).
-   */
-  private shouldSample(): boolean {
+  private shouldLog(): boolean {
     return Math.random() < this.sampleRate;
   }
 
-  /**
-   * Core logging function - formats and emits log entry.
-   */
-  private log(level: LogLevel, message: string, metadata: Record<string, unknown>): void {
-    // Sample check
-    if (!this.shouldSample()) return;
-
-    const entry: LogEntry = {
-      timestamp: new Date().toISOString(),
-      level,
-      logger: this.name,
-      message,
-      correlationId: this.getCorrelationId(),
-      ...metadata
-    };
-
-    // Output as JSON
-    console.log(JSON.stringify(entry));
+  private formatLog(entry: LogEntry): string {
+    return JSON.stringify(entry);
   }
 
-  debug(message: string, metadata: Record<string, unknown> = {}): void {
-    this.log('DEBUG', message, metadata);
-  }
+  private writeLog(entry: LogEntry): void {
+    if (!this.shouldLog()) return;
 
-  info(message: string, metadata: Record<string, unknown> = {}): void {
-    this.log('INFO', message, metadata);
-  }
-
-  warning(message: string, metadata: Record<string, unknown> = {}): void {
-    this.log('WARNING', message, metadata);
-  }
-
-  error(
-    message: string,
-    error?: Error,
-    metadata: Record<string, unknown> = {}
-  ): void {
-    const errorMetadata = error ? {
-      errorType: error.name,
-      errorMessage: error.message,
-      errorStack: error.stack?.split('\n').slice(0, 5).join('\n') // First 5 lines
-    } : {};
-
-    this.log('ERROR', message, { ...metadata, ...errorMetadata });
-  }
-
-  critical(
-    message: string,
-    error?: Error,
-    metadata: Record<string, unknown> = {}
-  ): void {
-    const errorMetadata = error ? {
-      errorType: error.name,
-      errorMessage: error.message,
-      errorStack: error.stack // Full stack for critical
-    } : {};
-
-    this.log('CRITICAL', message, { ...metadata, ...errorMetadata });
-  }
-
-  /**
-   * Timer decorator - automatically logs operation latency.
-   *
-   * Usage:
-   *   await logger.timer('session_read', async () => {
-   *     return await sessionManager.get(sessionId);
-   *   });
-   *
-   * Logs:
-   *   { "message": "session_read", "latencyMs": 12.3, "success": true }
-   */
-  async timer<T>(
-    operation: string,
-    fn: () => Promise<T>,
-    metadata: Record<string, unknown> = {}
-  ): Promise<T> {
-    const startTime = Date.now();
-    let success = true;
-    let error: Error | undefined;
-
-    try {
-      const result = await fn();
-      return result;
-    } catch (e) {
-      success = false;
-      error = e instanceof Error ? e : new Error(String(e));
-      throw e;
-    } finally {
-      const latencyMs = Date.now() - startTime;
-
-      if (success) {
-        this.info(operation, {
-          latencyMs,
-          success: true,
-          ...metadata
-        });
-      } else {
-        this.error(operation, error, {
-          latencyMs,
-          success: false,
-          ...metadata
-        });
-      }
+    const formatted = this.formatLog(entry);
+    switch (entry.level) {
+      case "error":
+        console.error(formatted);
+        break;
+      case "warn":
+        console.warn(formatted);
+        break;
+      case "debug":
+        // eslint-disable-next-line no-console
+        console.debug(formatted);
+        break;
+      default:
+        // eslint-disable-next-line no-console
+        console.log(formatted);
     }
   }
+
+  private getCurrentContext(): LogContext {
+    const alsContext = this.als.getStore();
+    if (alsContext) {
+      return { ...this.parentContext, ...alsContext };
+    }
+    return this.parentContext || {};
+  }
+
+  withCorrelation<T>(correlationId: string, fn: () => T): T;
+  withCorrelation<T>(correlationId: string, context: Partial<LogContext>, fn: () => T): T;
+  withCorrelation<T>(
+    correlationId: string,
+    contextOrFn: Partial<LogContext> | (() => T),
+    fn?: () => T
+  ): T {
+    const context = typeof contextOrFn === "function" ? {} : contextOrFn;
+    const callback = typeof contextOrFn === "function" ? contextOrFn : (fn ?? (() => ({}) as T));
+
+    context.correlationId = correlationId;
+    const currentContext = this.getCurrentContext();
+    const newContext = { ...currentContext, ...context };
+
+    return this.als.run(newContext, callback);
+  }
+
+  timer<T>(operation: string, fn: () => T): T;
+  timer<T>(operation: string, context: Partial<LogContext>, fn: () => T): T;
+  timer<T>(operation: string, contextOrFn: Partial<LogContext> | (() => T), fn?: () => T): T {
+    const context = typeof contextOrFn === "function" ? {} : contextOrFn;
+    const callback = typeof contextOrFn === "function" ? contextOrFn : (fn ?? (() => ({}) as T));
+
+    const startTime = Date.now();
+    const currentContext = this.getCurrentContext();
+    const timerContext = { ...currentContext, ...context, operation };
+
+    this.als.run(timerContext, () => {
+      this.info(`Starting operation: ${operation}`);
+    });
+
+    try {
+      const result = this.als.run(timerContext, callback);
+      const duration = Date.now() - startTime;
+      this.als.run(timerContext, () => {
+        this.info(`Completed operation: ${operation}`, { duration });
+      });
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      this.als.run(timerContext, () => {
+        this.error(`Failed operation: ${operation}`, { duration }, error as Error);
+      });
+      throw error;
+    }
+  }
+
+  debug(message: string, context?: Partial<LogContext>): void {
+    const currentContext = this.getCurrentContext();
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level: "debug",
+      message,
+      correlationId: currentContext.correlationId,
+      context: { ...currentContext, ...context },
+    };
+    this.writeLog(entry);
+  }
+
+  info(message: string, context?: Partial<LogContext>): void {
+    const currentContext = this.getCurrentContext();
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level: "info",
+      message,
+      correlationId: currentContext.correlationId,
+      context: { ...currentContext, ...context },
+    };
+    this.writeLog(entry);
+  }
+
+  warn(message: string, context?: Partial<LogContext>): void {
+    const currentContext = this.getCurrentContext();
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level: "warn",
+      message,
+      correlationId: currentContext.correlationId,
+      context: { ...currentContext, ...context },
+    };
+    this.writeLog(entry);
+  }
+
+  error(message: string, context?: Partial<LogContext>, error?: Error): void {
+    const currentContext = this.getCurrentContext();
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level: "error",
+      message,
+      correlationId: currentContext.correlationId,
+      context: { ...currentContext, ...context },
+      error: error
+        ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          }
+        : undefined,
+    };
+    this.writeLog(entry);
+  }
+
+  child(context: Partial<LogContext>): Logger {
+    const childLogger = new Logger(this.sampleRate);
+    // For simplicity in Cloudflare Workers, just return a logger that will inherit context when used
+    // In a real implementation, we'd share the ALS instance
+    childLogger.parentContext = { ...this.getCurrentContext(), ...context };
+    return childLogger;
+  }
 }
-
-/**
- * Create a child logger with additional context.
- *
- * Usage:
- *   const baseLogger = new Logger('api');
- *   const sessionLogger = baseLogger.child({ sessionId: 'abc123' });
- *   sessionLogger.info('operation'); // Includes sessionId in every log
- */
-Logger.prototype.child = function(
-  context: Record<string, unknown>
-): Logger {
-  const childLogger = new Logger(this.name, this.sampleRate);
-
-  // Override log method to include context
-  const originalLog = childLogger['log'].bind(childLogger);
-  childLogger['log'] = function(
-    level: LogLevel,
-    message: string,
-    metadata: Record<string, unknown>
-  ) {
-    originalLog(level, message, { ...context, ...metadata });
-  };
-
-  return childLogger;
-};

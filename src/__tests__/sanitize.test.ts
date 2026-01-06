@@ -2,7 +2,7 @@
  * Unit tests for input sanitization
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 import {
   sanitizeText,
   sanitizeProblemDescription,
@@ -147,6 +147,12 @@ describe("Input Sanitization", () => {
   });
 
   describe("RateLimiter", () => {
+    afterEach(() => {
+      rateLimiter.clear("limit-test-user");
+      rateLimiter.clear("cleanup-test-user");
+      vi.useRealTimers();
+    });
+
     it("should allow requests within limit", () => {
       rateLimiter.clear("test-user-1");
       expect(rateLimiter.allow("test-user-1")).toBe(true);
@@ -167,6 +173,30 @@ describe("Input Sanitization", () => {
       expect(rateLimiter.remaining("test-user-3")).toBeLessThan(100);
       rateLimiter.clear("test-user-3");
       expect(rateLimiter.remaining("test-user-3")).toBe(100);
+    });
+
+    it("should reject when exceeding max requests", () => {
+      rateLimiter.clear("limit-test-user");
+      for (let i = 0; i < 100; i += 1) {
+        expect(rateLimiter.allow("limit-test-user")).toBe(true);
+      }
+      expect(rateLimiter.allow("limit-test-user")).toBe(false);
+    });
+
+    it("should clean up expired timestamps", () => {
+      vi.useFakeTimers();
+      const now = Date.now();
+      rateLimiter.clear("cleanup-test-user");
+      vi.setSystemTime(now);
+
+      for (let i = 0; i < 5; i += 1) {
+        expect(rateLimiter.allow("cleanup-test-user")).toBe(true);
+      }
+
+      vi.advanceTimersByTime(60001); // Advance beyond window
+      rateLimiter.cleanup();
+
+      expect(rateLimiter.remaining("cleanup-test-user")).toBe(100);
     });
   });
 });

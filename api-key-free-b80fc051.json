@@ -1,0 +1,12 @@
+{
+  "id": "b80fc051db73b13db29ea42fdc01a932",
+  "key": "hummbl_b375bed407a2ea750dfab6fe2b9227d0",
+  "tier": "free",
+  "description": "Test development key",
+  "createdAt": "2025-11-26T22:20:08.336Z",
+  "limits": {
+    "requests": 1000,
+    "rpm": 60
+  },
+  "active": true
+}

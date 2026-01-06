@@ -1,0 +1,36 @@
+name: "Testing: Self-Dialectical methodology unit coverage"
+description: "Add comprehensive unit tests for the Self-Dialectical framework and tooling"
+title: "[Testing] Self-Dialectical methodology unit coverage"
+labels:
+  - testing
+  - week1
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Owner**: Windsurf Cascade (implementation) — review by Claude Sonnet 4.5.
+
+        Create Vitest suites for `getSelfDialecticalMethodology` and `auditModelCodes`, covering stage ordering, meta-model uniqueness, duplicate detection, wrong transformation flags, and invalid codes.
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: All items must be completed.
+      options:
+        - label: `npm run test -- src/framework/self_dialectical.test.ts` passes in CI
+        - label: Coverage for `src/framework/self_dialectical.ts` ≥ 90%
+        - label: Tests assert Result-pattern errors for ValidationError, NotFound, WrongTransformation, Duplicate
+  - type: textarea
+    id: fixtures
+    attributes:
+      label: Test Fixtures / Notes
+      description: Document edge cases (duplicates, mixed case inputs, wrong transformations) referenced in tests.
+      placeholder: "List any new fixtures or helper utilities added for these tests"
+  - type: input
+    id: pr
+    attributes:
+      label: Tracking PR
+      description: Link to the PR implementing these tests.
+      placeholder: "https://github.com/hummbl-dev/mcp-server/pull/..."
+    validations:
+      required: false

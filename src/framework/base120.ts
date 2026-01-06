@@ -5,7 +5,13 @@
  * Quality Score: 9.2/10
  */
 
-import type { MentalModel, Transformation, TransformationType } from "../types/domain.js";
+import type {
+  MentalModel,
+  Transformation,
+  TransformationType,
+  DomainError,
+} from "../types/domain.js";
+import { type Result, ok, err } from "../types/domain.js";
 
 export const TRANSFORMATIONS: Record<string, Transformation> = {
   P: {
@@ -840,30 +846,55 @@ export function getAllModels(): MentalModel[] {
   return Object.values(TRANSFORMATIONS).flatMap((t) => t.models);
 }
 
-export function getModelByCode(code: string): MentalModel | null {
+export function getModelByCode(code: string): Result<MentalModel, DomainError> {
   const allModels = getAllModels();
-  return allModels.find((m) => m.code === code.toUpperCase()) || null;
+  const normalizedCode = code.toUpperCase();
+  const model = allModels.find((m) => m.code === normalizedCode) || null;
+
+  if (!model) {
+    return err({ type: "NotFound", entity: "MentalModel", code: normalizedCode });
+  }
+
+  return ok(model);
 }
 
-export function getTransformationByKey(key: string): Transformation | null {
-  return TRANSFORMATIONS[key] || null;
+export function getTransformationByKey(
+  key: TransformationType
+): Result<Transformation, DomainError> {
+  const transformation = TRANSFORMATIONS[key] ?? null;
+
+  if (!transformation) {
+    return err({ type: "NotFound", entity: "Transformation", code: key });
+  }
+
+  return ok(transformation);
 }
 
-export function searchModels(query: string): MentalModel[] {
+export function searchModels(query: string): Result<MentalModel[], DomainError> {
   const lowerQuery = query.toLowerCase();
-  return getAllModels().filter(
+  const results = getAllModels().filter(
     (m) =>
       m.code.toLowerCase().includes(lowerQuery) ||
       m.name.toLowerCase().includes(lowerQuery) ||
       m.definition.toLowerCase().includes(lowerQuery)
   );
+
+  return ok(results);
 }
 
-export function getModelsByPriority(priority: number): MentalModel[] {
-  return getAllModels().filter((m) => m.priority === priority);
+export function getModelsByPriority(priority: number): Result<MentalModel[], DomainError> {
+  const models = getAllModels().filter((m) => m.priority === priority);
+  return ok(models);
 }
 
-export function getModelsByTransformation(transformationKey: TransformationType): MentalModel[] {
-  const trans = TRANSFORMATIONS[transformationKey];
-  return trans ? trans.models : [];
+export function getModelsByTransformation(
+  transformationKey: TransformationType
+): Result<MentalModel[], DomainError> {
+  const trans = TRANSFORMATIONS[transformationKey] ?? null;
+
+  if (!trans) {
+    return err({ type: "NotFound", entity: "Transformation", code: transformationKey });
+  }
+
+  return ok(trans.models);
 }

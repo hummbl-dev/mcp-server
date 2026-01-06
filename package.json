@@ -14,7 +14,9 @@
   ],
   "scripts": {
     "build": "tsc",
+    "build:api": "tsc --outDir dist --target es2022 --module es2022 --moduleResolution bundler src/api.ts",
     "dev": "tsx src/index.ts",
+    "dev:api": "wrangler dev src/api.ts",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
@@ -28,7 +30,13 @@
     "format:check": "prettier --check \"src/**/*.ts\"",
     "prepare": "husky",
     "validate": "npm run typecheck && npm run lint && npm run test",
-    "deploy": "wrangler deploy"
+    "deploy": "npm run build:api && wrangler deploy",
+    "deploy:staging": "npm run build:api && wrangler deploy --env staging",
+    "provision": "node scripts/provision-infra.js",
+    "seed": "wrangler d1 execute hummbl-api --file=seed.sql",
+    "create-key": "tsx scripts/create-api-key.ts",
+    "import-relationships": "tsx scripts/import-relationships-csv.ts",
+    "ship": "node scripts/deploy.js"
   },
   "keywords": [
     "mcp",
@@ -48,27 +56,34 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "@upstash/redis": "^1.35.6",
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/core": "^2.2.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.208.0",
+    "@opentelemetry/resources": "^2.2.0",
+    "@opentelemetry/sdk-trace-node": "^2.2.0",
+    "@opentelemetry/semantic-conventions": "^1.38.0",
+    "@upstash/redis": "^1.36.0",
+    "hono": "^4.11.3",
     "nanoid": "^5.1.6",
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251117.0",
-    "@types/node": "^22.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.15.0",
-    "@vitest/coverage-v8": "^4.0.9",
-    "@vitest/ui": "^4.0.9",
-    "eslint": "^9.15.0",
+    "@cloudflare/workers-types": "^4.20260103.0",
+    "@types/node": "^22.19.1",
+    "@typescript-eslint/eslint-plugin": "^8.52.0",
+    "@typescript-eslint/parser": "^8.52.0",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.11",
-    "prettier": "^3.4.2",
-    "tsx": "^4.19.0",
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
     "typescript": "^5.6.0",
-    "vitest": "^4.0.9"
+    "vitest": "^4.0.16"
   },
   "lint-staged": {
     "*.ts": [

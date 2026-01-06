@@ -114,6 +114,18 @@ Common issues and solutions for HUMMBL MCP Server.
 2. Use uppercase
 3. Example: `get_transformation` with key "P"
 
+### Self-Dialectical methodology missing
+
+**Problem**: `get_methodology` or methodology resources return errors
+
+**Solutions**:
+1. Ensure you are running v1.0.0-beta.2 or later (check stderr banner)
+2. Use exact resource URIs:
+   - `hummbl://methodology/self-dialectical-ai`
+   - `hummbl://methodology/self-dialectical-ai/overview`
+3. Validate methodology tool inputs (empty JSON object `{}` is sufficient)
+4. If auditing references, verify codes follow `[P|IN|CO|DE|RE|SY][1-20]`
+
 ## Development Issues
 
 ### Tests failing
