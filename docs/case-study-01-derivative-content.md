@@ -5,7 +5,7 @@
 ### Post 1 (Hook)
 I built a 120-model mental models framework using... the framework itself.
 
-Meta-recursive product development. Here's what 18 months of framework-driven building taught me:
+Meta-recursive product development. Here's what 22 months of framework-driven building taught me:
 
 🧵👇
 
@@ -16,7 +16,7 @@ Started with a mess:
 - Zero production infrastructure
 - Solo founder, full-time job, multiple clients
 
-Wickedness score: 19/30 (Tier 4 problem)
+Wickedness score: 20/30 (Tier 4 problem)
 
 ### Post 3 (Architecture)
 First breakthrough: 6 transformations, not random categories.
@@ -69,7 +69,7 @@ The numbers:
 ✅ 140 chaos tests
 ✅ 100% pass rate
 ✅ 1 human + 4 AI agents
-✅ 18 months
+✅ 22 months
 
 ### Post 8 (Meta-Proof)
 The meta-recursive proof:
@@ -90,7 +90,7 @@ The framework is live at hummbl.io
 
 MCP server for Claude Desktop: @hummbl/mcp-server
 
-Full case study: [link]
+Full case study: https://github.com/hummbl-dev/mcp-server/blob/main/docs/case-study-01-framework-development.md
 
 What's your Tier 4 problem? Let's see if Base120 can crack it.
 
@@ -98,7 +98,7 @@ What's your Tier 4 problem? Let's see if Base120 can crack it.
 
 ## 2. LinkedIn Post (Long-form)
 
-**18 months ago, I had a problem.**
+**22 months ago, I had a problem.**
 
 Mental models everywhere. Notes, books, scattered insights. No system. No validation. No product.
 
@@ -166,7 +166,7 @@ The framework is free at hummbl.io. DM me if you want to be a case study.
 │   • Need for empirical validation                          │
 │   • Multi-system AI coordination required                  │
 │                                                            │
-│   Wickedness Score: 19/30 (Tier 4)                        │
+│   Wickedness Score: 20/30 (Tier 4)                        │
 │                                                            │
 ├────────────────────────────────────────────────────────────┤
 │                                                            │
@@ -186,7 +186,7 @@ The framework is free at hummbl.io. DM me if you want to be a case study.
 │   THE RESULTS                                              │
 │   ─────────────────                                        │
 │                                                            │
-│   120/120        9.2/10         140            18          │
+│   120/120        9.2/10         140            22          │
 │   models         quality        tests          months      │
 │   validated      score          passing                    │
 │                                                            │
@@ -218,7 +218,7 @@ The framework is free at hummbl.io. DM me if you want to be a case study.
 ## 4. Video Script Outline (3-5 min)
 
 ### HOOK (0:00-0:15)
-"I spent 18 months building a mental models framework. The twist? I used the framework to build itself. Here's what happened."
+"I spent 22 months building a mental models framework. The twist? I used the framework to build itself. Here's what happened."
 
 ### PROBLEM (0:15-0:45)
 - Show messy notes, scattered models
@@ -268,7 +268,7 @@ The framework is free at hummbl.io. DM me if you want to be a case study.
 
 Hey,
 
-18 months ago I started building HUMMBL—a mental models framework for wicked problems.
+22 months ago I started building HUMMBL—a mental models framework for wicked problems.
 
 The meta part: I used the framework to build the framework.
 
@@ -288,14 +288,14 @@ The meta part: I used the framework to build the framework.
 - 120/120 models validated
 - 9.2/10 average quality
 - 140 chaos tests, 100% pass
-- 18 months, 1 human + 4 AI agents
+- 22 months, 1 human + 4 AI agents
 
 The meta-recursive proof: if a framework can build itself, it can handle anything at equivalent complexity.
 
 **Want to try it?**
 - Web: hummbl.io (free)
 - Claude Desktop: @hummbl/mcp-server
-- Full case study: [link]
+- Full case study: https://github.com/hummbl-dev/mcp-server/blob/main/docs/case-study-01-framework-development.md
 
 If you're working on a wicked problem—multiple stakeholders, low predictability, high complexity—reply and tell me about it. Looking for case study #2 and #3.
 
@@ -328,13 +328,13 @@ Sharing a case study from building HUMMBL—a systematic mental models framework
 - 120 models, 9.2/10 quality score
 - 140 chaos tests, 100% pass rate
 - MCP server for Claude Desktop
-- 18 months, solo founder
+- 22 months, solo founder
 
 **Tech stack:** React, Cloudflare Workers, D1, TypeScript
 
 **Links:**
 - Live: hummbl.io
 - MCP: npm @hummbl/mcp-server  
-- Case study: [link]
+- Case study: https://github.com/hummbl-dev/mcp-server/blob/main/docs/case-study-01-framework-development.md
 
 Would love feedback on the framework architecture and multi-agent coordination approach. AMA about the development process.
