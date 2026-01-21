@@ -408,6 +408,119 @@ Example:
 
 ---
 
+## Guided Workflows (NEW in Phase 2)
+
+HUMMBL now includes guided multi-turn workflows that walk you through systematic problem-solving using mental models. Perfect for complex problems that benefit from structured analysis.
+
+### Available Workflows
+
+#### 1. Root Cause Analysis
+**Use when**: Investigating failures, incidents, or recurring problems
+**Duration**: 20-30 minutes
+**Sequence**: P → IN → DE → SY
+
+Systematically find root causes, not just symptoms.
+
+#### 2. Strategy Design
+**Use when**: Creating strategies, planning initiatives, entering markets
+**Duration**: 30-45 minutes
+**Sequence**: P → CO → SY → RE
+
+Design comprehensive strategies with creative combinations and systemic thinking.
+
+#### 3. Decision Making
+**Use when**: High-stakes decisions with uncertainty
+**Duration**: 15-25 minutes
+**Sequence**: P → IN → SY → RE
+
+Make quality decisions through clear framing, stress-testing, and systematic evaluation.
+
+### Workflow Tools
+
+#### `list_workflows`
+List all available guided workflows.
+
+```json
+{
+  "tool": "list_workflows"
+}
+```
+
+#### `start_workflow`
+Begin a guided workflow for your problem.
+
+```json
+{
+  "tool": "start_workflow",
+  "arguments": {
+    "workflow_name": "root_cause_analysis",
+    "problem_description": "Our production API started failing intermittently after yesterday's deployment"
+  }
+}
+```
+
+#### `continue_workflow`
+Proceed to the next step after completing current step.
+
+```json
+{
+  "tool": "continue_workflow",
+  "arguments": {
+    "workflow_name": "root_cause_analysis",
+    "current_step": 1,
+    "step_insights": "Identified 3 affected stakeholders: customers experiencing timeouts, internal services with cascading failures, and ops team receiving alerts. Core assumption: the deployment changed something fundamental in request handling."
+  }
+}
+```
+
+#### `find_workflow_for_problem`
+Discover which workflow best fits your problem.
+
+```json
+{
+  "tool": "find_workflow_for_problem",
+  "arguments": {
+    "problem_keywords": "system failure production"
+  }
+}
+```
+
+### Example: Root Cause Analysis Workflow
+
+**Step 1 (Perspective)**:
+```json
+{
+  "currentStep": 1,
+  "totalSteps": 4,
+  "transformation": "P",
+  "guidance": "Frame the problem clearly from multiple perspectives",
+  "suggestedModels": ["P1", "P2", "P15"],
+  "questions": [
+    "What are the foundational facts we know for certain?",
+    "Who is affected and how?",
+    "What assumptions are we making?"
+  ]
+}
+```
+
+**After completing Step 1, continue:**
+```json
+{
+  "tool": "continue_workflow",
+  "arguments": {
+    "workflow_name": "root_cause_analysis",
+    "current_step": 1,
+    "step_insights": "Your insights here..."
+  }
+}
+```
+
+**Step 2 (Inversion)**: Test boundaries, work backward from failure
+**Step 3 (Decomposition)**: Isolate the failing component
+**Step 4 (Meta-Systems)**: Design systemic fixes and prevention
+
+---
+
 ## Available Resources
 
 Direct URI-based access to models and transformations:
