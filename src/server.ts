@@ -5,6 +5,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerModelTools } from "./tools/models.js";
+import { registerWorkflowTools } from "./tools/workflows.js";
 import { registerModelResources } from "./resources/models.js";
 
 /**
@@ -18,6 +19,7 @@ export function createServer(): McpServer {
 
   // Register all tools
   registerModelTools(server);
+  registerWorkflowTools(server); // Phase 2: Guided workflows
 
   // Register all resources
   registerModelResources(server);
