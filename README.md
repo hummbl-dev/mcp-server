@@ -119,6 +119,258 @@ Example:
 }
 ```
 
+## Usage Examples
+
+### Example 1: Getting a Specific Model
+
+**Scenario**: You want to understand "First Principles Thinking" before applying it to a problem.
+
+```json
+// Request
+{
+  "tool": "get_model",
+  "arguments": {
+    "code": "P1"
+  }
+}
+
+// Response
+{
+  "model": {
+    "code": "P1",
+    "name": "First Principles Framing",
+    "definition": "Reduce complex problems to foundational truths that cannot be further simplified",
+    "priority": 1,
+    "transformation": "P"
+  }
+}
+```
+
+**When to use**: Starting a new problem analysis by identifying core assumptions and fundamentals.
+
+---
+
+### Example 2: Listing Models by Transformation
+
+**Scenario**: You know you need to look at a problem from different perspectives but want to see all available perspective models.
+
+```json
+// Request
+{
+  "tool": "list_all_models",
+  "arguments": {
+    "transformation_filter": "P"
+  }
+}
+
+// Response
+{
+  "total": 20,
+  "models": [
+    {
+      "code": "P1",
+      "name": "First Principles Framing",
+      "definition": "Reduce complex problems to foundational truths...",
+      "priority": 1,
+      "transformation": "P"
+    },
+    {
+      "code": "P2",
+      "name": "Stakeholder Mapping",
+      "definition": "Identify all parties with interest, influence...",
+      "priority": 1,
+      "transformation": "P"
+    }
+    // ... 18 more models
+  ]
+}
+```
+
+**When to use**: Exploring all models within a specific transformation category to find the right approach.
+
+---
+
+### Example 3: Searching for Decision-Related Models
+
+**Scenario**: You're making a strategic decision and want to find all mental models related to decision-making.
+
+```json
+// Request
+{
+  "tool": "search_models",
+  "arguments": {
+    "query": "decision"
+  }
+}
+
+// Response
+{
+  "query": "decision",
+  "resultCount": 8,
+  "results": [
+    {
+      "code": "P2",
+      "name": "Stakeholder Mapping",
+      "definition": "Identify all parties with interest, influence, or impact in a system or decision",
+      "priority": 1,
+      "transformation": "P"
+    },
+    {
+      "code": "SY3",
+      "name": "Decision Trees & Game Theory",
+      "definition": "Model sequential choices and strategic interactions with payoff structures",
+      "priority": 1,
+      "transformation": "SY"
+    }
+    // ... 6 more results
+  ]
+}
+```
+
+**When to use**: Finding relevant models across all transformations for a specific concept or challenge.
+
+---
+
+### Example 4: Getting Recommendations for a Complex Problem
+
+**Scenario**: Your startup is scaling rapidly but systems are breaking down—you need guidance on which mental models to apply.
+
+```json
+// Request
+{
+  "tool": "recommend_models",
+  "arguments": {
+    "problem": "Our startup is growing rapidly but systems are breaking down. We need to scale operations without losing quality."
+  }
+}
+
+// Response
+{
+  "problem": "Our startup is growing rapidly but systems are breaking down...",
+  "recommendationCount": 2,
+  "recommendations": [
+    {
+      "pattern": "Complex system to understand",
+      "transformations": [
+        {
+          "key": "DE",
+          "name": "Decomposition",
+          "description": "Break down complexity into manageable components"
+        }
+      ],
+      "topModels": [
+        {
+          "code": "DE1",
+          "name": "Modular Decomposition",
+          "definition": "Break systems into independent, interchangeable components...",
+          "priority": 1
+        },
+        {
+          "code": "DE2",
+          "name": "Layered Architecture",
+          "definition": "Organize systems into hierarchical strata with clear interfaces",
+          "priority": 1
+        }
+      ]
+    },
+    {
+      "pattern": "Strategic or coordination challenge",
+      "transformations": [
+        {
+          "key": "SY",
+          "name": "Meta-Systems",
+          "description": "Understand rules, patterns, and systems governing systems"
+        }
+      ],
+      "topModels": [
+        {
+          "code": "SY1",
+          "name": "Feedback Loops & Causality",
+          "definition": "Trace how outputs loop back as inputs creating reinforcing or balancing dynamics",
+          "priority": 1
+        }
+      ]
+    }
+  ]
+}
+```
+
+**When to use**: You have a complex, multi-faceted problem and need AI-driven recommendations on where to start.
+
+---
+
+### Example 5: Exploring the Inversion Transformation
+
+**Scenario**: You've heard about "inversion thinking" and want to understand all the models in that category.
+
+```json
+// Request
+{
+  "tool": "get_transformation",
+  "arguments": {
+    "key": "IN"
+  }
+}
+
+// Response
+{
+  "key": "IN",
+  "name": "Inversion",
+  "description": "Reverse assumptions. Examine opposites, edges, negations.",
+  "modelCount": 20,
+  "models": [
+    {
+      "code": "IN1",
+      "name": "Subtractive Thinking",
+      "definition": "Improve systems by removing elements rather than adding complexity",
+      "priority": 1
+    },
+    {
+      "code": "IN2",
+      "name": "Premortem Analysis",
+      "definition": "Assume failure has occurred and work backward to identify causes",
+      "priority": 1
+    }
+    // ... 18 more models
+  ]
+}
+```
+
+**When to use**: Deep-diving into a transformation to understand its philosophy and available models.
+
+---
+
+### Example 6: Finding Problem Patterns
+
+**Scenario**: Your team struggles with innovation—everything feels incremental. You want to find pre-defined patterns that match this challenge.
+
+```json
+// Request
+{
+  "tool": "search_problem_patterns",
+  "arguments": {
+    "query": "innovation"
+  }
+}
+
+// Response
+{
+  "query": "innovation",
+  "patternCount": 1,
+  "patterns": [
+    {
+      "pattern": "Stuck in conventional thinking",
+      "transformations": ["IN"],
+      "topModels": ["IN1", "IN2", "IN3"]
+    }
+  ]
+}
+```
+
+**When to use**: You recognize a common problem type and want to quickly jump to the recommended mental models and approaches.
+
+---
+
 ## Available Resources
 
 Direct URI-based access to models and transformations:
@@ -126,6 +378,10 @@ Direct URI-based access to models and transformations:
 - `hummbl://model/{code}` – Individual model (e.g., `hummbl://model/P1`)
 - `hummbl://transformation/{type}` – All models in transformation (e.g., `hummbl://transformation/P`)
 - `hummbl://models` – Complete Base120 framework
+
+## Problem Patterns
+
+HUMMBL includes pre-defined problem patterns that map common challenges to recommended transformations and models. See [Problem Patterns Documentation](./docs/problem-patterns.md) for the complete catalog with detailed guidance.
 
 ## Development
 
