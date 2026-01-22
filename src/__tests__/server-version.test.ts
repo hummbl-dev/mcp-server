@@ -6,9 +6,7 @@ import { join, dirname } from "node:path";
 import { createServer } from "../server.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const packageJson = JSON.parse(
-  readFileSync(join(__dirname, "../../package.json"), "utf-8")
-);
+const packageJson = JSON.parse(readFileSync(join(__dirname, "../../package.json"), "utf-8"));
 const packageVersion: string = packageJson.version;
 
 const getServerVersion = (): string => {
@@ -23,7 +21,11 @@ describe("Server version contract", () => {
   });
 
   it("ensures index banner string stays in sync with package.json version", () => {
-    const indexSource = readFileSync(join(__dirname, "../index.ts"), "utf-8");
+    // Read from src directory (works whether test runs from src or dist)
+    const srcDir = __dirname.includes("/dist/")
+      ? join(__dirname, "../../src/index.ts")
+      : join(__dirname, "../index.ts");
+    const indexSource = readFileSync(srcDir, "utf-8");
     const expectedBanner = `HUMMBL MCP Server v${packageVersion} running on stdio`;
     expect(indexSource.includes(expectedBanner)).toBe(true);
   });

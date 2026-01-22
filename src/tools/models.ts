@@ -12,10 +12,12 @@ import { z } from "zod";
 
 import {
   TRANSFORMATIONS,
+  PROBLEM_PATTERNS,
   getAllModels,
   getModelByCode,
   searchModels,
   getModelsByTransformation,
+  getTransformationByKey,
 } from "../framework/base120.js";
 import { isOk } from "../types/domain.js";
 import { MCP_CONFIG } from "../config/mcp.js";
@@ -223,6 +225,118 @@ export function registerModelTools(server: McpServer): void {
         query,
         resultCount: enriched.length,
         results: enriched,
+      };
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(payload, null, 2),
+          },
+        ],
+        structuredContent: payload,
+      } as const;
+    }
+  );
+
+  // Tool: Get transformation
+  server.registerTool(
+    "get_transformation",
+    {
+      title: "Get Transformation Details",
+      description:
+        "Retrieve information about a specific transformation type and all its models (P, IN, CO, DE, RE, SY).",
+      inputSchema: z.object({
+        key: z
+          .enum(["P", "IN", "CO", "DE", "RE", "SY"])
+          .describe("Transformation key (P, IN, CO, DE, RE, or SY)"),
+      }),
+      outputSchema: z.object({
+        key: z.string(),
+        name: z.string(),
+        description: z.string(),
+        modelCount: z.number(),
+        models: z.array(
+          z.object({
+            code: z.string(),
+            name: z.string(),
+            definition: z.string(),
+            priority: z.number(),
+          })
+        ),
+      }),
+    },
+    async ({ key }) => {
+      const result = getTransformationByKey(key);
+
+      if (!isOk(result)) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Transformation '${key}' not found. Valid keys are: P, IN, CO, DE, RE, SY.`,
+            },
+          ],
+          isError: true,
+        } as const;
+      }
+
+      const transformation = result.value;
+
+      const payload = {
+        key: transformation.key,
+        name: transformation.name,
+        description: transformation.description,
+        modelCount: transformation.models.length,
+        models: transformation.models,
+      };
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(payload, null, 2),
+          },
+        ],
+        structuredContent: payload,
+      } as const;
+    }
+  );
+
+  // Tool: Search problem patterns
+  server.registerTool(
+    "search_problem_patterns",
+    {
+      title: "Search Problem Patterns",
+      description:
+        "Find pre-defined problem patterns with recommended transformations and top models based on a search query.",
+      inputSchema: z.object({
+        query: z.string().min(2).describe("Search query (minimum 2 characters)"),
+      }),
+      outputSchema: z.object({
+        query: z.string(),
+        patternCount: z.number(),
+        patterns: z.array(
+          z.object({
+            pattern: z.string(),
+            transformations: z.array(z.string()),
+            topModels: z.array(z.string()),
+          })
+        ),
+      }),
+    },
+    async ({ query }) => {
+      const lowerQuery = query.toLowerCase();
+
+      // Search patterns by pattern text
+      const matchingPatterns = PROBLEM_PATTERNS.filter((p) =>
+        p.pattern.toLowerCase().includes(lowerQuery)
+      );
+
+      const payload = {
+        query,
+        patternCount: matchingPatterns.length,
+        patterns: matchingPatterns,
       };
 
       return {

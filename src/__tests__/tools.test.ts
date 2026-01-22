@@ -15,8 +15,8 @@ describe("MCP Tools Integration", () => {
   });
 
   describe("Tool Registration", () => {
-    it("should register all 6 tools", () => {
-      expect(mockServer.tools.size).toBe(6);
+    it("should register all 8 tools", () => {
+      expect(mockServer.tools.size).toBe(8);
     });
 
     it("should register get_model tool", () => {
@@ -127,17 +127,20 @@ describe("MCP Tools Integration", () => {
   });
 
   describe("recommend_models tool", () => {
-    it("should return recommendations for problem", async () => {
-      const tool = mockServer.getTool("recommend_models");
-      const result = await tool.handler({
-        problem: "Our startup is growing rapidly but systems are breaking",
-      });
+    it.skipIf(!process.env.HUMMBL_API_KEY)(
+      "should return recommendations for problem",
+      async () => {
+        const tool = mockServer.getTool("recommend_models");
+        const result = await tool.handler({
+          problem: "Our startup is growing rapidly but systems are breaking",
+        });
 
-      expect(result.structuredContent.recommendationCount).toBeGreaterThan(0);
-      expect(result.structuredContent.recommendations.length).toBeGreaterThan(0);
-    });
+        expect(result.structuredContent.recommendationCount).toBeGreaterThan(0);
+        expect(result.structuredContent.recommendations.length).toBeGreaterThan(0);
+      }
+    );
 
-    it("should include problem in response", async () => {
+    it.skipIf(!process.env.HUMMBL_API_KEY)("should include problem in response", async () => {
       const problem = "Need to make strategic decision";
       const tool = mockServer.getTool("recommend_models");
       const result = await tool.handler({ problem });
@@ -145,7 +148,7 @@ describe("MCP Tools Integration", () => {
       expect(result.structuredContent.problem).toBe(problem);
     });
 
-    it("should return transformations and models", async () => {
+    it.skipIf(!process.env.HUMMBL_API_KEY)("should return transformations and models", async () => {
       const tool = mockServer.getTool("recommend_models");
       const result = await tool.handler({ problem: "innovation challenge" });
 
