@@ -3,6 +3,7 @@
  * Ported from Python Phase 1C implementation
  */
 
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 // Domain state schema - flexible record for any domain-specific data
@@ -43,7 +44,7 @@ export function createSession(
   const now = new Date().toISOString();
 
   return {
-    sessionId: crypto.randomUUID(),
+    sessionId: randomUUID(),
     userId,
     adapterType,
     createdAt: now,
