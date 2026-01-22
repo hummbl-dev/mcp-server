@@ -8,7 +8,11 @@
     "hummbl-mcp": "./dist/index.js"
   },
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist/**/*.d.ts.map",
+    "!dist/**/*.test.*",
+    "!dist/__tests__",
     "README.md",
     "LICENSE"
   ],
