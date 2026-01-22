@@ -14,7 +14,7 @@ export const SessionMetadataSchema = z.object({
   totalMessages: z.number().int().nonnegative(),
   totalCostUsd: z.number().nonnegative(),
   activeTools: z.array(z.string()),
-  lastActivity: z.string().datetime().optional(),
+  lastActivity: z.string().datetime({ offset: true }).optional(),
   clientInfo: z.record(z.unknown()).optional(),
 });
 
@@ -25,8 +25,8 @@ export const SessionSchema = z.object({
   sessionId: z.string().uuid(),
   userId: z.string(),
   adapterType: z.string(),
-  createdAt: z.string().datetime(),
-  lastActive: z.string().datetime(),
+  createdAt: z.string().datetime({ offset: true }),
+  lastActive: z.string().datetime({ offset: true }),
   version: z.number().int().positive(),
   domainState: DomainStateSchema,
   metadata: SessionMetadataSchema,
