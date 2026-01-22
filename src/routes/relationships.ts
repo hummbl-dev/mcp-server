@@ -160,9 +160,7 @@ router.post("/relationships", async (c: AppContext) => {
     // Ensure confidence is valid for RelationshipInput (A, B, or C)
     // Default to "C" if not provided, or convert "U" to "C"
     const validConfidence =
-      body.confidence && body.confidence !== "U"
-        ? (body.confidence as "A" | "B" | "C")
-        : "C";
+      body.confidence && body.confidence !== "U" ? (body.confidence as "A" | "B" | "C") : "C";
 
     // Generate ID
     const id = `R${Date.now().toString().slice(-6)}`;
