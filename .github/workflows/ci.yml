@@ -80,7 +80,7 @@ jobs:
       - name: Fix Formatting and ESLint Issues
         run: npm run lint:fix
       - name: Check formatting
-                run: npm run format:check
+        run: npm run format:check
 
   security:
     name: Security Audit
