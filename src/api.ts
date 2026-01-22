@@ -91,7 +91,7 @@ app.get("/v1/models/:code", authenticate, async (c: AppContext) => {
   );
 
   // Get enriched data from D1
-  const db = createD1Client(c.env.DB as any);
+  const db = createD1Client(c.env.DB);
   const enrichedResult = await db.getMentalModel(code);
 
   if (!isOk(enrichedResult)) {
@@ -112,7 +112,7 @@ app.get("/v1/models/:code", authenticate, async (c: AppContext) => {
 app.get("/v1/models/:code/relationships", async (c: AppContext) => {
   try {
     const code = c.req.param("code").toUpperCase();
-    const db = createD1Client(c.env.DB as any);
+    const db = createD1Client(c.env.DB);
 
     const result = await db.getRelationshipsForModel(code);
     if (!result.ok) {
@@ -132,7 +132,7 @@ app.get("/v1/models/:code/relationships", async (c: AppContext) => {
 app.post("/v1/relationships", authenticate, async (c: AppContext) => {
   try {
     const body = await c.req.json();
-    const db = createD1Client(c.env.DB as any);
+    const db = createD1Client(c.env.DB);
 
     // Validate required fields
     if (!body.source_code || !body.target_code || !body.relationship_type || !body.confidence) {
@@ -174,7 +174,7 @@ app.post("/v1/relationships/seed", authenticate, async (c: AppContext) => {
       return c.json({ error: "Admin permissions required" }, 403);
     }
 
-    const db = createD1Client(c.env.DB as any);
+    const db = createD1Client(c.env.DB);
     const { getSeedRelationships } = await import("./data/seed-relationships.js");
     const seedData = getSeedRelationships();
 
@@ -207,7 +207,7 @@ app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
   try {
     const id = c.req.param("id");
     const body = await c.req.json();
-    const db = createD1Client(c.env.DB as any);
+    const db = createD1Client(c.env.DB);
 
     // Validate confidence if provided
     if (body.confidence && !["A", "B", "C"].includes(body.confidence)) {
@@ -231,7 +231,7 @@ app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
 app.get("/v1/relationships/:id", async (c: AppContext) => {
   try {
     const id = c.req.param("id");
-    const db = createD1Client(c.env.DB as any);
+    const db = createD1Client(c.env.DB);
 
     const result = await db.getRelationship(id);
     if (!result) {
@@ -247,7 +247,7 @@ app.get("/v1/relationships/:id", async (c: AppContext) => {
 // List relationships with filters
 app.get("/v1/relationships", async (c: AppContext) => {
   try {
-    const db = createD1Client(c.env.DB as any);
+    const db = createD1Client(c.env.DB);
     const filters = {
       model: c.req.query("model"),
       type: c.req.query("type"),

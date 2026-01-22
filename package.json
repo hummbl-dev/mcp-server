@@ -28,7 +28,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "validate": "npm run typecheck && npm run lint && npm run test",
     "deploy": "npm run build:api && wrangler deploy",
     "deploy:staging": "npm run build:api && wrangler deploy --env staging",

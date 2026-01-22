@@ -3,6 +3,7 @@
  * Ported from Python Phase 1C d1_client.py
  */
 
+import type { D1Database } from "@cloudflare/workers-types";
 import type {
   SimpleRelationship,
   RelationshipInput,
@@ -10,12 +11,10 @@ import type {
   ModelRelationship,
 } from "../types/relationships.js";
 
-// D1 types are inferred from usage, interfaces removed to avoid unused variable errors
-
 export class D1Client {
-  private db: any;
+  private db: D1Database;
 
-  constructor(db: any) {
+  constructor(db: D1Database) {
     this.db = db;
   }
 
@@ -43,7 +42,7 @@ export class D1Client {
    */
   async query<T>(sql: string, ...params: unknown[]): Promise<T[]> {
     try {
-      const result = await (this.db as any)
+      const result = await this.db
         .prepare(sql)
         .bind(...params)
         .all();
@@ -62,7 +61,7 @@ export class D1Client {
    */
   async queryOne<T>(sql: string, ...params: unknown[]): Promise<T | null> {
     try {
-      const result = await (this.db as any)
+      const result = await this.db
         .prepare(sql)
         .bind(...params)
         .first();
@@ -419,6 +418,6 @@ export class D1Client {
 /**
  * Create a D1Client instance from a D1Database
  */
-export function createD1Client(db: any): D1Client {
+export function createD1Client(db: D1Database): D1Client {
   return new D1Client(db);
 }
