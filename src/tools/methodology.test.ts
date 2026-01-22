@@ -13,9 +13,8 @@ vi.mock("../framework/self_dialectical.js", () => {
   };
 });
 
-const { getSelfDialecticalMethodology, auditModelCodes } = await import(
-  "../framework/self_dialectical.js"
-);
+const { getSelfDialecticalMethodology, auditModelCodes } =
+  await import("../framework/self_dialectical.js");
 
 // Type assertions for mocked functions - cast to any to allow mock methods
 const mockedGetMethodology = getSelfDialecticalMethodology as any;
