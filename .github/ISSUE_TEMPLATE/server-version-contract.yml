@@ -1,0 +1,35 @@
+name: "Infra: Server version contract"
+description: "Add safety net ensuring server metadata/logs match package version"
+title: "[Infra] Server version contract test"
+labels:
+  - infra
+  - week1
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Owner**: Windsurf Cascade.
+
+        Add an integration test asserting `createServer().version` and the stderr banner string in `src/index.ts` match `package.json`'s `version`.
+  - type: checkboxes
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: All boxes must be checked in the PR.
+      options:
+        - label: New test (e.g., `src/__tests__/server-version.test.ts`) passes in CI
+        - label: Test reads package.json once and compares both server metadata + banner string
+        - label: CI fails if versions diverge
+  - type: textarea
+    id: implementation-notes
+    attributes:
+      label: Implementation Notes
+      description: Capture helpers used to read package.json or mock stderr.
+      placeholder: "Document any utilities or mocks introduced for version checks"
+  - type: input
+    id: pr
+    attributes:
+      label: Tracking PR
+      placeholder: "https://github.com/hummbl-dev/mcp-server/pull/..."
+    validations:
+      required: false

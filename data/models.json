@@ -1,0 +1,1096 @@
+{
+  "schema_version": "1.1",
+  "version": "1.0",
+  "lastUpdated": "2025-11-26",
+  "totalModels": 120,
+  "transformations": {
+    "P": "Perspective / Identity",
+    "IN": "Inversion",
+    "CO": "Composition",
+    "DE": "Decomposition",
+    "RE": "Recursion",
+    "SY": "Meta-Systems"
+  },
+  "models": [
+    {
+      "code": "P1",
+      "name": "First Principles Framing",
+      "definition": "Reduce complex problems to foundational truths that cannot be further simplified",
+      "example": "When redesigning pricing strategy, start with unit costs and desired margin rather than competitor benchmarks.",
+      "transformation": "P",
+      "when_to_use": "When inherited assumptions are blocking progress; when competitive benchmarking leads to undifferentiated solutions; when you need to justify decisions from ground truth rather than precedent.",
+      "how_to_apply": "1) List all assumptions about the problem. 2) Challenge each: 'Why do we believe this?' 3) Identify which cannot be reduced further—these are first principles. 4) Rebuild solution from those foundations only."
+    },
+    {
+      "code": "P2",
+      "name": "Stakeholder Mapping",
+      "definition": "Identify all parties with interest, influence, or impact in a system or decision",
+      "example": "Before launching a gait analysis service, map clinicians, patients, payers, and facility administrators with their respective goals.",
+      "transformation": "P",
+      "when_to_use": "Before major decisions affecting multiple parties; when facing unexpected resistance; when designing systems that serve diverse users; during change management initiatives.",
+      "how_to_apply": "1) Brainstorm all affected parties. 2) Categorize by influence (high/low) and interest (high/low). 3) Document each stakeholder's goals, concerns, and success criteria. 4) Identify conflicts and alignments between stakeholders."
+    },
+    {
+      "code": "P3",
+      "name": "Identity Stack",
+      "definition": "Recognize that individuals operate from multiple nested identities simultaneously",
+      "example": "A team lead switches between personal values, role responsibilities, team culture, and company mission when making decisions.",
+      "transformation": "P",
+      "when_to_use": "When someone's behavior seems inconsistent; when crafting messages that must resonate across contexts; when navigating organizational politics; during coaching or feedback conversations.",
+      "how_to_apply": "1) List identity layers: individual, role, team, organization, profession, culture. 2) Identify which layer is active in current context. 3) Recognize conflicts between layers. 4) Address the appropriate identity level in communication."
+    },
+    {
+      "code": "P4",
+      "name": "Lens Shifting",
+      "definition": "Deliberately adopt different interpretive frameworks to reveal hidden aspects of a situation",
+      "example": "Analyze declining engagement through operational efficiency, user motivation, and data quality lenses sequentially.",
+      "transformation": "P",
+      "when_to_use": "When initial analysis feels incomplete; when stakeholders disagree about problem definition; when seeking creative solutions; when standard approaches aren't working.",
+      "how_to_apply": "1) Name your current lens explicitly. 2) List 3-5 alternative lenses relevant to the domain. 3) Analyze the same situation through each lens sequentially. 4) Note insights unique to each perspective. 5) Synthesize a richer understanding."
+    },
+    {
+      "code": "P5",
+      "name": "Empathy Mapping",
+      "definition": "Systematically capture what stakeholders see, think, feel, and do in their context",
+      "example": "Draft onboarding materials after mapping what new members observe, worry about, experience emotionally, and attempt initially.",
+      "transformation": "P",
+      "when_to_use": "When designing user experiences; when communication isn't landing; when you need to understand customer pain points; before creating training or support materials.",
+      "how_to_apply": "1) Select target persona or stakeholder. 2) Fill four quadrants: Says, Thinks, Does, Feels. 3) Identify gaps between what they say and feel. 4) Extract pain points and opportunities from the map."
+    },
+    {
+      "code": "P6",
+      "name": "Point-of-View Anchoring",
+      "definition": "Establish and maintain a consistent reference frame before analysis begins",
+      "example": "Evaluate all feature requests from the anchor of member lifetime value rather than switching between cost, effort, and novelty.",
+      "transformation": "P",
+      "when_to_use": "When decisions drift due to shifting criteria; when comparing unlike options; when building consistent evaluation frameworks; during prioritization exercises.",
+      "how_to_apply": "1) Declare the single anchor perspective explicitly. 2) Document why this anchor matters most. 3) Evaluate all options against this anchor first. 4) Only after anchored analysis, consider secondary perspectives."
+    },
+    {
+      "code": "P7",
+      "name": "Perspective Switching",
+      "definition": "Rotate through multiple viewpoints to identify invariants and blind spots",
+      "example": "Review policy changes from staff operations, member experience, legal compliance, and financial impact perspectives before finalizing.",
+      "transformation": "P",
+      "when_to_use": "Before finalizing significant decisions; when seeking robust solutions; during design reviews; when anticipating objections or resistance.",
+      "how_to_apply": "1) List all relevant perspectives. 2) For each perspective, ask: 'What does this look like from here?' 3) Note concerns unique to each view. 4) Identify elements that survive all perspectives (invariants). 5) Address perspective-specific concerns."
+    },
+    {
+      "code": "P8",
+      "name": "Narrative Framing",
+      "definition": "Structure information as causal stories with conflict, choice, and consequence",
+      "example": "Present roadmap as member journey obstacles, strategic decisions made, and expected outcomes rather than feature lists.",
+      "transformation": "P",
+      "when_to_use": "When presenting to executives or external stakeholders; when information needs to be memorable; when building buy-in for change; when explaining complex decisions.",
+      "how_to_apply": "1) Identify the protagonist (user, team, company). 2) Define the conflict or challenge they face. 3) Describe the choice or intervention. 4) Show the consequence or outcome. 5) Connect to broader meaning or stakes."
+    },
+    {
+      "code": "P9",
+      "name": "Cultural Lens Shifting",
+      "definition": "Adjust communication and interpretation for different cultural contexts and norms",
+      "example": "Adapt health messaging between medical professional, fitness enthusiast, and general wellness audiences with appropriate metaphors and emphasis.",
+      "transformation": "P",
+      "when_to_use": "When communicating across professional boundaries; when expanding to new markets; when messaging isn't resonating with target audience; when onboarding diverse team members.",
+      "how_to_apply": "1) Identify the target culture's values and communication norms. 2) Translate concepts into culturally relevant metaphors. 3) Adjust formality, directness, and emphasis. 4) Test with culture representatives before broad distribution."
+    },
+    {
+      "code": "P10",
+      "name": "Context Windowing",
+      "definition": "Define explicit boundaries in time, space, and scope for analysis or action",
+      "example": "Limit quarterly revenue review to eastern region only, excluding ongoing pilots and international operations.",
+      "transformation": "P",
+      "when_to_use": "When analysis scope creep threatens completion; when comparing like-to-like; when isolating variables for testing; when defining project boundaries.",
+      "how_to_apply": "1) Explicitly state time boundaries (start/end dates). 2) Define geographic or organizational scope. 3) List what is explicitly excluded and why. 4) Document boundary decisions for future reference."
+    },
+    {
+      "code": "P11",
+      "name": "Role Perspective-Taking",
+      "definition": "Temporarily inhabit specific roles to understand constraints and priorities",
+      "example": "When designing admin tools, spend sessions thinking as customer service rep, billing specialist, and compliance officer.",
+      "transformation": "P",
+      "when_to_use": "When designing for users you don't directly interact with; when anticipating adoption challenges; when building cross-functional alignment; during requirements gathering.",
+      "how_to_apply": "1) Select a specific role to inhabit. 2) Research or interview someone in that role. 3) Walk through a typical day/task from their perspective. 4) Document constraints, frustrations, and priorities unique to that role."
+    },
+    {
+      "code": "P12",
+      "name": "Temporal Framing",
+      "definition": "Organize understanding across past causes, present states, and future implications",
+      "example": "Structure strategic review around historical decisions that led here, current positioning, and trajectory toward goals.",
+      "transformation": "P",
+      "when_to_use": "When explaining how situations evolved; during strategic planning; when learning from history to inform future; when building institutional memory.",
+      "how_to_apply": "1) Document key past decisions and their rationale. 2) Assess current state objectively. 3) Project likely future states under current trajectory. 4) Identify intervention points where past patterns can be changed."
+    },
+    {
+      "code": "P13",
+      "name": "Spatial Framing",
+      "definition": "Scale perspective from local details to global patterns and back",
+      "example": "Analyze checkout abandonment at individual click level, page flow, entire funnel, and cross-site industry patterns.",
+      "transformation": "P",
+      "when_to_use": "When local fixes don't address systemic issues; when global patterns obscure local nuances; when debugging requires different zoom levels; during root cause analysis.",
+      "how_to_apply": "1) Start at current zoom level. 2) Zoom out: What patterns emerge at higher levels? 3) Zoom in: What details are hidden at lower levels? 4) Identify the right level for intervention. 5) Verify solution works across scales."
+    },
+    {
+      "code": "P14",
+      "name": "Reference Class Framing",
+      "definition": "Select comparable situations to inform judgment and avoid uniqueness bias",
+      "example": "Forecast new market entry by studying three similar companies in adjacent markets rather than assuming unprecedented circumstances.",
+      "transformation": "P",
+      "when_to_use": "When forecasting outcomes; when combating 'this time is different' thinking; during project estimation; when evaluating unprecedented decisions.",
+      "how_to_apply": "1) Identify the decision or prediction to make. 2) Find 5-10 comparable historical cases. 3) Note outcome distribution across cases. 4) Position current situation within that distribution. 5) Adjust for specific differences."
+    },
+    {
+      "code": "P15",
+      "name": "Assumption Surfacing",
+      "definition": "Explicitly identify and document beliefs underlying plans or models",
+      "example": "Before launching subscription tier, list assumptions about conversion rates, retention, support costs, and competitive response.",
+      "transformation": "P",
+      "when_to_use": "Before major investments; when plans depend on uncertain conditions; during model building; when stakeholders have different mental models.",
+      "how_to_apply": "1) State the plan or model. 2) Ask: 'What must be true for this to work?' 3) List every assumption, even obvious ones. 4) Rate each assumption's certainty and impact if wrong. 5) Plan validation for high-impact uncertain assumptions."
+    },
+    {
+      "code": "P16",
+      "name": "Identity-Context Reciprocity",
+      "definition": "Recognize how identities shape interpretations and contexts reinforce identities",
+      "example": "Acknowledge that company culture influences how leaders frame problems, which then reinforces that same culture.",
+      "transformation": "P",
+      "when_to_use": "During culture change initiatives; when breaking self-reinforcing patterns; when understanding why change is hard; during organizational design.",
+      "how_to_apply": "1) Identify current dominant identity/culture. 2) Map how that identity shapes problem framing. 3) Trace how those frames reinforce the identity. 4) Identify intervention points to break the cycle."
+    },
+    {
+      "code": "P17",
+      "name": "Frame Control & Reframing",
+      "definition": "Consciously select or reshape interpretive frames to enable new solutions",
+      "example": "Transform budget deficit into investment prioritization opportunity to shift team from cuts to strategic allocation.",
+      "transformation": "P",
+      "when_to_use": "When current framing limits options; when shifting team energy from negative to constructive; during negotiations; when introducing change.",
+      "how_to_apply": "1) Name the current frame explicitly. 2) Identify how it limits options. 3) Generate 3+ alternative frames for same situation. 4) Select frame that enables desired outcomes. 5) Introduce new frame with concrete language."
+    },
+    {
+      "code": "P18",
+      "name": "Boundary Object Selection",
+      "definition": "Choose representations that bridge multiple perspectives while remaining meaningful to each",
+      "example": "Use customer journey maps as boundary objects between design, engineering, marketing, and support teams.",
+      "transformation": "P",
+      "when_to_use": "When coordinating across functions with different vocabularies; when building shared understanding; during handoffs between teams; when creating alignment documents.",
+      "how_to_apply": "1) Identify the perspectives that need bridging. 2) Find or create an artifact meaningful to all. 3) Verify each perspective can interpret it meaningfully. 4) Use the boundary object as common reference point in discussions."
+    },
+    {
+      "code": "P19",
+      "name": "Sensemaking Canvases",
+      "definition": "Deploy structured templates to systematically capture and organize observations",
+      "example": "Use business model canvas to map value proposition, customer segments, channels, and cost structure during market analysis.",
+      "transformation": "P",
+      "when_to_use": "When facing complex new situations; during strategy development; when onboarding to new domain; when facilitating group analysis.",
+      "how_to_apply": "1) Select appropriate canvas for the domain (business model, empathy map, lean canvas, etc.). 2) Fill each section with current knowledge. 3) Identify gaps requiring research. 4) Iterate as understanding develops."
+    },
+    {
+      "code": "P20",
+      "name": "Worldview Articulation",
+      "definition": "Make explicit the fundamental beliefs and values that drive interpretation and action",
+      "example": "Document team's shared worldview about user agency, data ethics, and platform responsibility before designing recommendation systems.",
+      "transformation": "P",
+      "when_to_use": "Before value-laden decisions; when building team alignment; during hiring to ensure fit; when resolving conflicts rooted in different values.",
+      "how_to_apply": "1) Identify the domain requiring worldview clarity. 2) Surface individual beliefs through discussion or survey. 3) Find common ground and document shared values. 4) Note areas of legitimate disagreement. 5) Use articulated worldview to guide decisions."
+    },
+    {
+      "code": "IN1",
+      "name": "Subtractive Thinking",
+      "definition": "Improve systems by removing elements rather than adding complexity",
+      "example": "Strip features from product until value proposition breaks, then restore only the last removed feature.",
+      "transformation": "IN",
+      "when_to_use": "When systems feel bloated; when complexity is slowing progress; when seeking elegance; during product simplification initiatives.",
+      "how_to_apply": "1) List all components of the system. 2) Remove one component mentally. 3) Ask: 'Does it still work? Is it better?' 4) If yes, remove it for real. 5) Repeat until removal breaks core value."
+    },
+    {
+      "code": "IN2",
+      "name": "Premortem Analysis",
+      "definition": "Assume failure has occurred and work backward to identify causes",
+      "example": "Six months before launch, gather team to explain why the product failed spectacularly, capturing risks that optimism obscures.",
+      "transformation": "IN",
+      "when_to_use": "Before major launches or initiatives; when team seems overconfident; during project kickoffs; when stakes are high and failure is costly.",
+      "how_to_apply": "1) Gather the team. 2) State: 'It's six months from now and this project failed badly.' 3) Each person writes why it failed. 4) Share and cluster failure modes. 5) Prioritize risks and create mitigations."
+    },
+    {
+      "code": "IN3",
+      "name": "Problem Reversal",
+      "definition": "Solve the inverse of the stated problem to reveal insights",
+      "example": "Ask how would we guarantee maximum customer churn to identify anti-retention patterns currently present.",
+      "transformation": "IN",
+      "when_to_use": "When stuck on a problem; when looking for non-obvious causes; during brainstorming sessions; when conventional approaches aren't working.",
+      "how_to_apply": "1) State the problem. 2) Invert it: 'How would we cause the opposite outcome?' 3) Brainstorm ways to achieve that bad outcome. 4) Check if any are currently happening. 5) Fix the inversions you find."
+    },
+    {
+      "code": "IN4",
+      "name": "Contra-Logic",
+      "definition": "Argue the opposite position to stress-test assumptions and expose weak reasoning",
+      "example": "Defend users prefer offline interaction thoroughly to validate digital-first strategy against strongest counterargument.",
+      "transformation": "IN",
+      "when_to_use": "Before finalizing strategy; when validating assumptions; during decision-making meetings; when seeking intellectual honesty.",
+      "how_to_apply": "1) State your position clearly. 2) Construct the strongest possible argument against it. 3) Attack your position as if you believed the opposite. 4) Note where your original position is weakest. 5) Strengthen or abandon accordingly."
+    },
+    {
+      "code": "IN5",
+      "name": "Negative Space Framing",
+      "definition": "Study what is absent rather than what is present",
+      "example": "Identify which customer segments never convert and investigate why, rather than only analyzing successful conversions.",
+      "transformation": "IN",
+      "when_to_use": "When success analysis yields diminishing returns; when looking for untapped opportunities; during market analysis; when debugging user behavior.",
+      "how_to_apply": "1) Identify what you typically study (successes, active users, etc.). 2) Define the inverse set (failures, non-users, etc.). 3) Analyze the negative space with equal rigor. 4) Look for patterns explaining absence. 5) Address root causes."
+    },
+    {
+      "code": "IN6",
+      "name": "Inverse/Proof by Contradiction",
+      "definition": "Assume a claim is false, derive logical impossibility, thus proving the claim true",
+      "example": "Test capacity model by assuming queue never grows and demonstrating mathematical contradiction under realistic load.",
+      "transformation": "IN",
+      "when_to_use": "When validating logical claims; during mathematical or system modeling; when need definitive proof; during architecture validation.",
+      "how_to_apply": "1) State the claim you want to prove. 2) Assume the opposite is true. 3) Follow logical implications of that assumption. 4) Find a contradiction or impossibility. 5) Conclude original claim must be true."
+    },
+    {
+      "code": "IN7",
+      "name": "Boundary Testing",
+      "definition": "Explore extreme conditions to find system limits and breaking points",
+      "example": "Test pricing sensitivity at $0 and 10× current price to understand elasticity range and psychological anchors.",
+      "transformation": "IN",
+      "when_to_use": "When defining operating ranges; during stress testing; when seeking system limits; before scaling operations.",
+      "how_to_apply": "1) Identify the variable to test. 2) Define extreme low and high values. 3) Test or model behavior at extremes. 4) Find where system breaks or behavior changes. 5) Document safe operating range."
+    },
+    {
+      "code": "IN8",
+      "name": "Contrapositive Reasoning",
+      "definition": "Use logical equivalence that if A then B equals if not B then not A",
+      "example": "If no referral spike follows campaign, then campaign was not viral, revealing misclassification of effort.",
+      "transformation": "IN",
+      "when_to_use": "When validating causal claims; during diagnostic reasoning; when testing hypotheses indirectly; during logical analysis.",
+      "how_to_apply": "1) State the causal claim: 'If A then B.' 2) Form contrapositive: 'If not B then not A.' 3) Check if B is present. 4) If B is absent, conclude A was absent. 5) Use for diagnostic elimination."
+    },
+    {
+      "code": "IN9",
+      "name": "Backward Induction",
+      "definition": "Begin with desired end state and work backward to determine necessary steps",
+      "example": "Start from passing certification audit and work backward through documentation, controls, and process changes needed.",
+      "transformation": "IN",
+      "when_to_use": "During goal planning; when the end state is clearer than the path; for complex multi-step projects; during strategic planning.",
+      "how_to_apply": "1) Define the end state precisely. 2) Ask: 'What must be true immediately before this?' 3) Repeat, working backward. 4) Continue until you reach current state. 5) Execute steps in forward order."
+    },
+    {
+      "code": "IN10",
+      "name": "Red Teaming",
+      "definition": "Organize adversarial review to find vulnerabilities through simulated attack",
+      "example": "Conduct security tabletop where designated team attempts to break authentication flow using realistic attack vectors.",
+      "transformation": "IN",
+      "when_to_use": "Before security-critical launches; when validating robustness; during compliance preparation; when stakes of failure are high.",
+      "how_to_apply": "1) Assemble adversarial team with relevant expertise. 2) Brief them on system and constraints. 3) Task them with breaking/exploiting the system. 4) Document all vulnerabilities found. 5) Prioritize and remediate."
+    },
+    {
+      "code": "IN11",
+      "name": "Devil's Advocate Protocol",
+      "definition": "Assign explicit role to argue against group consensus or preferred option",
+      "example": "Designate team member to comprehensively challenge acquisition strategy, forcing examination of unspoken assumptions.",
+      "transformation": "IN",
+      "when_to_use": "When group consensus forms quickly; before major irreversible decisions; during strategic planning; when avoiding groupthink is critical.",
+      "how_to_apply": "1) Formally assign devil's advocate role. 2) Brief them: their job is to find flaws and argue against. 3) Protect them from social consequences. 4) Require genuine engagement with their objections. 5) Rotate the role."
+    },
+    {
+      "code": "IN12",
+      "name": "Failure First Design",
+      "definition": "Begin planning by identifying all possible failure modes and designing to prevent them",
+      "example": "Architect data pipeline by first listing every way it could lose, corrupt, or duplicate data, then adding safeguards.",
+      "transformation": "IN",
+      "when_to_use": "When designing critical systems; during architecture planning; when reliability is paramount; before building infrastructure.",
+      "how_to_apply": "1) Before designing the happy path, list all failure modes. 2) Categorize by severity and likelihood. 3) Design prevention for high-severity modes. 4) Design detection for unavoidable modes. 5) Design recovery for detected failures."
+    },
+    {
+      "code": "IN13",
+      "name": "Opportunity Cost Focus",
+      "definition": "Evaluate options by what must be forgone rather than what is gained",
+      "example": "Frame hiring decision as we can't pursue mobile app if we staff this platform expansion to clarify tradeoffs.",
+      "transformation": "IN",
+      "when_to_use": "During resource allocation decisions; when options seem equally good; when hidden tradeoffs need surfacing; during prioritization.",
+      "how_to_apply": "1) For each option, list what you gain. 2) More importantly, list what you cannot do if you choose this. 3) Evaluate the forgone options explicitly. 4) Choose based on which opportunity cost is most acceptable."
+    },
+    {
+      "code": "IN14",
+      "name": "Second-Order Effects (Inverted)",
+      "definition": "Trace negative downstream consequences rather than immediate benefits",
+      "example": "Before adding gamification, consider how it might reduce intrinsic motivation, create perverse incentives, or exclude accessibility needs.",
+      "transformation": "IN",
+      "when_to_use": "Before implementing popular solutions; when evaluating interventions; during policy design; when past quick fixes backfired.",
+      "how_to_apply": "1) Identify the proposed change. 2) Ask: 'What negative second-order effects could this cause?' 3) Think through who might game it or be harmed. 4) Consider how it changes incentives. 5) Mitigate or reconsider."
+    },
+    {
+      "code": "IN15",
+      "name": "Constraint Reversal",
+      "definition": "Temporarily remove assumed constraints to explore alternative solution space",
+      "example": "Design workshop where team plans with unlimited budget to identify features cut only due to resource limits, not strategic fit.",
+      "transformation": "IN",
+      "when_to_use": "When feeling stuck; during creative ideation; when constraints may be artificial; when seeking breakthrough solutions.",
+      "how_to_apply": "1) List current constraints. 2) Remove one constraint completely. 3) Design the solution without that constraint. 4) Evaluate: Is this solution actually possible? Is the constraint real? 5) Either remove constraint or incorporate insights."
+    },
+    {
+      "code": "IN16",
+      "name": "Inverse Optimization",
+      "definition": "Maximize worst outcomes to understand system vulnerabilities",
+      "example": "Optimize schedule to maximize context switching and interruptions to identify how current practices harm productivity.",
+      "transformation": "IN",
+      "when_to_use": "When seeking system vulnerabilities; during process improvement; when conventional optimization plateaus; during anti-pattern identification.",
+      "how_to_apply": "1) Identify the outcome you normally optimize for. 2) Invert: How would you maximize the opposite? 3) Find the recipe for disaster. 4) Check if any elements of that recipe are present. 5) Eliminate them."
+    },
+    {
+      "code": "IN17",
+      "name": "Counterfactual Negation",
+      "definition": "Imagine outcomes if key decision had been reversed",
+      "example": "Evaluate what if we had not acquired that company to assess merger's actual contribution versus assumed value.",
+      "transformation": "IN",
+      "when_to_use": "During retrospectives; when evaluating past decisions; when assessing actual vs. perceived value; during portfolio review.",
+      "how_to_apply": "1) Identify the decision to evaluate. 2) Construct counterfactual: What if we hadn't done this? 3) Model the alternative timeline realistically. 4) Compare actual outcomes to counterfactual. 5) Attribute value accurately."
+    },
+    {
+      "code": "IN18",
+      "name": "Kill-Criteria & Stop Rules",
+      "definition": "Define conditions that trigger project termination before launch",
+      "example": "Establish if beta retention falls below 40% after two iterations, we kill this feature to prevent sunk cost fallacy.",
+      "transformation": "IN",
+      "when_to_use": "At project inception; when allocating resources to experiments; during portfolio management; when avoiding escalation of commitment.",
+      "how_to_apply": "1) Before starting, define failure criteria. 2) Set specific, measurable thresholds. 3) Commit to honoring them regardless of sunk costs. 4) Review criteria at each checkpoint. 5) Execute stop rules when triggered."
+    },
+    {
+      "code": "IN19",
+      "name": "Harm Minimization (Via Negativa)",
+      "definition": "Improve by removing harmful elements rather than adding beneficial ones",
+      "example": "Audit codebase to identify and delete unused dependencies, reducing attack surface and maintenance burden.",
+      "transformation": "IN",
+      "when_to_use": "When systems are fragile; during technical debt reduction; when addition has failed; during simplification efforts.",
+      "how_to_apply": "1) Identify sources of harm or friction. 2) Rather than adding solutions, remove the harmful elements. 3) Verify removal improves situation. 4) Resist urge to add compensating features. 5) Embrace the simplicity."
+    },
+    {
+      "code": "IN20",
+      "name": "Antigoals & Anti-Patterns Catalog",
+      "definition": "Document failure modes to avoid rather than success patterns to emulate",
+      "example": "Maintain team wiki of ways we've broken production with root causes to prevent recurrence.",
+      "transformation": "IN",
+      "when_to_use": "During onboarding; when building institutional memory; after incidents; during standards development.",
+      "how_to_apply": "1) After each failure, document what went wrong. 2) Identify the anti-pattern: what behavior caused this? 3) Add to catalog with context and warning signs. 4) Review catalog during planning. 5) Update as new anti-patterns emerge."
+    },
+    {
+      "code": "CO1",
+      "name": "Synergy Principle",
+      "definition": "Design combinations where integrated value exceeds sum of parts",
+      "example": "Bundle gait analysis with metabolic testing to increase average revenue per user beyond either service alone.",
+      "transformation": "CO",
+      "when_to_use": "When creating product bundles; during partnership evaluation; when seeking multiplicative value; during ecosystem design.",
+      "how_to_apply": "1) List components being combined. 2) Calculate standalone value of each. 3) Identify interaction effects between them. 4) Verify combined value exceeds sum. 5) If not synergistic, reconsider combination."
+    },
+    {
+      "code": "CO2",
+      "name": "Chunking",
+      "definition": "Group related elements into meaningful units to reduce cognitive load",
+      "example": "Organize employee handbook as five macro sections rather than fifty flat chapters, easing navigation and comprehension.",
+      "transformation": "CO",
+      "when_to_use": "When information is overwhelming; during documentation design; when training new team members; during interface design.",
+      "how_to_apply": "1) List all elements to organize. 2) Identify natural groupings based on similarity or relatedness. 3) Create 5-9 chunks (cognitive sweet spot). 4) Name each chunk meaningfully. 5) Organize elements within chunks."
+    },
+    {
+      "code": "CO3",
+      "name": "Functional Composition",
+      "definition": "Chain pure operations where output of one becomes input of next",
+      "example": "Compose ETL pipeline as extract | transform | load where each stage has clean interfaces and defined outputs.",
+      "transformation": "CO",
+      "when_to_use": "When building data pipelines; during workflow automation; when designing modular systems; during API design.",
+      "how_to_apply": "1) Define the overall transformation needed. 2) Break into discrete, pure functions. 3) Ensure each function's output matches next function's input. 4) Chain functions together. 5) Test composition end-to-end."
+    },
+    {
+      "code": "CO4",
+      "name": "Interdisciplinary Synthesis",
+      "definition": "Merge insights from distinct fields to generate novel solutions",
+      "example": "Combine biomechanics expertise with UX design principles to create injury prevention app with actionable movement cues.",
+      "transformation": "CO",
+      "when_to_use": "When single-discipline approaches aren't working; during innovation efforts; when building new products; during research.",
+      "how_to_apply": "1) Identify disciplines relevant to the problem. 2) Extract key insights from each discipline. 3) Look for complementary or tension points. 4) Synthesize a solution using multiple lenses. 5) Validate with experts from each field."
+    },
+    {
+      "code": "CO5",
+      "name": "Emergence",
+      "definition": "Recognize higher-order behavior arising from component interactions beyond individual properties",
+      "example": "Observe referral flywheel forming organically when individual incentives, network effects, and product value align unexpectedly.",
+      "transformation": "CO",
+      "when_to_use": "When analyzing complex systems; during culture assessment; when unexpected patterns appear; during systems design.",
+      "how_to_apply": "1) Study individual component behaviors. 2) Observe system-level behavior. 3) Identify emergent properties not reducible to components. 4) Understand what interactions produce emergence. 5) Design to encourage positive emergence."
+    },
+    {
+      "code": "CO6",
+      "name": "Gestalt Integration",
+      "definition": "Perceive and leverage whole patterns rather than isolated components",
+      "example": "Design brand identity where logo, color palette, typography, and voice form coherent unified impression.",
+      "transformation": "CO",
+      "when_to_use": "During brand development; when designing user experiences; when seeking coherence; during system unification.",
+      "how_to_apply": "1) Step back from individual elements. 2) Perceive the whole impression they create together. 3) Identify whether whole is coherent. 4) Adjust elements to serve the whole. 5) Test holistic perception with fresh eyes."
+    },
+    {
+      "code": "CO7",
+      "name": "Network Effects",
+      "definition": "Exploit increasing value as user base or connections grow",
+      "example": "Structure community features so member directory, skill-sharing, and local groups become more valuable with each new participant.",
+      "transformation": "CO",
+      "when_to_use": "During platform design; when evaluating business models; when seeking competitive moats; during growth strategy.",
+      "how_to_apply": "1) Identify where user value depends on other users. 2) Design features that increase value with scale. 3) Lower barriers to participation. 4) Create visibility of network size. 5) Monitor value-per-user as network grows."
+    },
+    {
+      "code": "CO8",
+      "name": "Layered Abstraction",
+      "definition": "Separate concerns into hierarchical levels with clear interfaces between them",
+      "example": "Architect system with presentation, business logic, and data layers isolated for independent modification and testing.",
+      "transformation": "CO",
+      "when_to_use": "During system architecture; when managing complexity; when enabling parallel development; during refactoring.",
+      "how_to_apply": "1) Identify distinct concerns in the system. 2) Group concerns into layers by abstraction level. 3) Define interfaces between layers. 4) Ensure layers only communicate through interfaces. 5) Allow independent evolution within layers."
+    },
+    {
+      "code": "CO9",
+      "name": "Interface Contracts",
+      "definition": "Define explicit agreements about data structures and behavior between components",
+      "example": "Specify JSON schemas for partner API to ensure data exchange remains stable across independent evolution.",
+      "transformation": "CO",
+      "when_to_use": "During API design; when building integrations; when coordinating across teams; during system boundaries definition.",
+      "how_to_apply": "1) Identify integration points between components. 2) Define data structures exchanged (schemas). 3) Specify behavioral expectations (contracts). 4) Document error handling. 5) Version contracts for evolution."
+    },
+    {
+      "code": "CO10",
+      "name": "Pipeline Orchestration",
+      "definition": "Coordinate sequential stages with explicit handoffs and error handling",
+      "example": "Design nightly batch process as ingest → validate → clean → transform → train → report with retry logic.",
+      "transformation": "CO",
+      "when_to_use": "When building data pipelines; during workflow automation; when processes have multiple stages; during batch processing design.",
+      "how_to_apply": "1) Identify all stages in the pipeline. 2) Define inputs and outputs for each stage. 3) Design handoff mechanisms between stages. 4) Add error handling and retry logic. 5) Implement monitoring for each stage."
+    },
+    {
+      "code": "CO11",
+      "name": "Pattern Composition (Tiling)",
+      "definition": "Combine repeating elements to construct complex structures efficiently",
+      "example": "Build design system from atomic components (buttons, inputs) that compose into molecules (forms) and organisms (checkout flows).",
+      "transformation": "CO",
+      "when_to_use": "When building design systems; during UI development; when seeking consistency at scale; during component library design.",
+      "how_to_apply": "1) Identify atomic elements (smallest reusable units). 2) Combine atoms into molecules (small compositions). 3) Combine molecules into organisms (larger compositions). 4) Use organisms to build templates. 5) Maintain consistency through reuse."
+    },
+    {
+      "code": "CO12",
+      "name": "Modular Interoperability",
+      "definition": "Ensure independent components work together through standardized connections",
+      "example": "Design analytics modules to accept common event schema, enabling mix-and-match reporting without custom integration.",
+      "transformation": "CO",
+      "when_to_use": "When building extensible systems; during platform development; when enabling third-party integrations; during ecosystem design.",
+      "how_to_apply": "1) Define standard interfaces for component communication. 2) Design components to be self-contained. 3) Test components in isolation. 4) Verify interoperability through integration tests. 5) Document integration patterns."
+    },
+    {
+      "code": "CO13",
+      "name": "Cross-Domain Analogy",
+      "definition": "Transfer solution patterns from one domain to solve problems in another",
+      "example": "Apply manufacturing's just-in-time inventory principles to content creation workflow, producing articles closer to publication needs.",
+      "transformation": "CO",
+      "when_to_use": "When stuck in domain-specific thinking; during innovation workshops; when seeking fresh approaches; during problem-solving.",
+      "how_to_apply": "1) Identify the problem's core structure abstractly. 2) Find analogous problems in different domains. 3) Study how those domains solve it. 4) Translate the solution pattern to your domain. 5) Adapt for domain-specific constraints."
+    },
+    {
+      "code": "CO14",
+      "name": "Platformization",
+      "definition": "Extract common capabilities into reusable infrastructure serving multiple use cases",
+      "example": "Convert custom authentication into platform service supporting web app, mobile app, and partner integrations.",
+      "transformation": "CO",
+      "when_to_use": "When duplicating capabilities across products; during technical consolidation; when seeking economies of scale; during architecture evolution.",
+      "how_to_apply": "1) Identify capabilities duplicated across products. 2) Abstract common functionality from specific implementations. 3) Build shared platform service. 4) Define clean API for consumers. 5) Migrate products to use platform."
+    },
+    {
+      "code": "CO15",
+      "name": "Combinatorial Design",
+      "definition": "Systematically explore option combinations to find optimal configurations",
+      "example": "Test A/B/C pricing × 3 billing periods × 2 feature sets to identify best-converting offer structure.",
+      "transformation": "CO",
+      "when_to_use": "During multivariate testing; when optimizing configurations; during product experimentation; when seeking optimal bundles.",
+      "how_to_apply": "1) Identify variables to test. 2) List possible values for each variable. 3) Generate combinations systematically. 4) Test combinations against success metric. 5) Identify winning combination and understand why."
+    },
+    {
+      "code": "CO16",
+      "name": "System Integration Testing",
+      "definition": "Verify assembled components work correctly together, not just in isolation",
+      "example": "Test complete user journey from signup through payment through first value delivery in production-like environment.",
+      "transformation": "CO",
+      "when_to_use": "Before releases; when components have been developed independently; during migration; when validating end-to-end flows.",
+      "how_to_apply": "1) Define end-to-end scenarios. 2) Create production-like test environment. 3) Execute scenarios across all integrated components. 4) Verify data flows correctly between components. 5) Test failure modes at integration points."
+    },
+    {
+      "code": "CO17",
+      "name": "Orchestration vs Choreography",
+      "definition": "Choose between centralized coordination or distributed peer-to-peer interaction",
+      "example": "Implement order fulfillment as choreography where services react to events rather than central orchestrator managing all steps.",
+      "transformation": "CO",
+      "when_to_use": "During distributed system design; when choosing coordination patterns; during microservices architecture; when scaling operations.",
+      "how_to_apply": "1) Map the workflow requiring coordination. 2) Evaluate: Does it need central control or can services self-coordinate? 3) For simple, changing workflows: choreography. 4) For complex, stable workflows: orchestration. 5) Implement chosen pattern."
+    },
+    {
+      "code": "CO18",
+      "name": "Knowledge Graphing",
+      "definition": "Represent information as interconnected entities and relationships rather than isolated documents",
+      "example": "Build internal wiki as graph where concepts, people, projects, and decisions link, enabling discovery through relationships.",
+      "transformation": "CO",
+      "when_to_use": "When building knowledge bases; during information architecture; when relationships matter; during semantic systems design.",
+      "how_to_apply": "1) Identify entity types (people, concepts, projects, etc.). 2) Define relationship types between entities. 3) Create entities and relationships. 4) Enable navigation via relationships. 5) Maintain graph as knowledge evolves."
+    },
+    {
+      "code": "CO19",
+      "name": "Multi-Modal Integration",
+      "definition": "Synthesize information from different sensory or data modalities",
+      "example": "Combine quantitative metrics, qualitative feedback, behavioral logs, and market signals into unified health assessment.",
+      "transformation": "CO",
+      "when_to_use": "When single data source is incomplete; during comprehensive analysis; when building holistic understanding; during assessment design.",
+      "how_to_apply": "1) Identify all available data modalities. 2) Understand what each modality captures well. 3) Design integration framework. 4) Weight modalities appropriately. 5) Synthesize into unified view."
+    },
+    {
+      "code": "CO20",
+      "name": "Holistic Integration",
+      "definition": "Unify disparate elements into coherent, seamless whole where boundaries dissolve",
+      "example": "Merge onboarding, product education, customer support, and community into continuous integrated member experience.",
+      "transformation": "CO",
+      "when_to_use": "When silos create friction; during customer experience design; when seeking seamlessness; during organizational integration.",
+      "how_to_apply": "1) Map current boundaries and handoffs. 2) Identify friction at boundaries. 3) Design experience that transcends boundaries. 4) Reorganize to support seamless flow. 5) Measure integrated experience quality."
+    },
+    {
+      "code": "DE1",
+      "name": "Root Cause Analysis (5 Whys)",
+      "definition": "Iteratively ask why problems occur until fundamental cause emerges",
+      "example": "Throughput declined because rework increased because validation was skipped because deadline pressure exceeded process discipline.",
+      "transformation": "DE",
+      "when_to_use": "During incident post-mortems; when symptoms keep recurring; when surface fixes don't last; during problem diagnosis.",
+      "how_to_apply": "1) State the problem. 2) Ask 'Why did this happen?' 3) Take the answer and ask 'Why?' again. 4) Repeat 5 times or until you hit root cause. 5) Address the root cause, not symptoms."
+    },
+    {
+      "code": "DE2",
+      "name": "Factorization",
+      "definition": "Separate multiplicative components to understand relative contribution of each factor",
+      "example": "Express revenue as demand × capacity × conversion to isolate whether growth requires more leads, slots, or optimization.",
+      "transformation": "DE",
+      "when_to_use": "When analyzing business metrics; during growth planning; when seeking leverage points; during performance diagnosis.",
+      "how_to_apply": "1) Identify the metric to decompose. 2) Express it as product of component factors. 3) Measure each factor independently. 4) Identify which factor has most improvement potential. 5) Focus efforts on highest-leverage factor."
+    },
+    {
+      "code": "DE3",
+      "name": "Modularization",
+      "definition": "Partition system into self-contained units with minimal interdependencies",
+      "example": "Restructure monolithic program into independent tracks (strength, mobility, nutrition) each manageable separately.",
+      "transformation": "DE",
+      "when_to_use": "When systems are hard to change; during refactoring; when enabling parallel work; during scalability planning.",
+      "how_to_apply": "1) Identify current system boundaries. 2) Find high-cohesion clusters (things that change together). 3) Find low-coupling boundaries (minimal dependencies). 4) Draw module boundaries along these lines. 5) Define clean interfaces between modules."
+    },
+    {
+      "code": "DE4",
+      "name": "Layered Breakdown",
+      "definition": "Decompose from system to subsystem to component progressively",
+      "example": "Map service delivery as platform → core services → API endpoints → database queries for targeted troubleshooting.",
+      "transformation": "DE",
+      "when_to_use": "During system documentation; when debugging complex systems; during architecture review; when onboarding to new systems.",
+      "how_to_apply": "1) Start at highest abstraction level (system). 2) Break into major subsystems. 3) Break each subsystem into components. 4) Continue until reaching atomic units. 5) Document relationships between levels."
+    },
+    {
+      "code": "DE5",
+      "name": "Dimensional Reduction",
+      "definition": "Focus on most informative variables while discarding noise or redundancy",
+      "example": "Condense dashboard from 47 metrics to 8 key indicators that capture essential health of business.",
+      "transformation": "DE",
+      "when_to_use": "When overwhelmed by data; during dashboard design; when seeking signal in noise; during feature selection.",
+      "how_to_apply": "1) List all variables/metrics. 2) Identify redundancy (highly correlated metrics). 3) Identify low-information metrics. 4) Keep only high-signal, non-redundant metrics. 5) Verify reduced set captures essential variance."
+    },
+    {
+      "code": "DE6",
+      "name": "Taxonomy/Classification",
+      "definition": "Organize entities into hierarchical categories based on shared properties",
+      "example": "Classify support tickets into technical, billing, education, feature request for routing and pattern analysis.",
+      "transformation": "DE",
+      "when_to_use": "When organizing large sets of items; during knowledge management; when building search systems; during data modeling.",
+      "how_to_apply": "1) Collect representative sample of entities. 2) Identify distinguishing properties. 3) Create categories based on properties. 4) Ensure categories are mutually exclusive and collectively exhaustive. 5) Assign entities to categories."
+    },
+    {
+      "code": "DE7",
+      "name": "Pareto Decomposition (80/20)",
+      "definition": "Identify vital few drivers producing most impact versus trivial many",
+      "example": "Discover 3 SKUs generating 75% of revenue, enabling focused inventory and marketing optimization.",
+      "transformation": "DE",
+      "when_to_use": "During prioritization; when resources are limited; when seeking highest leverage; during portfolio analysis.",
+      "how_to_apply": "1) List all items and their impact metric. 2) Sort by impact descending. 3) Calculate cumulative percentage. 4) Identify the vital few (typically ~20%) driving most impact (~80%). 5) Focus disproportionate attention on vital few."
+    },
+    {
+      "code": "DE8",
+      "name": "Work Breakdown Structure",
+      "definition": "Hierarchically divide project into deliverable-oriented components with clear ownership",
+      "example": "Decompose product launch into marketing, engineering, operations, legal branches, each with sub-tasks and owners.",
+      "transformation": "DE",
+      "when_to_use": "During project planning; when estimating effort; when assigning ownership; during progress tracking.",
+      "how_to_apply": "1) Define project scope. 2) Break into major deliverables. 3) Break deliverables into work packages. 4) Break work packages into tasks. 5) Assign owner and estimate for each task."
+    },
+    {
+      "code": "DE9",
+      "name": "Signal Separation",
+      "definition": "Distinguish meaningful patterns from random variation or confounding factors",
+      "example": "Isolate seasonal trends from promotion effects from organic growth in sales data using time series decomposition.",
+      "transformation": "DE",
+      "when_to_use": "During data analysis; when attributing causes; when forecasting; during experiment analysis.",
+      "how_to_apply": "1) Identify potential signal sources. 2) Model or estimate each source. 3) Subtract known signals from data. 4) Analyze residual for additional signals. 5) Validate separation by reconstruction."
+    },
+    {
+      "code": "DE10",
+      "name": "Abstraction Laddering",
+      "definition": "Move up and down conceptual hierarchy to find appropriate solution level",
+      "example": "Reframe increase trial signups as reduce friction (up) or simplify form fields (down) depending on insight needs.",
+      "transformation": "DE",
+      "when_to_use": "When problem framing feels wrong; during brainstorming; when seeking the right level of intervention; during problem definition.",
+      "how_to_apply": "1) State problem at current level. 2) Go up: 'Why does this matter?' (more abstract). 3) Go down: 'How specifically?' (more concrete). 4) Explore solutions at each level. 5) Choose level with best solution options."
+    },
+    {
+      "code": "DE11",
+      "name": "Scope Delimitation",
+      "definition": "Define precise boundaries of what is included versus excluded from consideration",
+      "example": "Limit analysis to domestic market, active users, past six months, excluding pilots and enterprise contracts.",
+      "transformation": "DE",
+      "when_to_use": "At project kickoff; during analysis planning; when managing scope creep; during requirements definition.",
+      "how_to_apply": "1) State what is in scope explicitly. 2) State what is out of scope explicitly. 3) Document boundary conditions. 4) Get stakeholder agreement on scope. 5) Enforce scope during execution."
+    },
+    {
+      "code": "DE12",
+      "name": "Constraint Isolation",
+      "definition": "Identify specific limiting factor preventing performance improvement",
+      "example": "Determine throughput bounded by database connections, not server CPU, focusing optimization efforts appropriately.",
+      "transformation": "DE",
+      "when_to_use": "During performance optimization; when improvements plateau; when seeking bottlenecks; during capacity planning.",
+      "how_to_apply": "1) Measure performance at each stage. 2) Identify where work queues or waits. 3) Verify this is the constraint by testing relief. 4) Optimize the constraint first. 5) Re-identify constraint after optimization."
+    },
+    {
+      "code": "DE13",
+      "name": "Failure Mode Analysis (FMEA)",
+      "definition": "Enumerate potential failure points with severity, likelihood, and detectability ratings",
+      "example": "List payment processor outage, inventory stock-out, delivery delay with criticality scores to prioritize safeguards.",
+      "transformation": "DE",
+      "when_to_use": "During system design; before launches; during risk assessment; when building critical systems.",
+      "how_to_apply": "1) List all potential failure modes. 2) Rate each: Severity (1-10), Likelihood (1-10), Detectability (1-10). 3) Calculate Risk Priority Number (S × L × D). 4) Prioritize mitigation by RPN. 5) Design controls for high-RPN failures."
+    },
+    {
+      "code": "DE14",
+      "name": "Variable Control & Isolation",
+      "definition": "Hold factors constant to measure single variable's causal impact",
+      "example": "Test new algorithm by fixing traffic source, user cohort, and time period while varying only recommendation engine.",
+      "transformation": "DE",
+      "when_to_use": "During experiments; when testing hypotheses; during A/B testing; when seeking causal evidence.",
+      "how_to_apply": "1) Identify the variable to test. 2) List all confounding variables. 3) Control confounders by holding constant or randomizing. 4) Vary only the test variable. 5) Measure outcome difference attributable to test variable."
+    },
+    {
+      "code": "DE15",
+      "name": "Decision Tree Expansion",
+      "definition": "Map choices and their consequences as branching paths",
+      "example": "Structure pricing strategy as acquire customer → discount tier decision → retention outcome tree to evaluate paths.",
+      "transformation": "DE",
+      "when_to_use": "During decision analysis; when comparing strategies; when visualizing contingencies; during game theory analysis.",
+      "how_to_apply": "1) Identify decision points. 2) Branch for each option at each point. 3) Continue until terminal outcomes. 4) Assign probabilities and values to paths. 5) Calculate expected value of each initial choice."
+    },
+    {
+      "code": "DE16",
+      "name": "Hypothesis Disaggregation",
+      "definition": "Break compound claim into testable sub-hypotheses",
+      "example": "Split new design will increase engagement into separate tests of comprehension, navigation, and feature adoption.",
+      "transformation": "DE",
+      "when_to_use": "Before experiments; when validating complex claims; during research design; when seeking specific insights.",
+      "how_to_apply": "1) State the compound hypothesis. 2) Identify implicit sub-claims. 3) Formulate each sub-claim as testable hypothesis. 4) Design tests for each sub-hypothesis. 5) Test independently to isolate which parts hold."
+    },
+    {
+      "code": "DE17",
+      "name": "Orthogonalization",
+      "definition": "Ensure factors vary independently without correlation or interdependence",
+      "example": "Design A/B test with independent variations in headline, image, and call-to-action for clean attribution.",
+      "transformation": "DE",
+      "when_to_use": "During experiment design; when analyzing correlated variables; during feature engineering; when seeking clean attribution.",
+      "how_to_apply": "1) List all factors to test. 2) Check for correlations between factors. 3) If correlated, either: combine into single factor, or design to break correlation. 4) Verify independence statistically. 5) Analyze factors independently."
+    },
+    {
+      "code": "DE18",
+      "name": "Scenario Decomposition",
+      "definition": "Partition future possibilities into discrete, mutually exclusive scenarios",
+      "example": "Plan for high-growth, steady-state, and contraction scenarios separately with distinct strategic responses.",
+      "transformation": "DE",
+      "when_to_use": "During strategic planning; when facing uncertainty; when building contingency plans; during forecasting.",
+      "how_to_apply": "1) Identify key uncertainties. 2) Define extreme states for each uncertainty. 3) Combine into discrete scenarios. 4) Ensure scenarios are mutually exclusive. 5) Develop strategy for each scenario."
+    },
+    {
+      "code": "DE19",
+      "name": "Critical Path Unwinding",
+      "definition": "Trace longest sequence of dependent tasks determining minimum project duration",
+      "example": "Identify legal review → security audit → compliance certification chain as immovable timeline constraint.",
+      "transformation": "DE",
+      "when_to_use": "During project scheduling; when accelerating timelines; when identifying blockers; during resource allocation.",
+      "how_to_apply": "1) Map all tasks and dependencies. 2) Calculate duration of each path through the network. 3) Identify the longest path (critical path). 4) Focus acceleration efforts on critical path. 5) Monitor critical path tasks closely."
+    },
+    {
+      "code": "DE20",
+      "name": "Partition-and-Conquer",
+      "definition": "Divide problem into independent subproblems solvable separately then combined",
+      "example": "Split database migration into schema conversion, data transfer, and application cutover as parallel workstreams.",
+      "transformation": "DE",
+      "when_to_use": "When problems are too large to tackle whole; during parallel execution planning; when seeking efficiency; during algorithm design.",
+      "how_to_apply": "1) Identify natural partition boundaries. 2) Verify partitions are independent. 3) Solve each partition separately. 4) Design combination/merge strategy. 5) Execute partitions in parallel, then combine."
+    },
+    {
+      "code": "RE1",
+      "name": "Recursive Improvement (Kaizen)",
+      "definition": "Continuously refine process through small, frequent enhancements",
+      "example": "Hold weekly retrospective to identify one process friction point and implement fix, compounding improvements.",
+      "transformation": "RE",
+      "when_to_use": "When building continuous improvement culture; during operational excellence initiatives; when big-bang changes fail; during process maturation.",
+      "how_to_apply": "1) Establish regular improvement cadence. 2) Identify one small improvement each cycle. 3) Implement immediately. 4) Measure impact. 5) Repeat, compounding gains over time."
+    },
+    {
+      "code": "RE2",
+      "name": "Feedback Loops",
+      "definition": "Create mechanisms where system outputs influence future inputs",
+      "example": "Implement churn alerts that trigger retention outreach, which reduces future churn, strengthening the feedback cycle.",
+      "transformation": "RE",
+      "when_to_use": "When designing self-improving systems; during automation design; when creating adaptive processes; during control system design.",
+      "how_to_apply": "1) Identify the output to monitor. 2) Define desired state. 3) Compare output to desired state. 4) Feed difference back to influence input. 5) Tune loop gain for stability and responsiveness."
+    },
+    {
+      "code": "RE3",
+      "name": "Meta-Learning (Learn-to-Learn)",
+      "definition": "Improve the process of learning itself, not just domain knowledge",
+      "example": "After each training program, evaluate what made learning effective and refine training methodology accordingly.",
+      "transformation": "RE",
+      "when_to_use": "When building learning organizations; during training program design; when onboarding isn't working; during skill development programs.",
+      "how_to_apply": "1) After learning something, reflect: How did I learn this? 2) What worked well in the learning process? 3) What didn't work? 4) Adjust learning approach for next time. 5) Apply improved learning process."
+    },
+    {
+      "code": "RE4",
+      "name": "Nested Narratives",
+      "definition": "Structure information as stories within stories for depth and memorability",
+      "example": "Present case study (story) containing tactical choices (nested stories) each illustrating broader principles (framing story).",
+      "transformation": "RE",
+      "when_to_use": "When creating memorable content; during teaching complex topics; when building engagement; during presentation design.",
+      "how_to_apply": "1) Identify the outer framing story. 2) Identify inner stories that illustrate key points. 3) Nest inner stories within outer narrative. 4) Ensure each level is complete and engaging. 5) Connect levels with clear transitions."
+    },
+    {
+      "code": "RE5",
+      "name": "Fractal Reasoning",
+      "definition": "Recognize self-similar patterns repeating across different scales",
+      "example": "Observe daily stand-up, weekly review, quarterly planning exhibiting same rhythm of sync, reflect, adjust pattern.",
+      "transformation": "RE",
+      "when_to_use": "When designing scalable processes; during pattern recognition; when seeking consistency across scales; during organizational design.",
+      "how_to_apply": "1) Identify pattern at one scale. 2) Look for same pattern at larger scale. 3) Look for same pattern at smaller scale. 4) Design interventions that work across scales. 5) Leverage self-similarity for consistency."
+    },
+    {
+      "code": "RE6",
+      "name": "Recursive Framing",
+      "definition": "Apply mental models to the process of selecting mental models",
+      "example": "Use decision tree (DE15) to choose between decision tree and scenario planning for strategic decisions.",
+      "transformation": "RE",
+      "when_to_use": "When unsure which framework to use; during meta-cognitive development; when building expertise; during problem-solving methodology design.",
+      "how_to_apply": "1) Recognize you need to choose a mental model. 2) Select a meta-model to guide selection. 3) Apply meta-model to evaluate options. 4) Choose appropriate model for the problem. 5) Reflect on whether meta-model worked."
+    },
+    {
+      "code": "RE7",
+      "name": "Self-Referential Logic",
+      "definition": "Create systems that monitor, measure, or modify themselves",
+      "example": "Build telemetry infrastructure that tracks its own reliability, automatically adjusting monitoring thresholds based on learned patterns.",
+      "transformation": "RE",
+      "when_to_use": "When building autonomous systems; during self-healing system design; when creating adaptive infrastructure; during AI system design.",
+      "how_to_apply": "1) Design the primary system function. 2) Add monitoring of system's own behavior. 3) Create rules for self-modification based on monitoring. 4) Implement safeguards against runaway self-modification. 5) Test self-referential behavior carefully."
+    },
+    {
+      "code": "RE8",
+      "name": "Bootstrapping",
+      "definition": "Build capability using currently available resources, then use that to build more",
+      "example": "Start with manual process, automate most painful step, use time saved to automate next step.",
+      "transformation": "RE",
+      "when_to_use": "When starting with limited resources; during capability building; when automating incrementally; during startup phases.",
+      "how_to_apply": "1) Assess current capabilities. 2) Use current capabilities to build slightly better capability. 3) Use new capability to build next level. 4) Repeat, each iteration enabling the next. 5) Compound capability growth."
+    },
+    {
+      "code": "RE9",
+      "name": "Iterative Prototyping",
+      "definition": "Cycle rapidly through build-test-learn loops with increasing fidelity",
+      "example": "Ship two-week gait assessment pilot, gather feedback, refine protocol, expand to four weeks, repeat.",
+      "transformation": "RE",
+      "when_to_use": "During product development; when requirements are uncertain; when seeking product-market fit; during innovation projects.",
+      "how_to_apply": "1) Build minimum viable version. 2) Test with real users. 3) Learn from feedback. 4) Incorporate learnings into next version. 5) Increase fidelity each iteration."
+    },
+    {
+      "code": "RE10",
+      "name": "Compounding Cycles",
+      "definition": "Design systems where gains reinforce future gains exponentially",
+      "example": "Grow content library → improve SEO → drive more traffic → generate more content ideas → expand library.",
+      "transformation": "RE",
+      "when_to_use": "During growth strategy design; when seeking exponential returns; during flywheel creation; when building competitive moats.",
+      "how_to_apply": "1) Identify potential reinforcing loop. 2) Map how output feeds back to input. 3) Design to strengthen the feedback. 4) Remove friction from the loop. 5) Kickstart the cycle and monitor compounding."
+    },
+    {
+      "code": "RE11",
+      "name": "Calibration Loops",
+      "definition": "Repeatedly check predictions against outcomes to improve forecasting accuracy",
+      "example": "Compare estimated task durations to actual completion times monthly, adjusting future estimates based on error patterns.",
+      "transformation": "RE",
+      "when_to_use": "During forecasting improvement; when building estimation skills; during prediction markets; when improving judgment.",
+      "how_to_apply": "1) Make prediction and record it. 2) Observe actual outcome. 3) Compare prediction to outcome. 4) Analyze error patterns. 5) Adjust prediction methodology based on patterns."
+    },
+    {
+      "code": "RE12",
+      "name": "Bayesian Updating in Practice",
+      "definition": "Continuously revise beliefs as new evidence arrives, weighting by reliability",
+      "example": "Update conversion rate estimates after each campaign, incorporating both prior experience and latest results.",
+      "transformation": "RE",
+      "when_to_use": "When incorporating new evidence; during probabilistic reasoning; when beliefs should evolve; during model updating.",
+      "how_to_apply": "1) State prior belief with confidence. 2) Encounter new evidence. 3) Assess evidence reliability. 4) Update belief proportionally to evidence strength. 5) New belief becomes next prior."
+    },
+    {
+      "code": "RE13",
+      "name": "Gradient Descent Heuristic",
+      "definition": "Iteratively adjust toward improvement, even without perfect knowledge of optimal direction",
+      "example": "Experiment with pricing in small increments, moving toward revenue-maximizing point through successive tests.",
+      "transformation": "RE",
+      "when_to_use": "During optimization without full information; when seeking local optima; during hill-climbing problems; when exact optimal is unknown.",
+      "how_to_apply": "1) Start at current position. 2) Try small move in promising direction. 3) If improved, continue that direction. 4) If worse, try different direction. 5) Iterate until improvements plateau."
+    },
+    {
+      "code": "RE14",
+      "name": "Spiral Learning",
+      "definition": "Revisit concepts at increasing depth, building on previous understanding",
+      "example": "Teach strategy fundamentals in onboarding, revisit with case studies quarterly, culminate in strategic planning facilitation.",
+      "transformation": "RE",
+      "when_to_use": "During curriculum design; when teaching complex topics; during skill development programs; when building deep expertise.",
+      "how_to_apply": "1) Introduce concept at basic level. 2) Apply and practice. 3) Return to concept with more depth. 4) Apply in more complex context. 5) Repeat with increasing sophistication."
+    },
+    {
+      "code": "RE15",
+      "name": "Convergence-Divergence Cycling",
+      "definition": "Alternate between expanding possibilities and narrowing to decisions",
+      "example": "Brainstorm features broadly (diverge), evaluate feasibility (converge), explore top three deeply (diverge), select one (converge).",
+      "transformation": "RE",
+      "when_to_use": "During creative problem-solving; when balancing exploration and exploitation; during design thinking; when facilitating workshops.",
+      "how_to_apply": "1) Diverge: Generate many options without judgment. 2) Converge: Filter to promising candidates. 3) Diverge: Explore candidates deeply. 4) Converge: Select final choice. 5) Repeat as needed for refinement."
+    },
+    {
+      "code": "RE16",
+      "name": "Retrospective→Prospective Loop",
+      "definition": "Use systematic reflection on past to inform future planning",
+      "example": "Conduct project post-mortem, extract learnings, incorporate into next project's kickoff planning.",
+      "transformation": "RE",
+      "when_to_use": "After project completion; during continuous improvement; when building institutional memory; during sprint planning.",
+      "how_to_apply": "1) Conduct retrospective: What worked? What didn't? 2) Extract actionable learnings. 3) Feed learnings into next planning cycle. 4) Verify learnings were applied. 5) Retrospect on whether they helped."
+    },
+    {
+      "code": "RE17",
+      "name": "Versioning & Diff",
+      "definition": "Track changes over time and compare versions to understand evolution",
+      "example": "Version control documents, policies, and models to identify what changed, why, and with what effect.",
+      "transformation": "RE",
+      "when_to_use": "During document management; when tracking system evolution; during audit and compliance; when debugging regressions.",
+      "how_to_apply": "1) Establish versioning system. 2) Record each change with timestamp and reason. 3) Compare versions to see differences. 4) Analyze patterns in evolution. 5) Use history to inform future changes."
+    },
+    {
+      "code": "RE18",
+      "name": "Anti-Catastrophic Forgetting",
+      "definition": "Preserve critical knowledge while adapting to new information",
+      "example": "When retraining recommendation model, maintain performance on established use cases while improving on new patterns.",
+      "transformation": "RE",
+      "when_to_use": "During model updates; when evolving systems; during knowledge management; when balancing stability and adaptation.",
+      "how_to_apply": "1) Identify critical knowledge to preserve. 2) Create tests/benchmarks for preserved knowledge. 3) Adapt system to new information. 4) Verify preserved knowledge still holds. 5) If degraded, adjust adaptation approach."
+    },
+    {
+      "code": "RE19",
+      "name": "Auto-Refactor",
+      "definition": "Systematically improve system structure without changing external behavior",
+      "example": "Schedule regular code refactoring sprints to reduce technical debt, improving maintainability for future development.",
+      "transformation": "RE",
+      "when_to_use": "During technical debt reduction; when maintainability suffers; during code quality improvement; before major feature work.",
+      "how_to_apply": "1) Identify structural issues. 2) Define refactoring that improves structure. 3) Create tests to verify behavior unchanged. 4) Apply refactoring. 5) Run tests to confirm behavior preserved."
+    },
+    {
+      "code": "RE20",
+      "name": "Recursive Governance (Guardrails that Learn)",
+      "definition": "Establish rules that adapt based on their own effectiveness",
+      "example": "Implement content moderation policies that adjust thresholds based on false positive and false negative rates.",
+      "transformation": "RE",
+      "when_to_use": "During policy design; when building adaptive systems; during threshold tuning; when static rules fail.",
+      "how_to_apply": "1) Establish initial rules. 2) Monitor rule effectiveness. 3) Identify patterns in rule failures. 4) Adjust rules based on patterns. 5) Repeat continuously, rules evolve with context."
+    },
+    {
+      "code": "SY1",
+      "name": "Leverage Points",
+      "definition": "Identify intervention points where small changes produce disproportionate effects",
+      "example": "Shift default option from opt-in to opt-out for newsletter, dramatically increasing engagement with minimal effort.",
+      "transformation": "SY",
+      "when_to_use": "When seeking high-impact low-effort changes; during system optimization; when resources are constrained; during strategic intervention design.",
+      "how_to_apply": "1) Map the system's causal structure. 2) Identify points where small changes ripple through system. 3) Rank by impact-to-effort ratio. 4) Intervene at highest-leverage point. 5) Monitor system response."
+    },
+    {
+      "code": "SY2",
+      "name": "System Boundaries",
+      "definition": "Define what is inside versus outside system scope for analysis or design",
+      "example": "Clarify whether data governance includes partner systems or stops at API boundary to determine responsibility.",
+      "transformation": "SY",
+      "when_to_use": "At project inception; when responsibilities are unclear; during architecture design; when managing interfaces.",
+      "how_to_apply": "1) Identify candidate system boundaries. 2) Define what's inside the boundary. 3) Define what's outside. 4) Specify interface at boundary. 5) Document who owns what."
+    },
+    {
+      "code": "SY3",
+      "name": "Stocks & Flows",
+      "definition": "Distinguish accumulations from rates of change affecting them",
+      "example": "Track active member stock with new join flow and churn flow to understand growth dynamics and intervention points.",
+      "transformation": "SY",
+      "when_to_use": "During system dynamics modeling; when analyzing growth; during capacity planning; when diagnosing accumulation problems.",
+      "how_to_apply": "1) Identify stocks (things that accumulate). 2) Identify inflows (what adds to stock). 3) Identify outflows (what depletes stock). 4) Model stock level over time. 5) Intervene on flows to change stock behavior."
+    },
+    {
+      "code": "SY4",
+      "name": "Requisite Variety",
+      "definition": "Match control system's complexity to system being controlled",
+      "example": "Develop triage playbooks categorized by incident type, severity, and context rather than one-size-fits-all response.",
+      "transformation": "SY",
+      "when_to_use": "When responses feel inadequate; during control system design; when standardization fails; during exception handling design.",
+      "how_to_apply": "1) Assess variety in system being controlled. 2) Assess variety in current control mechanisms. 3) Identify mismatch. 4) Increase controller variety to match system variety. 5) Add nuanced responses for nuanced situations."
+    },
+    {
+      "code": "SY5",
+      "name": "Systems Archetypes",
+      "definition": "Recognize recurring dynamic patterns across different domains",
+      "example": "Identify shifting the burden pattern where quick fixes undermine fundamental solutions, perpetuating problems.",
+      "transformation": "SY",
+      "when_to_use": "When diagnosing system behavior; during pattern recognition; when problems recur; during strategic diagnosis.",
+      "how_to_apply": "1) Observe system behavior pattern. 2) Compare to known archetypes (shifting the burden, limits to growth, etc.). 3) Identify which archetype matches. 4) Apply archetype-specific interventions. 5) Monitor for pattern change."
+    },
+    {
+      "code": "SY6",
+      "name": "Feedback Structure Mapping",
+      "definition": "Diagram causal loops showing how variables influence each other",
+      "example": "Map how quality improves retention, which increases resources, which enables quality investment, creating reinforcing loop.",
+      "transformation": "SY",
+      "when_to_use": "During system analysis; when understanding complex dynamics; during strategy development; when communicating system behavior.",
+      "how_to_apply": "1) Identify key variables. 2) Draw arrows showing causal influence. 3) Label: + (same direction) or - (opposite direction). 4) Identify loops: reinforcing (all + or even -) or balancing (odd -). 5) Analyze loop dynamics."
+    },
+    {
+      "code": "SY7",
+      "name": "Path Dependence",
+      "definition": "Acknowledge how early decisions constrain future options through accumulated consequences",
+      "example": "Recognize initial technology choices now lock in vendor ecosystem, affecting all subsequent architecture decisions.",
+      "transformation": "SY",
+      "when_to_use": "During strategic planning; when evaluating legacy decisions; during platform choices; when assessing switching costs.",
+      "how_to_apply": "1) Identify current constraints. 2) Trace back: What past decisions created these constraints? 3) Assess cost of reversing path. 4) For new decisions, consider future path dependence. 5) Choose paths that preserve optionality."
+    },
+    {
+      "code": "SY8",
+      "name": "Homeostasis/Dynamic Equilibrium",
+      "definition": "Understand self-regulating mechanisms maintaining stable states despite disturbances",
+      "example": "Design recovery rules that automatically scale infrastructure during traffic spikes, then scale back down.",
+      "transformation": "SY",
+      "when_to_use": "During resilient system design; when stability is required; during auto-scaling implementation; when designing self-regulating processes.",
+      "how_to_apply": "1) Define desired stable state. 2) Identify potential disturbances. 3) Design negative feedback to counter disturbances. 4) Test response to disturbances. 5) Tune feedback for appropriate response speed."
+    },
+    {
+      "code": "SY9",
+      "name": "Phase Transitions & Tipping Points",
+      "definition": "Identify thresholds where gradual changes produce sudden qualitative shifts",
+      "example": "Recognize 40% referral rate as tipping point triggering organic growth that sustains without paid acquisition.",
+      "transformation": "SY",
+      "when_to_use": "During growth analysis; when planning for scale transitions; during risk assessment; when seeking critical mass.",
+      "how_to_apply": "1) Monitor key metrics over time. 2) Look for non-linear jumps in behavior. 3) Identify thresholds where jumps occur. 4) Push toward positive tipping points. 5) Monitor proximity to negative tipping points."
+    },
+    {
+      "code": "SY10",
+      "name": "Causal Loop Diagrams",
+      "definition": "Visualize circular cause-effect relationships with reinforcing and balancing dynamics",
+      "example": "Diagram wait time → satisfaction → reviews → demand → wait time loop before adding capacity.",
+      "transformation": "SY",
+      "when_to_use": "During systems thinking exercises; when analyzing feedback dynamics; during stakeholder communication; when diagnosing system behavior.",
+      "how_to_apply": "1) List variables in the system. 2) Draw causal arrows between variables. 3) Mark polarity (+ or -). 4) Trace loops and classify as reinforcing (R) or balancing (B). 5) Use diagram to identify intervention points."
+    },
+    {
+      "code": "SY11",
+      "name": "Governance Patterns",
+      "definition": "Design decision rights, accountability structures, and coordination mechanisms",
+      "example": "Establish RACI matrix defining who is Responsible, Accountable, Consulted, Informed for cross-functional initiatives.",
+      "transformation": "SY",
+      "when_to_use": "During organizational design; when clarifying responsibilities; during process design; when coordination is failing.",
+      "how_to_apply": "1) Identify decisions requiring governance. 2) Define roles involved. 3) Assign decision rights (who decides, who approves). 4) Establish escalation paths. 5) Document and communicate governance structure."
+    },
+    {
+      "code": "SY12",
+      "name": "Protocol/Interface Standards",
+      "definition": "Specify rules for interaction enabling coordination without central control",
+      "example": "Define REST API standards allowing independent team services to communicate without coordination overhead.",
+      "transformation": "SY",
+      "when_to_use": "During distributed system design; when enabling team autonomy; during integration planning; when reducing coordination costs.",
+      "how_to_apply": "1) Identify coordination needs. 2) Define standard interface/protocol. 3) Specify behavior at interface. 4) Enable independent operation within protocol. 5) Evolve protocol as needs change."
+    },
+    {
+      "code": "SY13",
+      "name": "Incentive Architecture",
+      "definition": "Design reward and penalty structures aligning individual actions with system goals",
+      "example": "Structure sales compensation to reward customer lifetime value, not just deal size, reducing churn from poor fit.",
+      "transformation": "SY",
+      "when_to_use": "During compensation design; when behavior misaligns with goals; during gamification; when reducing perverse incentives.",
+      "how_to_apply": "1) Define desired behaviors. 2) Analyze current incentives. 3) Identify misalignments. 4) Redesign incentives to align behavior with goals. 5) Monitor for gaming and adjust."
+    },
+    {
+      "code": "SY14",
+      "name": "Risk & Resilience Engineering",
+      "definition": "Build systems that fail gracefully and recover automatically",
+      "example": "Implement circuit breakers that isolate failing services, preventing cascading failures across dependent systems.",
+      "transformation": "SY",
+      "when_to_use": "During critical system design; when building fault tolerance; during disaster recovery planning; when failures are costly.",
+      "how_to_apply": "1) Identify potential failures. 2) Design isolation mechanisms. 3) Implement graceful degradation. 4) Create automatic recovery procedures. 5) Test failure scenarios regularly."
+    },
+    {
+      "code": "SY15",
+      "name": "Multi-Scale Alignment",
+      "definition": "Ensure strategy, operations, and execution cohere across organizational levels",
+      "example": "Verify individual OKRs roll up to team goals, which support division strategy, which serves company mission.",
+      "transformation": "SY",
+      "when_to_use": "During strategy deployment; when alignment is lacking; during OKR setting; when local optimization undermines global goals.",
+      "how_to_apply": "1) Articulate goals at each level. 2) Map connections between levels. 3) Verify lower-level goals support higher-level. 4) Identify misalignments. 5) Adjust to create coherence."
+    },
+    {
+      "code": "SY16",
+      "name": "Ecosystem Strategy",
+      "definition": "Position organization within network of partners, competitors, and stakeholders",
+      "example": "Develop platform that attracts third-party integrations, creating ecosystem value beyond internal capabilities.",
+      "transformation": "SY",
+      "when_to_use": "During competitive strategy; when building platforms; during partnership planning; when seeking network effects.",
+      "how_to_apply": "1) Map ecosystem players. 2) Identify value flows between players. 3) Find strategic position in ecosystem. 4) Build capabilities that strengthen position. 5) Cultivate ecosystem relationships."
+    },
+    {
+      "code": "SY17",
+      "name": "Policy Feedbacks",
+      "definition": "Anticipate how rules shape behavior, which creates conditions affecting future rules",
+      "example": "Predict expense policy tightening will drive shadow spending workarounds, undermining both compliance and efficiency.",
+      "transformation": "SY",
+      "when_to_use": "During policy design; when anticipating unintended consequences; during regulatory response; when rules are gamed.",
+      "how_to_apply": "1) Propose policy. 2) Predict behavioral responses. 3) Trace second-order effects of those responses. 4) Anticipate how effects create pressure for policy change. 5) Design policy to account for feedback."
+    },
+    {
+      "code": "SY18",
+      "name": "Measurement & Telemetry",
+      "definition": "Instrument systems to capture state, changes, and anomalies for informed response",
+      "example": "Deploy monitoring that tracks error rates, latency, throughput, and resource utilization across service mesh.",
+      "transformation": "SY",
+      "when_to_use": "During system operation; when visibility is lacking; during performance management; when debugging production issues.",
+      "how_to_apply": "1) Identify key system properties to measure. 2) Instrument collection of metrics. 3) Establish baselines and thresholds. 4) Create alerts for anomalies. 5) Build dashboards for visibility."
+    },
+    {
+      "code": "SY19",
+      "name": "Meta-Model Selection",
+      "definition": "Choose appropriate framework or tool for specific problem characteristics",
+      "example": "Select between financial modeling, simulation, and scenario planning based on uncertainty type and decision stakes.",
+      "transformation": "SY",
+      "when_to_use": "When facing new problems; when multiple frameworks could apply; during methodology selection; when building analysis capability.",
+      "how_to_apply": "1) Characterize the problem (uncertainty, stakes, time horizon). 2) Assess available frameworks. 3) Match framework characteristics to problem characteristics. 4) Select best-fit framework. 5) Apply and evaluate fit."
+    },
+    {
+      "code": "SY20",
+      "name": "Systems-of-Systems Coordination",
+      "definition": "Manage interactions between independent systems with emergent behaviors",
+      "example": "Coordinate across supply chain, inventory, logistics, and fulfillment systems each with own optimization but requiring global coherence.",
+      "transformation": "SY",
+      "when_to_use": "During enterprise integration; when independent systems must cooperate; during merger integration; when local optimization conflicts with global.",
+      "how_to_apply": "1) Map constituent systems and their boundaries. 2) Identify interaction points. 3) Design coordination mechanisms at interfaces. 4) Balance local autonomy with global coherence. 5) Monitor emergent behavior at system-of-systems level."
+    }
+  ]
+}

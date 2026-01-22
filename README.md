@@ -55,14 +55,41 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
+### `get_methodology`
+
+Retrieve the canonical Self-Dialectical AI Systems methodology, including all stages and HUMMBL Base120 references.
+
+Example:
+
+```json
+{}
+```
+
+### `audit_model_references`
+
+Audit a list of HUMMBL model references for validity, duplication, and transformation alignment.
+
+Example:
+
+```json
+{
+  "items": [
+    { "code": "IN11", "expectedTransformation": "IN" },
+    { "code": "CO4" }
+  ]
+}
+```
+
 After configuration, restart Claude Desktop. The HUMMBL tools will appear in the attachment menu.
 
 ## Available Tools
 
 ### `get_model`
+
 Retrieve detailed information about a specific mental model.
 
 Example:
+
 ```json
 {
   "code": "P1"
@@ -70,9 +97,11 @@ Example:
 ```
 
 ### `list_all_models`
+
 List all 120 mental models, optionally filtered by transformation type.
 
 Example:
+
 ```json
 {
   "transformation_filter": "P"
@@ -80,9 +109,11 @@ Example:
 ```
 
 ### `search_models`
+
 Search models by keyword across names, descriptions, and examples.
 
 Example:
+
 ```json
 {
   "query": "decision"
@@ -90,9 +121,11 @@ Example:
 ```
 
 ### `recommend_models`
+
 Get AI-recommended models based on problem description.
 
 Example:
+
 ```json
 {
   "problem_description": "Our startup is growing rapidly but systems are breaking down. We need to scale operations without losing quality."
@@ -100,9 +133,11 @@ Example:
 ```
 
 ### `get_transformation`
+
 Retrieve information about a specific transformation type and all its models.
 
 Example:
+
 ```json
 {
   "type": "IN"
@@ -110,9 +145,11 @@ Example:
 ```
 
 ### `search_problem_patterns`
+
 Find pre-defined problem patterns with recommended approaches.
 
 Example:
+
 ```json
 {
   "query": "innovation"
@@ -491,6 +528,16 @@ Direct URI-based access to models and transformations:
 - `hummbl://model/{code}` – Individual model (e.g., `hummbl://model/P1`)
 - `hummbl://transformation/{type}` – All models in transformation (e.g., `hummbl://transformation/P`)
 - `hummbl://models` – Complete Base120 framework
+- `hummbl://methodology/self-dialectical-ai` – Structured Self-Dialectical AI methodology definition
+- `hummbl://methodology/self-dialectical-ai/overview` – Markdown overview of the methodology for quick operator reference
+
+### Self-Dialectical Methodology Overview
+
+The HUMMBL Self-Dialectical AI Systems methodology (v1.2) enables ethical self-correction via five dialectical stages (thesis, antithesis, synthesis, convergence, meta-reflection) mapped to Base120 mental models plus SY meta-models. Use the tools/resources above to fetch the canonical JSON definition, Markdown overview, or to audit references in external documents.
+
+## Problem Patterns
+
+HUMMBL includes pre-defined problem patterns that map common challenges to recommended transformations and models. See [Problem Patterns Documentation](./docs/problem-patterns.md) for the complete catalog with detailed guidance.
 
 ## Problem Patterns
 

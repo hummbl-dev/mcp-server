@@ -6,6 +6,7 @@
 import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { getAllModels, getModelByCode, getTransformationByKey } from "../framework/base120.js";
+import { isOk, isTransformationType } from "../types/domain.js";
 
 /**
  * Register HUMMBL resources with the MCP server.
@@ -24,13 +25,15 @@ export function registerModelResources(server: McpServer): void {
       const rawCode = variables.code;
       const code = Array.isArray(rawCode) ? rawCode[0] : rawCode;
       const normalizedCode = code.toUpperCase();
-      const model = getModelByCode(normalizedCode);
+      const result = getModelByCode(normalizedCode);
 
-      if (!model) {
+      if (!isOk(result)) {
         throw new Error(
           `Model code '${code}' not found. Use valid HUMMBL Base120 codes like P1, IN3, CO5.`
         );
       }
+
+      const model = result.value;
 
       return {
         contents: [
@@ -56,14 +59,28 @@ export function registerModelResources(server: McpServer): void {
     async (uri: URL, variables: Record<string, string | string[]>) => {
       const rawType = variables.type;
       const type = Array.isArray(rawType) ? rawType[0] : rawType;
-      const upperType = type.toUpperCase();
-      const transformation = getTransformationByKey(upperType);
 
-      if (!transformation) {
+      if (!type) {
+        throw new Error("Transformation type is required (P, IN, CO, DE, RE, SY).");
+      }
+
+      const upperType = type.toUpperCase();
+
+      if (!isTransformationType(upperType)) {
         throw new Error(
           `Transformation '${type}' not found. Valid transformations are: P, IN, CO, DE, RE, SY.`
         );
       }
+
+      const result = getTransformationByKey(upperType);
+
+      if (!isOk(result)) {
+        throw new Error(
+          `Transformation '${type}' not found. Valid transformations are: P, IN, CO, DE, RE, SY.`
+        );
+      }
+
+      const transformation = result.value;
 
       return {
         contents: [

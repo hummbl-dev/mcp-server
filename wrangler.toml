@@ -1,16 +1,31 @@
-name = "hummbl-mcp-server"
-main = "src/index.ts"
+name = "hummbl-api"
+main = "dist/api.js"
 compatibility_date = "2024-01-01"
 
 # D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "hummbl-mcp-history"
-database_id = "YOUR_DATABASE_ID"  # Get from: wrangler d1 create hummbl-mcp-history
+database_name = "hummbl-api"
+database_id = "YOUR_D1_DATABASE_ID"  # Get from: wrangler d1 create hummbl-api
+
+# KV Namespace bindings
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "YOUR_API_KEYS_KV_ID"  # Get from: wrangler kv:namespace create "API_KEYS"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "YOUR_SESSIONS_KV_ID"  # Get from: wrangler kv:namespace create "SESSIONS"
 
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
 
-# Secrets (set via: wrangler secret put REDIS_URL)
-# REDIS_URL = "redis://..." (don't commit this)
+# Custom domain configuration
+[[routes]]
+pattern = "api.hummbl.io/*"
+zone_name = "hummbl.io"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# JWT_SECRET = "your-secret-key"
+# REDIS_URL = "redis://..." (if needed)

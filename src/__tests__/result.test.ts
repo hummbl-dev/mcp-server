@@ -3,14 +3,14 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { ok, err, isOk, isErr, Result } from "../types/domain.js";
+import { ok, err, isOk, isErr, type DomainError, Result } from "../types/domain.js";
 
 describe("Result Pattern", () => {
   describe("ok", () => {
     it("should create success result", () => {
       const result = ok(42);
-      expect(result.success).toBe(true);
-      if (result.success) {
+      expect(result.ok).toBe(true);
+      if (result.ok) {
         expect(result.value).toBe(42);
       }
     });
@@ -18,16 +18,16 @@ describe("Result Pattern", () => {
     it("should work with objects", () => {
       const data = { name: "test" };
       const result = ok(data);
-      expect(result.success).toBe(true);
-      if (result.success) {
+      expect(result.ok).toBe(true);
+      if (result.ok) {
         expect(result.value).toEqual(data);
       }
     });
 
     it("should work with null", () => {
       const result = ok(null);
-      expect(result.success).toBe(true);
-      if (result.success) {
+      expect(result.ok).toBe(true);
+      if (result.ok) {
         expect(result.value).toBeNull();
       }
     });
@@ -35,19 +35,20 @@ describe("Result Pattern", () => {
 
   describe("err", () => {
     it("should create error result", () => {
-      const error = new Error("test error");
-      const result = err(error);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe(error);
+      const error: DomainError = { type: "Internal", message: "test error" };
+      const result = err<DomainError>(error);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toEqual(error);
       }
     });
 
     it("should work with string errors", () => {
-      const result = err("error message");
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("error message");
+      const error: DomainError = { type: "Unknown", message: "error message" };
+      const result = err<DomainError>(error);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toEqual(error);
       }
     });
   });
@@ -59,7 +60,7 @@ describe("Result Pattern", () => {
     });
 
     it("should return false for error result", () => {
-      const result: Result<number> = err(new Error("test"));
+      const result: Result<number> = err<DomainError>({ type: "Internal", message: "test" });
       expect(isOk(result)).toBe(false);
     });
 
@@ -74,7 +75,7 @@ describe("Result Pattern", () => {
 
   describe("isErr", () => {
     it("should return true for error result", () => {
-      const result: Result<number> = err(new Error("test"));
+      const result: Result<number> = err<DomainError>({ type: "Internal", message: "test" });
       expect(isErr(result)).toBe(true);
     });
 
@@ -84,10 +85,14 @@ describe("Result Pattern", () => {
     });
 
     it("should narrow type correctly", () => {
-      const result: Result<number> = err(new Error("test"));
+      const result: Result<number> = err<DomainError>({ type: "Internal", message: "test" });
       if (isErr(result)) {
-        const error: Error = result.error;
-        expect(error.message).toBe("test");
+        const error: DomainError = result.error;
+        if (error.type === "Internal") {
+          expect(error.message).toBe("test");
+        } else {
+          throw new Error("Expected Internal error type for this test");
+        }
       }
     });
   });

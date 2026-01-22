@@ -95,6 +95,15 @@ describe("HistoryManager", () => {
       // Should still work, compression is placeholder for now
       expect(redisClient.rpush).toHaveBeenCalled();
     });
+
+    it("compresses payloads greater than 1KB", async () => {
+      const sessionId = "session-large";
+      const largePayload = createUserMessage("a".repeat(2000));
+
+      await historyManager.addMessage(sessionId, largePayload);
+
+      expect(redisClient.rpush).toHaveBeenCalledWith(`history:${sessionId}`, expect.any(String));
+    });
   });
 
   describe("getHistory", () => {
@@ -287,6 +296,15 @@ describe("HistoryManager", () => {
       const result = await historyManager.clearHistory("session123");
 
       expect(result).toBe(false);
+    });
+
+    it("continues when Redis delete fails", async () => {
+      vi.spyOn(redisClient, "delete").mockResolvedValueOnce(false);
+
+      const result = await historyManager.clearHistory("session123");
+
+      expect(result).toBe(true);
+      expect(d1Client.execute).toHaveBeenCalled();
     });
   });
 

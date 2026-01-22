@@ -1,0 +1,21 @@
+{
+  "id": "a5e31daf-5418-4e55-b172-bd43deb0b047",
+  "key": "hummbl_500984f125584895",
+  "tier": "enterprise",
+  "name": "Enterprise Test Key",
+  "createdAt": "2025-11-27T19:08:47.186Z",
+  "usageCount": 0,
+  "rateLimit": {
+    "requestsPerHour": 10000,
+    "requestsPerDay": 100000
+  },
+  "permissions": [
+    "read:health",
+    "read:models",
+    "read:transformations",
+    "read:search",
+    "read:recommend",
+    "admin:*"
+  ],
+  "isActive": true
+}
