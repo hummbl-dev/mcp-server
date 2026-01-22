@@ -539,6 +539,10 @@ The HUMMBL Self-Dialectical AI Systems methodology (v1.2) enables ethical self-c
 
 HUMMBL includes pre-defined problem patterns that map common challenges to recommended transformations and models. See [Problem Patterns Documentation](./docs/problem-patterns.md) for the complete catalog with detailed guidance.
 
+## Problem Patterns
+
+HUMMBL includes pre-defined problem patterns that map common challenges to recommended transformations and models. See [Problem Patterns Documentation](./docs/problem-patterns.md) for the complete catalog with detailed guidance.
+
 ## Development
 
 ### Setup

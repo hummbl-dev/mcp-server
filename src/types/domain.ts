@@ -226,3 +226,50 @@ export interface WorkflowProgress {
   nextAction: string;
   canResume: boolean;
 }
+
+/**
+ * Workflow types for guided multi-turn problem solving
+ */
+
+export type WorkflowType = "root_cause_analysis" | "strategy_design" | "decision_making";
+
+export interface WorkflowStep {
+  stepNumber: number;
+  transformation: TransformationType;
+  models: string[]; // Model codes to apply
+  guidance: string; // What to do in this step
+  questions: string[]; // Prompts to guide thinking
+  expectedOutput: string; // What should result from this step
+}
+
+export interface WorkflowTemplate {
+  name: WorkflowType;
+  displayName: string;
+  description: string;
+  problemTypes: string[]; // When to use this workflow
+  steps: WorkflowStep[];
+  estimatedDuration: string; // e.g., "15-30 minutes"
+}
+
+export interface WorkflowState {
+  workflowName: WorkflowType;
+  currentStep: number;
+  totalSteps: number;
+  startedAt: string;
+  lastUpdatedAt: string;
+  completed: boolean;
+  stepResults: Record<number, string>; // User's insights from each step
+}
+
+export interface WorkflowProgress {
+  workflow: WorkflowType;
+  displayName: string;
+  currentStep: number;
+  totalSteps: number;
+  transformation: TransformationType;
+  guidance: string;
+  suggestedModels: string[];
+  questions: string[];
+  nextAction: string;
+  canResume: boolean;
+}
