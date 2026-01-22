@@ -27,8 +27,8 @@ export const MessageSchema = z.object({
   content: z.string(),
   toolCalls: z.array(ToolCallSchema).optional(),
   toolCallId: z.string().optional(),
-  timestamp: z.string().datetime({ offset: true }),
-  metadata: z.record(z.unknown()).optional(), // For cost, tokens, etc.
+  timestamp: z.iso.datetime({}),
+  metadata: z.record(z.string(), z.unknown()).optional(), // For cost, tokens, etc.
 });
 
 export type Message = z.infer<typeof MessageSchema>;

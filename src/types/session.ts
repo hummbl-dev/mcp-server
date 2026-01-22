@@ -6,7 +6,7 @@
 import { z } from "zod";
 
 // Domain state schema - flexible record for any domain-specific data
-export const DomainStateSchema = z.record(z.unknown());
+export const DomainStateSchema = z.record(z.string(), z.unknown());
 export type DomainState = z.infer<typeof DomainStateSchema>;
 
 // Session metadata schema
@@ -14,8 +14,8 @@ export const SessionMetadataSchema = z.object({
   totalMessages: z.number().int().nonnegative(),
   totalCostUsd: z.number().nonnegative(),
   activeTools: z.array(z.string()),
-  lastActivity: z.string().datetime({ offset: true }).optional(),
-  clientInfo: z.record(z.unknown()).optional(),
+  lastActivity: z.iso.datetime({}).optional(),
+  clientInfo: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type SessionMetadata = z.infer<typeof SessionMetadataSchema>;
@@ -25,8 +25,8 @@ export const SessionSchema = z.object({
   sessionId: z.string().uuid(),
   userId: z.string(),
   adapterType: z.string(),
-  createdAt: z.string().datetime({ offset: true }),
-  lastActive: z.string().datetime({ offset: true }),
+  createdAt: z.iso.datetime({}),
+  lastActive: z.iso.datetime({}),
   version: z.number().int().positive(),
   domainState: DomainStateSchema,
   metadata: SessionMetadataSchema,
