@@ -16,7 +16,7 @@ async function main(): Promise<void> {
 
   // Log to stderr (stdout is reserved for MCP protocol)
   console.error("HUMMBL MCP Server v1.0.0-beta.2 running on stdio");
-  console.error("Ready to serve mental models via Model Context Protocol");
+  console.error("Ready to serve Base120 mental models via Model Context Protocol");
 }
 
 main().catch((error) => {

@@ -1,0 +1,13 @@
+# Base120 lint ignore list
+# - Lines are matched against repo-relative paths.
+# - Prefix "re:" to use a regex on the path.
+# - Otherwise, substring match is used.
+# Examples:
+# docs/legacy/
+# re:^docs/legacy/.*\.md$
+coverage/
+dist/
+build/
+.next/
+out/
+scripts/validate-base120-refs.cjs

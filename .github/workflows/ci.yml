@@ -82,6 +82,9 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
+      - name: Lint Base120 references
+        run: node scripts/validate-base120-refs.cjs
+
   security:
     name: Security Audit
     runs-on: ubuntu-latest
