@@ -37,3 +37,15 @@ coverage/
 .cache/
 temp/
 tmp/
+
+# API Keys and Secrets
+api-key*.json
+*.key
+*.pem
+
+# Backup and temporary files
+*.bak
+*.old
+*.new
+*.tmp
+*~.nib

@@ -1,0 +1,54 @@
+name = "hummbl-api"
+main = "dist/api.js"
+compatibility_date = "2024-01-01"
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "hummbl-api"
+database_id = "YOUR_D1_DATABASE_ID"  # Get from: wrangler d1 create hummbl-api
+
+# KV Namespace bindings
+[[kv_namespaces]]
+binding = "API_KEYS"
+id = "YOUR_API_KEYS_KV_ID"  # Get from: wrangler kv:namespace create "API_KEYS"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "YOUR_SESSIONS_KV_ID"  # Get from: wrangler kv:namespace create "SESSIONS"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Custom domain configuration (optional)
+# Uncomment and configure if you have a custom domain
+# [[routes]]
+# pattern = "api.yourdomain.com/*"
+# zone_name = "yourdomain.com"
+
+# Secrets (set via: wrangler secret put SECRET_NAME)
+# These should NOT be in this file - use wrangler secrets commands instead:
+#   wrangler secret put JWT_SECRET
+#   wrangler secret put REDIS_URL (if using Upstash Redis)
+#   wrangler secret put REDIS_TOKEN (if using Upstash Redis)
+
+# Staging environment configuration
+[env.staging]
+name = "hummbl-api-staging"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "hummbl-api-staging"
+database_id = "YOUR_STAGING_D1_DATABASE_ID"
+
+[[env.staging.kv_namespaces]]
+binding = "API_KEYS"
+id = "YOUR_STAGING_API_KEYS_KV_ID"
+
+[[env.staging.kv_namespaces]]
+binding = "SESSIONS"
+id = "YOUR_STAGING_SESSIONS_KV_ID"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
