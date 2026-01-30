@@ -23,7 +23,8 @@ export function registerWorkflowTools(server: McpServer): void {
     "list_workflows",
     {
       title: "List Available Workflows",
-      description: "Get all available guided workflows for problem-solving with mental models.",
+      description:
+        "Get all available guided workflows for problem-solving with Base120 mental models.",
       inputSchema: z.object({}),
       outputSchema: z.object({
         count: z.number(),
@@ -72,7 +73,7 @@ export function registerWorkflowTools(server: McpServer): void {
     {
       title: "Start Guided Workflow",
       description:
-        "Begin a guided multi-turn workflow for systematic problem-solving using mental models.",
+        "Begin a guided multi-turn workflow for systematic problem-solving using Base120 mental models.",
       inputSchema: z.object({
         workflow_name: z
           .enum(["root_cause_analysis", "strategy_design", "decision_making"])

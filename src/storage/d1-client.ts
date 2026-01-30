@@ -124,7 +124,7 @@ export class D1Client {
         FOREIGN KEY (session_id) REFERENCES sessions(session_id)
       )`,
 
-      // Mental models table
+      // Base120 mental models table
       `CREATE TABLE IF NOT EXISTS mental_models (
         code TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -158,7 +158,7 @@ export class D1Client {
   }
 
   /**
-   * Get enriched mental model data from database
+   * Get enriched Base120 mental model data from database
    */
   async getMentalModel(code: string) {
     const sql = `

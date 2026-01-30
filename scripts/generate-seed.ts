@@ -108,7 +108,7 @@ const main = (): void => {
   const sql = buildSeedStatements(models);
   writeFileSync(SEED_OUTPUT_PATH, sql, "utf-8");
   // eslint-disable-next-line no-console
-  console.log(`Generated ${models.length} mental model rows in ${path.relative(PROJECT_ROOT, SEED_OUTPUT_PATH)}`);
+  console.log(`Generated ${models.length} Base120 mental model rows in ${path.relative(PROJECT_ROOT, SEED_OUTPUT_PATH)}`);
 };
 
 main();

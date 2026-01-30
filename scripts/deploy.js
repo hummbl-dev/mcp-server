@@ -120,7 +120,7 @@ function buildAndDeploy() {
 }
 
 function seedDatabase() {
-  log("Seeding database with mental models...");
+  log("Seeding database with Base120 mental models...");
 
   // Check if seed.sql exists
   try {
@@ -131,7 +131,7 @@ function seedDatabase() {
   }
 
   // Execute seed
-  execCommand("npm run seed", "Seeding database with mental models");
+  execCommand("npm run seed", "Seeding database with Base120 mental models");
 }
 
 function generateApiKey() {

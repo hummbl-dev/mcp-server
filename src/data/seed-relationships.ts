@@ -75,7 +75,7 @@ export const SEED_RELATIONSHIPS: RelationshipInput[] = [
     relationship_type: "sequences",
     confidence: "B",
     evidence:
-      "Hanlon's Razor typically precedes applying Occam's Razor - first assume good intent, then apply simplest explanation.",
+      "IN4 (base120-ok) typically precedes applying IN5 (base120-ok) - first assume good intent, then apply simplest explanation.",
   },
   {
     source_code: "CO3",

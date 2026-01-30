@@ -19,7 +19,7 @@ export const SERVER_MODE = MCP_CONFIG.HUMMBL_API_KEY ? "hybrid" : "local-only";
 // Informational logging (not a warning, since local-only mode is fully functional)
 if (SERVER_MODE === "local-only") {
   console.info(
-    "ℹ️  Running in local-only mode (all 120 mental models available)\n" +
+    "ℹ️  Running in local-only mode (all 120 Base120 mental models available)\n" +
       "   Set HUMMBL_API_KEY environment variable to enable enhanced API recommendations"
   );
 }
