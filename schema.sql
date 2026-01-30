@@ -87,6 +87,10 @@ CREATE INDEX IF NOT EXISTS idx_relationships_confidence ON relationships(confide
 CREATE INDEX IF NOT EXISTS idx_relationships_status ON relationships(review_status);
 CREATE INDEX IF NOT EXISTS idx_relationships_validated_by ON relationships(validated_by);
 
+-- Unique index to prevent duplicate relationships
+CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_unique 
+ON relationships(model_a, model_b, relationship_type, direction);
+
 -- Model relationships table (simplified version)
 CREATE TABLE IF NOT EXISTS model_relationships (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
