@@ -1,0 +1,45 @@
+# CODEOWNERS file for HUMMBL MCP Server
+# 
+# This file defines code ownership for the repository.
+# Code owners are automatically requested for review when someone opens a pull request.
+#
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repository
+* @hummbl-dev
+
+# Core framework and mental models
+/src/framework/ @hummbl-dev
+/src/data/ @hummbl-dev
+
+# Security-related files
+/SECURITY.md @hummbl-dev
+/SECURITY_NOTICE.md @hummbl-dev
+/.github/ISSUE_TEMPLATE/security.md @hummbl-dev
+
+# Documentation
+/docs/ @hummbl-dev
+/README.md @hummbl-dev
+/CONTRIBUTING.md @hummbl-dev
+/CHANGELOG.md @hummbl-dev
+
+# Configuration files
+/.github/ @hummbl-dev
+/package.json @hummbl-dev
+/tsconfig.json @hummbl-dev
+/eslint.config.js @hummbl-dev
+
+# Database schema
+/schema.sql @hummbl-dev
+/schema/ @hummbl-dev
+/seed.sql @hummbl-dev
+
+# Deployment configuration
+/wrangler.toml @hummbl-dev
+/wrangler.toml.example @hummbl-dev
+/DEPLOYMENT.md @hummbl-dev
+
+# Testing
+/tests/ @hummbl-dev
+/src/__tests__/ @hummbl-dev
+/vitest.config.ts @hummbl-dev
