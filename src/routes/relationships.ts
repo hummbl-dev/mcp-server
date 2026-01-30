@@ -30,6 +30,30 @@ const router = new Hono<{
 }>();
 
 /**
+ * Convert database direction to API response direction for a specific model
+ * @param dbDirection - Direction from database ('a→b', 'b→a', or 'bidirectional')
+ * @param isModelA - Whether the querying model is model_a in the relationship
+ * @returns 'outgoing', 'incoming', or 'bidirectional'
+ */
+function toResponseDirection(
+  dbDirection: string,
+  isModelA: boolean
+): "outgoing" | "incoming" | "bidirectional" {
+  if (dbDirection === "bidirectional") {
+    return "bidirectional";
+  }
+
+  // For 'a→b': if we're model_a, it's outgoing; if we're model_b, it's incoming
+  // For 'b→a': if we're model_a, it's incoming; if we're model_b, it's outgoing
+  if (dbDirection === "a→b") {
+    return isModelA ? "outgoing" : "incoming";
+  } else {
+    // dbDirection === 'b→a'
+    return isModelA ? "incoming" : "outgoing";
+  }
+}
+
+/**
  * GET /v1/relationships
  * List relationships with optional filtering
  */
@@ -99,7 +123,7 @@ router.get("/models/:code/relationships", async (c: AppContext) => {
         return {
           related_model: isModelA ? rel.model_b : rel.model_a,
           type: rel.relationship_type,
-          direction: isModelA ? "outgoing" : "incoming",
+          direction: toResponseDirection(rel.direction, isModelA),
           confidence: rel.confidence,
           logical_derivation: rel.logical_derivation,
           relationship_id: rel.id,

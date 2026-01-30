@@ -400,7 +400,7 @@ export class D1Client {
       const params: unknown[] = [];
 
       if (filters?.model) {
-        whereClause += " AND (source_code = ? OR target_code = ?)";
+        whereClause += " AND (model_a = ? OR model_b = ?)";
         params.push(filters.model, filters.model);
       }
 
@@ -414,16 +414,21 @@ export class D1Client {
         params.push(filters.confidence);
       }
 
+      if (filters?.status) {
+        whereClause += " AND review_status = ?";
+        params.push(filters.status);
+      }
+
       const limit = filters?.limit || 50;
       const offset = filters?.offset || 0;
 
       const sql = `
-        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
-               confidence, evidence as logical_derivation, NULL as has_literature_support,
-               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
-               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
-               NULL as notes, created_at, updated_at
-        FROM model_relationships
+        SELECT id, model_a, model_b, relationship_type, direction,
+               confidence, logical_derivation, has_literature_support,
+               literature_citation, literature_url, empirical_observation,
+               validated_by, validated_at, review_status, notes,
+               created_at, updated_at
+        FROM relationships
         ${whereClause}
         ORDER BY confidence DESC, created_at DESC
         LIMIT ? OFFSET ?
@@ -442,12 +447,12 @@ export class D1Client {
   async getRelationship(id: string): Promise<ModelRelationship | null> {
     try {
       const sql = `
-        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
-               confidence, evidence as logical_derivation, NULL as has_literature_support,
-               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
-               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
-               NULL as notes, created_at, updated_at
-        FROM model_relationships
+        SELECT id, model_a, model_b, relationship_type, direction,
+               confidence, logical_derivation, has_literature_support,
+               literature_citation, literature_url, empirical_observation,
+               validated_by, validated_at, review_status, notes,
+               created_at, updated_at
+        FROM relationships
         WHERE id = ?
       `;
 
