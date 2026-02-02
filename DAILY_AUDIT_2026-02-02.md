@@ -203,6 +203,17 @@ The previous audit (January 30, 2026) addressed all critical issues:
 2. **Console Statements**: 37 lint warnings are from console.log statements in scripts - acceptable for CLI tooling
 3. **Non-null Assertions**: 4 warnings for non-null assertions in API routes - documented and acceptable
 
+### Dependency Updates Available (Non-Critical)
+
+| Package | Current | Latest | Notes |
+|---------|---------|--------|-------|
+| @cloudflare/workers-types | 4.20260124.0 | 4.20260131.0 | Dev dependency |
+| @commitlint/cli | 20.4.0 | 20.4.1 | Dev dependency |
+| @commitlint/config-conventional | 20.4.0 | 20.4.1 | Dev dependency |
+| @types/node | 25.0.10 | 25.2.0 | Dev dependency |
+
+These updates are handled automatically by Dependabot.
+
 ---
 
 ## Summary
