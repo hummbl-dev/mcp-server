@@ -1,15 +1,60 @@
 /**
  * Cloudflare D1 client wrapper for MCP server persistent storage
- * Ported from Python Phase 1C d1_client.py
+ * Ported from Phase 1C implementation with relationship persistence upgrades
  */
 
 import type { D1Database } from "@cloudflare/workers-types";
 import type {
-  SimpleRelationship,
-  RelationshipInput,
-  SimpleRelationshipResult,
   ModelRelationship,
+  RelationshipRecordInput,
 } from "../types/relationships.js";
+
+export class DuplicateRelationshipError extends Error {
+  constructor() {
+    super("duplicate_relationship");
+    this.name = "DuplicateRelationshipError";
+  }
+}
+
+const RELATIONSHIP_COLUMNS = `
+    id,
+    model_a,
+    model_b,
+    relationship_type,
+    direction,
+    confidence,
+    logical_derivation,
+    has_literature_support,
+    literature_citation,
+    literature_url,
+    empirical_observation,
+    validated_by,
+    validated_at,
+    review_status,
+    notes,
+    created_at,
+    updated_at
+  `;
+
+type DbRelationshipRow = {
+  id: string;
+  model_a: string;
+  model_b: string;
+  relationship_type: string;
+  direction: string;
+  confidence: string;
+  logical_derivation: string;
+  has_literature_support: number | null;
+  literature_citation: string | null;
+  literature_url: string | null;
+  empirical_observation: string | null;
+  validated_by: string;
+  validated_at: string;
+  review_status: string;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
 
 export class D1Client {
   private db: D1Database;
@@ -18,15 +63,10 @@ export class D1Client {
     this.db = db;
   }
 
-  /**
-   * Execute a query and return number of affected rows
-   */
+  /** Execute a statement that mutates rows */
   async execute(sql: string, ...params: unknown[]): Promise<number> {
     try {
-      const result = await this.db
-        .prepare(sql)
-        .bind(...params)
-        .run();
+      const result = await this.db.prepare(sql).bind(...params).run();
       if (!result.success) {
         throw new Error(result.error || "D1 execution failed");
       }
@@ -37,51 +77,36 @@ export class D1Client {
     }
   }
 
-  /**
-   * Execute a query and return all results
-   */
+  /** Query for multiple rows */
   async query<T>(sql: string, ...params: unknown[]): Promise<T[]> {
     try {
-      const result = await this.db
-        .prepare(sql)
-        .bind(...params)
-        .all();
+      const result = await this.db.prepare(sql).bind(...params).all();
       if (!result.success) {
         throw new Error(result.error || "D1 query failed");
       }
-      return result.results as T[];
+      return (result.results || []) as T[];
     } catch (error) {
       console.error("D1 QUERY failed", { sql, params, error });
       throw error;
     }
   }
 
-  /**
-   * Execute a query and return first result
-   */
+  /** Query for a single row */
   async queryOne<T>(sql: string, ...params: unknown[]): Promise<T | null> {
     try {
-      const result = await this.db
-        .prepare(sql)
-        .bind(...params)
-        .first();
-      return result as T | null;
+      const result = await this.db.prepare(sql).bind(...params).first();
+      return (result as T) || null;
     } catch (error) {
       console.error("D1 QUERY_ONE failed", { sql, params, error });
       throw error;
     }
   }
 
-  /**
-   * Execute multiple queries in a transaction
-   */
+  /** Execute statements in a batch */
   async transaction(queries: Array<{ sql: string; params: unknown[] }>): Promise<boolean> {
     try {
       const statements = queries.map((q) => this.db.prepare(q.sql).bind(...q.params));
-
       await this.db.batch(statements);
-
-      // If batch completes without throwing, consider it successful
       return true;
     } catch (error) {
       console.error("D1 TRANSACTION failed", { queries, error });
@@ -89,15 +114,9 @@ export class D1Client {
     }
   }
 
-  /**
-   * Run database migrations
-   */
+  /** Run basic migrations (sessions/messages/models tables) */
   async runMigrations(): Promise<void> {
-    // In a real implementation, this would read SQL files from migrationDir
-    // and execute them in order. For now, we'll implement basic schema setup.
-
     const migrations = [
-      // Sessions table
       `CREATE TABLE IF NOT EXISTS sessions (
         session_id TEXT PRIMARY KEY,
         user_id TEXT NOT NULL,
@@ -105,26 +124,22 @@ export class D1Client {
         created_at TEXT NOT NULL,
         last_active TEXT NOT NULL,
         version INTEGER NOT NULL DEFAULT 1,
-        domain_state TEXT, -- JSON
+        domain_state TEXT,
         total_messages INTEGER NOT NULL DEFAULT 0,
         total_cost_usd REAL NOT NULL DEFAULT 0,
-        metadata TEXT -- JSON
+        metadata TEXT
       )`,
-
-      // Messages table
       `CREATE TABLE IF NOT EXISTS messages (
         message_id TEXT PRIMARY KEY,
         session_id TEXT NOT NULL,
         role TEXT NOT NULL,
         content TEXT NOT NULL,
-        tool_calls TEXT, -- JSON array
+        tool_calls TEXT,
         tool_call_id TEXT,
         timestamp TEXT NOT NULL,
-        metadata TEXT, -- JSON
+        metadata TEXT,
         FOREIGN KEY (session_id) REFERENCES sessions(session_id)
       )`,
-
-      // Base120 mental models table
       `CREATE TABLE IF NOT EXISTS mental_models (
         code TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -137,36 +152,117 @@ export class D1Client {
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         version INTEGER NOT NULL DEFAULT 1
       )`,
-
-      // Indexes for performance
-      `CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_sessions_active ON sessions(last_active)`,
-      `CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id)`,
-      `CREATE INDEX IF NOT EXISTS idx_messages_timestamp ON messages(timestamp)`,
+      `CREATE TABLE IF NOT EXISTS relationships (
+        id TEXT PRIMARY KEY,
+        model_a TEXT NOT NULL,
+        model_b TEXT NOT NULL,
+        relationship_type TEXT NOT NULL,
+        direction TEXT NOT NULL,
+        confidence TEXT NOT NULL DEFAULT 'U',
+        logical_derivation TEXT NOT NULL,
+        has_literature_support INTEGER DEFAULT 0,
+        literature_citation TEXT,
+        literature_url TEXT,
+        empirical_observation TEXT,
+        validated_by TEXT NOT NULL,
+        validated_at TEXT NOT NULL,
+        review_status TEXT NOT NULL DEFAULT 'draft',
+        notes TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (model_a) REFERENCES mental_models(code),
+        FOREIGN KEY (model_b) REFERENCES mental_models(code)
+      )`,
+      `CREATE INDEX IF NOT EXISTS idx_relationships_model_a ON relationships(model_a)`,
+      `CREATE INDEX IF NOT EXISTS idx_relationships_model_b ON relationships(model_b)`,
+      `CREATE INDEX IF NOT EXISTS idx_relationships_type ON relationships(relationship_type)`,
+      `CREATE INDEX IF NOT EXISTS idx_relationships_confidence ON relationships(confidence)`,
+      `CREATE INDEX IF NOT EXISTS idx_relationships_status ON relationships(review_status)`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_logical ON relationships(model_a, model_b, relationship_type, direction)`,
     ];
 
     for (const migration of migrations) {
-      try {
-        await this.execute(migration);
-        // eslint-disable-next-line no-console
-        console.log("Migration executed:", migration.split("\n")[0]);
-      } catch (error) {
-        console.error("Migration failed:", migration, error);
-        throw error;
+      await this.execute(migration);
+    }
+
+    await this.migrateLegacyRelationships();
+  }
+
+  private async migrateLegacyRelationships(): Promise<void> {
+    try {
+      const tableExists = await this.queryOne<{ name: string }>(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='model_relationships'"
+      );
+      if (!tableExists) {
+        return;
       }
+
+      const legacyCount = await this.queryOne<{ count: number }>(
+        "SELECT COUNT(*) as count FROM model_relationships"
+      );
+      if (!legacyCount || legacyCount.count === 0) {
+        return;
+      }
+
+      const insertSql = `
+        INSERT INTO relationships (
+          id,
+          model_a,
+          model_b,
+          relationship_type,
+          direction,
+          confidence,
+          logical_derivation,
+          has_literature_support,
+          literature_citation,
+          literature_url,
+          empirical_observation,
+          validated_by,
+          validated_at,
+          review_status,
+          notes
+        )
+        SELECT
+          printf('RMIG-%06d', id),
+          source_code,
+          target_code,
+          relationship_type,
+          'a→b',
+          confidence,
+          COALESCE(evidence, 'legacy import'),
+          0,
+          NULL,
+          NULL,
+          NULL,
+          'legacy-import',
+          COALESCE(created_at, CURRENT_TIMESTAMP),
+          'draft',
+          NULL
+        FROM model_relationships mr
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM relationships r
+          WHERE r.model_a = mr.source_code
+            AND r.model_b = mr.target_code
+            AND r.relationship_type = mr.relationship_type
+            AND r.direction = 'a→b'
+        )
+      `;
+
+      await this.execute(insertSql);
+    } catch (error) {
+      console.error("Failed to migrate legacy relationships", error);
     }
   }
 
-  /**
-   * Get enriched Base120 mental model data from database
-   */
+
+  /** Retrieve enriched mental model from DB */
   async getMentalModel(code: string) {
     const sql = `
       SELECT code, name, transformation, definition, example, when_to_use, how_to_apply
       FROM mental_models
       WHERE code = ?
     `;
-
     const result = await this.queryOne<{
       code: string;
       name: string;
@@ -178,73 +274,25 @@ export class D1Client {
     }>(sql, code);
 
     if (!result) {
-      return {
-        ok: false,
-        error: { type: "NOT_FOUND", message: `Model ${code} not found in database` },
-      } as const;
+      return { ok: false as const, error: { type: "NOT_FOUND", message: `Model ${code} not found in database` } };
     }
 
-    return { ok: true, value: result } as const;
+    return { ok: true as const, value: result };
   }
 
-  /**
-   * Get relationships for a specific model (simplified)
-   */
-  async getRelationshipsForModel(
-    code: string
-  ): Promise<SimpleRelationshipResult<SimpleRelationship[]>> {
-    try {
-      const sql = `
-        SELECT id, source_code, target_code, relationship_type, confidence, evidence, created_at
-        FROM model_relationships
-        WHERE source_code = ? OR target_code = ?
-        ORDER BY confidence DESC, created_at DESC
-      `;
-
-      const relationships = await this.query<SimpleRelationship>(sql, code, code);
-      return { ok: true as const, value: relationships };
-    } catch (error) {
-      return { ok: false, error: `Failed to get relationships: ${error}` };
-    }
+  /** Relationships touching a given model */
+  async getRelationshipsForModel(code: string): Promise<ModelRelationship[]> {
+    const sql = `
+      SELECT ${RELATIONSHIP_COLUMNS}
+      FROM relationships
+      WHERE model_a = ? OR model_b = ?
+      ORDER BY validated_at DESC, created_at DESC
+    `;
+    const rows = await this.query<DbRelationshipRow>(sql, code, code);
+    return rows.map(mapRowToRelationship);
   }
 
-  /**
-   * Create a new relationship (simplified)
-   */
-  async createSimpleRelationship(rel: RelationshipInput): Promise<SimpleRelationshipResult> {
-    try {
-      const sql = `
-        INSERT INTO model_relationships (source_code, target_code, relationship_type, confidence, evidence)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-
-      await this.query(
-        sql,
-        rel.source_code,
-        rel.target_code,
-        rel.relationship_type,
-        rel.confidence,
-        rel.evidence || null
-      );
-
-      // Return a simple success result - the actual created relationship would need to be fetched
-      return {
-        ok: true as const,
-        value: {
-          source_code: rel.source_code,
-          target_code: rel.target_code,
-          relationship_type: rel.relationship_type,
-          confidence: rel.confidence,
-        } as SimpleRelationship,
-      };
-    } catch (error) {
-      return { ok: false, error: `Failed to create relationship: ${error}` };
-    }
-  }
-
-  /**
-   * Get all relationships with optional filters
-   */
+  /** List relationships with optional filters */
   async getRelationships(filters?: {
     model?: string;
     type?: string;
@@ -253,171 +301,224 @@ export class D1Client {
     limit?: number;
     offset?: number;
   }): Promise<ModelRelationship[]> {
-    try {
-      let whereClause = "WHERE 1=1";
-      const params: unknown[] = [];
+    let whereClause = "WHERE 1=1";
+    const params: unknown[] = [];
 
-      if (filters?.model) {
-        whereClause += " AND (source_code = ? OR target_code = ?)";
-        params.push(filters.model, filters.model);
-      }
-
-      if (filters?.type) {
-        whereClause += " AND relationship_type = ?";
-        params.push(filters.type);
-      }
-
-      if (filters?.confidence) {
-        whereClause += " AND confidence = ?";
-        params.push(filters.confidence);
-      }
-
-      const limit = filters?.limit || 50;
-      const offset = filters?.offset || 0;
-
-      const sql = `
-        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
-               confidence, evidence as logical_derivation, NULL as has_literature_support,
-               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
-               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
-               NULL as notes, created_at, updated_at
-        FROM model_relationships
-        ${whereClause}
-        ORDER BY confidence DESC, created_at DESC
-        LIMIT ? OFFSET ?
-      `;
-
-      return (await this.query(sql, [...params, limit, offset])) as ModelRelationship[];
-    } catch (error) {
-      console.error("Failed to get relationships:", error);
-      throw error;
+    if (filters?.model) {
+      whereClause += " AND (model_a = ? OR model_b = ?)";
+      params.push(filters.model, filters.model);
     }
+
+    if (filters?.type) {
+      whereClause += " AND relationship_type = ?";
+      params.push(filters.type);
+    }
+
+    if (filters?.confidence) {
+      whereClause += " AND confidence = ?";
+      params.push(filters.confidence);
+    }
+
+    if (filters?.status) {
+      whereClause += " AND review_status = ?";
+      params.push(filters.status);
+    }
+
+    const limit = filters?.limit ?? 50;
+    const offset = filters?.offset ?? 0;
+
+    const sql = `
+      SELECT ${RELATIONSHIP_COLUMNS}
+      FROM relationships
+      ${whereClause}
+      ORDER BY validated_at DESC, created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const rows = await this.query<DbRelationshipRow>(sql, ...params, limit, offset);
+    return rows.map(mapRowToRelationship);
   }
 
-  /**
-   * Get single relationship by ID
-   */
+  /** Fetch a single relationship */
   async getRelationship(id: string): Promise<ModelRelationship | null> {
-    try {
-      const sql = `
-        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
-               confidence, evidence as logical_derivation, NULL as has_literature_support,
-               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
-               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
-               NULL as notes, created_at, updated_at
-        FROM model_relationships
-        WHERE id = ?
-      `;
-
-      const results = (await this.query(sql, id)) as ModelRelationship[];
-      return results.length > 0 ? results[0] : null;
-    } catch (error) {
-      console.error("Failed to get relationship:", error);
-      throw error;
-    }
+    const sql = `
+      SELECT ${RELATIONSHIP_COLUMNS}
+      FROM relationships
+      WHERE id = ?
+    `;
+    const row = await this.queryOne<DbRelationshipRow>(sql, id);
+    return row ? mapRowToRelationship(row) : null;
   }
 
-  /**
-   * Get all relationships for a specific model (using filters)
-   */
   async getRelationshipsForModelWithFilters(code: string): Promise<ModelRelationship[]> {
     return this.getRelationships({ model: code });
   }
 
-  /**
-   * Create new relationship
-   */
-  async createRelationship(input: RelationshipInput): Promise<ModelRelationship> {
+  /** Persist a new relationship record */
+  async createRelationship(input: RelationshipRecordInput): Promise<ModelRelationship> {
+    const sql = `
+      INSERT INTO relationships (
+        id,
+        model_a,
+        model_b,
+        relationship_type,
+        direction,
+        confidence,
+        logical_derivation,
+        has_literature_support,
+        literature_citation,
+        literature_url,
+        empirical_observation,
+        validated_by,
+        validated_at,
+        review_status,
+        notes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
     try {
-      const sql = `
-        INSERT INTO model_relationships (source_code, target_code, relationship_type, confidence, evidence)
-        VALUES (?, ?, ?, ?, ?)
-      `;
-
-      await this.query(
+      await this.execute(
         sql,
-        input.source_code,
-        input.target_code,
+        input.id,
+        input.model_a,
+        input.model_b,
         input.relationship_type,
+        input.direction,
         input.confidence,
-        input.evidence || null
+        input.logical_derivation,
+        input.has_literature_support ? 1 : 0,
+        input.literature_citation ?? null,
+        input.literature_url ?? null,
+        input.empirical_observation ?? null,
+        input.validated_by,
+        input.validated_at,
+        input.review_status,
+        input.notes ?? null
       );
-
-      // Get the created relationship
-      const selectSql = `
-        SELECT id, source_code as model_a, target_code as model_b, relationship_type, 'a→b' as direction,
-               confidence, evidence as logical_derivation, NULL as has_literature_support,
-               NULL as literature_citation, NULL as literature_url, NULL as empirical_observation,
-               'system' as validated_by, created_at as validated_at, 'confirmed' as review_status,
-               NULL as notes, created_at, updated_at
-        FROM model_relationships
-        WHERE source_code = ? AND target_code = ? AND relationship_type = ?
-        ORDER BY created_at DESC LIMIT 1
-      `;
-
-      const results = (await this.query(
-        selectSql,
-        input.source_code,
-        input.target_code,
-        input.relationship_type
-      )) as ModelRelationship[];
-      return results[0];
     } catch (error) {
-      console.error("Failed to create relationship:", error);
+      if (isUniqueConstraintError(error)) {
+        throw new DuplicateRelationshipError();
+      }
       throw error;
     }
+
+    const row = await this.queryOne<DbRelationshipRow>(
+      `SELECT ${RELATIONSHIP_COLUMNS} FROM relationships WHERE id = ?`,
+      input.id
+    );
+    if (!row) {
+      throw new Error("Relationship not found after insert");
+    }
+    return mapRowToRelationship(row);
   }
 
-  /**
-   * Update existing relationship (partial update)
-   */
-  async updateRelationship(
-    id: string,
-    updates: Partial<ModelRelationship>
-  ): Promise<ModelRelationship> {
-    try {
-      const setParts: string[] = [];
-      const params: unknown[] = [];
+  /** Update existing relationship fields */
+  async updateRelationship(id: string, updates: Partial<ModelRelationship>): Promise<ModelRelationship> {
+    const setParts: string[] = [];
+    const params: unknown[] = [];
 
-      // Map the simple relationship fields to the complex ones
-      if (updates.relationship_type) {
-        setParts.push("relationship_type = ?");
-        params.push(updates.relationship_type);
-      }
-      if (updates.confidence) {
-        setParts.push("confidence = ?");
-        params.push(updates.confidence);
-      }
-      if (updates.logical_derivation) {
-        setParts.push("evidence = ?");
-        params.push(updates.logical_derivation);
-      }
-
-      if (setParts.length === 0) {
-        throw new Error("No valid updates provided");
-      }
-
-      params.push(id);
-
-      const sql = `UPDATE model_relationships SET ${setParts.join(", ")}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
-      await this.query(sql, ...params);
-
-      // Return the updated relationship
-      const result = await this.getRelationship(id);
-      if (!result) {
-        throw new Error("Relationship not found after update");
-      }
-      return result;
-    } catch (error) {
-      console.error("Failed to update relationship:", error);
-      throw error;
+    if (updates.relationship_type) {
+      setParts.push("relationship_type = ?");
+      params.push(updates.relationship_type);
     }
+    if (updates.direction) {
+      setParts.push("direction = ?");
+      params.push(updates.direction);
+    }
+    if (updates.confidence) {
+      setParts.push("confidence = ?");
+      params.push(updates.confidence);
+    }
+    if (updates.logical_derivation) {
+      setParts.push("logical_derivation = ?");
+      params.push(updates.logical_derivation);
+    }
+    if (updates.literature_support) {
+      setParts.push("has_literature_support = ?");
+      params.push(updates.literature_support.has_support ? 1 : 0);
+      setParts.push("literature_citation = ?");
+      params.push(updates.literature_support.citation ?? null);
+      setParts.push("literature_url = ?");
+      params.push(updates.literature_support.url ?? null);
+    }
+    if (updates.empirical_observation !== undefined) {
+      setParts.push("empirical_observation = ?");
+      params.push(updates.empirical_observation ?? null);
+    }
+    if (updates.review_status) {
+      setParts.push("review_status = ?");
+      params.push(updates.review_status);
+    }
+    if (updates.notes !== undefined) {
+      setParts.push("notes = ?");
+      params.push(updates.notes ?? null);
+    }
+
+    if (setParts.length === 0) {
+      throw new Error("No valid updates provided");
+    }
+
+    setParts.push("updated_at = CURRENT_TIMESTAMP");
+    params.push(id);
+
+    const sql = `UPDATE relationships SET ${setParts.join(", ")} WHERE id = ?`;
+    await this.execute(sql, ...params);
+
+    const relationship = await this.getRelationship(id);
+    if (!relationship) {
+      throw new Error("Relationship not found after update");
+    }
+    return relationship;
+  }
+
+  async deleteRelationship(id: string): Promise<boolean> {
+    const deleted = await this.execute(`DELETE FROM relationships WHERE id = ?`, id);
+    return deleted > 0;
   }
 }
 
-/**
- * Create a D1Client instance from a D1Database
- */
+function mapRowToRelationship(row: DbRelationshipRow): ModelRelationship {
+  const literature_support = buildLiteratureSupport(row);
+
+  return {
+    id: row.id,
+    model_a: row.model_a,
+    model_b: row.model_b,
+    relationship_type: row.relationship_type as ModelRelationship["relationship_type"],
+    direction: row.direction as ModelRelationship["direction"],
+    confidence: row.confidence as ModelRelationship["confidence"],
+    logical_derivation: row.logical_derivation,
+    literature_support,
+    empirical_observation: row.empirical_observation || undefined,
+    validated_by: row.validated_by,
+    validated_at: row.validated_at,
+    review_status: row.review_status as ModelRelationship["review_status"],
+    notes: row.notes || undefined,
+    created_at: row.created_at || undefined,
+    updated_at: row.updated_at || undefined,
+  };
+}
+
+const buildLiteratureSupport = (
+  row: DbRelationshipRow
+): ModelRelationship["literature_support"] => {
+  const hasSupport = Boolean(row.has_literature_support);
+
+  if (!hasSupport && !row.literature_citation && !row.literature_url) {
+    return undefined;
+  }
+
+  return {
+    has_support: hasSupport,
+    citation: row.literature_citation || undefined,
+    url: row.literature_url || undefined,
+  };
+};
+
+const isUniqueConstraintError = (error: unknown): boolean =>
+  error instanceof Error && error.message.includes("UNIQUE constraint failed: relationships");
+
+/** Create a D1Client instance */
 export function createD1Client(db: D1Database): D1Client {
   return new D1Client(db);
 }
