@@ -3,7 +3,7 @@
 // HUMMBL Relationship Seeding Script
 // Imports initial validated relationships into D1 database
 
-import { createD1Client } from "../storage/d1-client.js";
+import { createD1Client, DuplicateRelationshipError } from "../storage/d1-client.js";
 import { seedRelationships } from "../db/seed-relationships.js";
 import type { D1Database } from "@cloudflare/workers-types";
 
@@ -18,6 +18,7 @@ async function seedRelationshipsData(env: Env) {
 
   let successCount = 0;
   let errorCount = 0;
+  let skippedCount = 0;
 
   for (const relationship of seedRelationships) {
     try {
@@ -39,20 +40,27 @@ async function seedRelationshipsData(env: Env) {
         `✅ Created relationship ${result.id}: ${relationship.model_a} ${relationship.relationship_type} ${relationship.model_b}`
       );
     } catch (error) {
-      errorCount++;
-      console.error(`❌ Error creating relationship ${relationship.id}:`, error);
+      if (error instanceof DuplicateRelationshipError) {
+        skippedCount++;
+        console.log(
+          `⏭️  Skipped duplicate relationship: ${relationship.model_a} ${relationship.relationship_type} ${relationship.model_b}`
+        );
+      } else {
+        errorCount++;
+        console.error(`❌ Error creating relationship ${relationship.id}:`, error);
+      }
     }
   }
 
   console.log(`\n📊 Seeding complete:`);
   console.log(`   ✅ ${successCount} relationships created`);
+  console.log(`   ⏭️  ${skippedCount} duplicates skipped`);
   console.log(`   ❌ ${errorCount} errors`);
 
-  if (errorCount === 0 && successCount === 0) {
-    console.log(`🎯 Ready for relationship validation workflow!`);
-    console.log(`   Use API endpoints to add verified relationships.`);
+  if (errorCount === 0 && successCount === 0 && skippedCount > 0) {
+    console.log(`🎯 All relationships already exist!`);
   } else if (errorCount === 0) {
-    console.log(`🎉 All relationships seeded successfully!`);
+    console.log(`🎉 Seeding completed successfully!`);
   }
 }
 

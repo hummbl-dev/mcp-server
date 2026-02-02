@@ -3,7 +3,7 @@
 // HUMMBL CSV Relationship Import Script
 // Bulk imports relationships from CSV for validation workflow
 
-import { createD1Client } from "../storage/d1-client.js";
+import { createD1Client, DuplicateRelationshipError } from "../storage/d1-client.js";
 import {
   isRelationshipType,
   isDirection,
@@ -69,6 +69,7 @@ async function importRelationshipsFromCSV(env: Env, csvText: string, dryRun = fa
 
   let successCount = 0;
   let errorCount = 0;
+  let skippedCount = 0;
   const errors: string[] = [];
 
   for (const relationship of relationships) {
@@ -120,15 +121,23 @@ async function importRelationshipsFromCSV(env: Env, csvText: string, dryRun = fa
         `✅ ${dryRun ? "Validated" : "Imported"} relationship ${relationship.id}: ${relationship.model_a} ${relationship.relationship_type} ${relationship.model_b}`
       );
     } catch (error) {
-      errorCount++;
-      const errorMsg = `❌ Failed to ${dryRun ? "validate" : "import"} relationship ${relationship.id}: ${error instanceof Error ? error.message : "Unknown error"}`;
-      errors.push(errorMsg);
-      console.error(errorMsg);
+      if (error instanceof DuplicateRelationshipError) {
+        skippedCount++;
+        console.log(
+          `⏭️  Skipped duplicate relationship ${relationship.id}: ${relationship.model_a} ${relationship.relationship_type} ${relationship.model_b}`
+        );
+      } else {
+        errorCount++;
+        const errorMsg = `❌ Failed to ${dryRun ? "validate" : "import"} relationship ${relationship.id}: ${error instanceof Error ? error.message : "Unknown error"}`;
+        errors.push(errorMsg);
+        console.error(errorMsg);
+      }
     }
   }
 
   console.log(`\n📊 Import complete:`);
   console.log(`   ✅ ${successCount} relationships ${dryRun ? "validated" : "imported"}`);
+  console.log(`   ⏭️  ${skippedCount} duplicates skipped`);
   console.log(`   ❌ ${errorCount} errors`);
 
   if (errors.length > 0) {
@@ -136,7 +145,7 @@ async function importRelationshipsFromCSV(env: Env, csvText: string, dryRun = fa
     errors.forEach((error) => console.log(`   ${error}`));
   }
 
-  return { successCount, errorCount, errors };
+  return { successCount, errorCount, skippedCount, errors };
 }
 
 // CSV Template

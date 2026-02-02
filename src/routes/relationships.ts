@@ -3,7 +3,7 @@
 
 import { Hono } from "hono";
 import type { AppContext } from "../api.js";
-import { createD1Client } from "../storage/d1-client.js";
+import { createD1Client, DuplicateRelationshipError } from "../storage/d1-client.js";
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 import type {
   CreateRelationshipRequest,
@@ -28,6 +28,30 @@ import {
 const router = new Hono<{
   Bindings: { DB: D1Database; API_KEYS: KVNamespace; SESSIONS: KVNamespace };
 }>();
+
+/**
+ * Convert database direction to API response direction for a specific model
+ * @param dbDirection - Direction from database ('a→b', 'b→a', or 'bidirectional')
+ * @param isModelA - Whether the querying model is model_a in the relationship
+ * @returns 'outgoing', 'incoming', or 'bidirectional'
+ */
+function toResponseDirection(
+  dbDirection: string,
+  isModelA: boolean
+): "outgoing" | "incoming" | "bidirectional" {
+  if (dbDirection === "bidirectional") {
+    return "bidirectional";
+  }
+
+  // For 'a→b': if we're model_a, it's outgoing; if we're model_b, it's incoming
+  // For 'b→a': if we're model_a, it's incoming; if we're model_b, it's outgoing
+  if (dbDirection === "a→b") {
+    return isModelA ? "outgoing" : "incoming";
+  } else {
+    // dbDirection === 'b→a'
+    return isModelA ? "incoming" : "outgoing";
+  }
+}
 
 /**
  * GET /v1/relationships
@@ -99,7 +123,7 @@ router.get("/models/:code/relationships", async (c: AppContext) => {
         return {
           related_model: isModelA ? rel.model_b : rel.model_a,
           type: rel.relationship_type,
-          direction: isModelA ? "outgoing" : "incoming",
+          direction: toResponseDirection(rel.direction, isModelA),
           confidence: rel.confidence,
           logical_derivation: rel.logical_derivation,
           relationship_id: rel.id,
@@ -157,11 +181,6 @@ router.post("/relationships", async (c: AppContext) => {
       return c.json({ error: "Invalid confidence level" }, 400);
     }
 
-    // Ensure confidence is valid for RelationshipInput (A, B, or C)
-    // Default to "C" if not provided, or convert "U" to "C"
-    const validConfidence =
-      body.confidence && body.confidence !== "U" ? (body.confidence as "A" | "B" | "C") : "C";
-
     // Generate ID
     const id = `R${Date.now().toString().slice(-6)}`;
 
@@ -171,31 +190,26 @@ router.post("/relationships", async (c: AppContext) => {
       model_b: body.model_b.toUpperCase(),
       relationship_type: body.relationship_type,
       direction: body.direction,
-      confidence: body.confidence || "U", // Keep "U" for relationshipData (full ModelRelationship)
+      confidence: body.confidence || "U",
       logical_derivation: body.logical_derivation,
       has_literature_support: body.literature_support?.has_support ? 1 : 0,
       literature_citation: body.literature_support?.citation,
       literature_url: body.literature_support?.url,
       empirical_observation: body.empirical_observation,
-      validated_by: user.name,
+      validated_by: body.validated_by || user.name,
       validated_at: new Date().toISOString(),
       review_status: "draft" as const,
       notes: body.notes,
     };
 
-    // Convert to RelationshipInput format
-    const relationshipInput = {
-      source_code: relationshipData.model_a,
-      target_code: relationshipData.model_b,
-      relationship_type: relationshipData.relationship_type,
-      confidence: validConfidence,
-      evidence: relationshipData.logical_derivation,
-    };
-
-    const result = await db.createRelationship(relationshipInput);
+    const result = await db.createCanonicalRelationship(relationshipData);
 
     return c.json(result, 201);
-  } catch {
+  } catch (error) {
+    // Handle duplicate relationship error
+    if (error instanceof DuplicateRelationshipError) {
+      return c.json({ error: error.message }, 409);
+    }
     return c.json({ error: "Internal server error" }, 500);
   }
 });
