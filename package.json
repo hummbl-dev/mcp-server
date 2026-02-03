@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260124.0",
-    "@commitlint/cli": "^20.4.0",
+    "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.0",
     "@types/node": "^25.0.9",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
