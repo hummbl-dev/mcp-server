@@ -293,7 +293,7 @@ export class D1Client {
     }
   }
 
-  /** Retrieve enriched mental model from DB */
+  /** Retrieve enriched Base120 model from DB */
   async getMentalModel(code: string) {
     const sql = `
       SELECT code, name, transformation, definition, example, when_to_use, how_to_apply
