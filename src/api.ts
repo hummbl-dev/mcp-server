@@ -114,14 +114,11 @@ app.get("/v1/models/:code/relationships", async (c: AppContext) => {
     const code = c.req.param("code").toUpperCase();
     const db = createD1Client(c.env.DB);
 
-    const result = await db.getRelationshipsForModel(code);
-    if (!result.ok) {
-      return c.json({ error: result.error }, 500);
-    }
+    const relationships = await db.getRelationshipsForModel(code);
 
     return c.json({
       model: code,
-      relationships: result.value,
+      relationships,
     });
   } catch {
     return c.json({ error: "Internal server error" }, 500);

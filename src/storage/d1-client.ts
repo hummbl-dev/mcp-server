@@ -4,10 +4,47 @@
  */
 
 import type { D1Database } from "@cloudflare/workers-types";
-import type {
-  ModelRelationship,
-  RelationshipRecordInput,
-} from "../types/relationships.js";
+import type { ModelRelationship, RelationshipRecordInput } from "../types/relationships.js";
+
+type DbRelationshipRow = {
+  id: string;
+  model_a: string;
+  model_b: string;
+  relationship_type: string;
+  direction: string;
+  confidence: string;
+  logical_derivation: string;
+  has_literature_support: number | null;
+  literature_citation: string | null;
+  literature_url: string | null;
+  empirical_observation: string | null;
+  validated_by: string;
+  validated_at: string;
+  review_status: string;
+  notes: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+
+const RELATIONSHIP_COLUMNS = `
+  id,
+  model_a,
+  model_b,
+  relationship_type,
+  direction,
+  confidence,
+  logical_derivation,
+  has_literature_support,
+  literature_citation,
+  literature_url,
+  empirical_observation,
+  validated_by,
+  validated_at,
+  review_status,
+  notes,
+  created_at,
+  updated_at
+`;
 
 /**
  * Error thrown when attempting to create a duplicate relationship
@@ -29,7 +66,10 @@ export class D1Client {
   /** Execute a statement that mutates rows */
   async execute(sql: string, ...params: unknown[]): Promise<number> {
     try {
-      const result = await this.db.prepare(sql).bind(...params).run();
+      const result = await this.db
+        .prepare(sql)
+        .bind(...params)
+        .run();
       if (!result.success) {
         throw new Error(result.error || "D1 execution failed");
       }
@@ -43,7 +83,10 @@ export class D1Client {
   /** Query for multiple rows */
   async query<T>(sql: string, ...params: unknown[]): Promise<T[]> {
     try {
-      const result = await this.db.prepare(sql).bind(...params).all();
+      const result = await this.db
+        .prepare(sql)
+        .bind(...params)
+        .all();
       if (!result.success) {
         throw new Error(result.error || "D1 query failed");
       }
@@ -57,7 +100,10 @@ export class D1Client {
   /** Query for a single row */
   async queryOne<T>(sql: string, ...params: unknown[]): Promise<T | null> {
     try {
-      const result = await this.db.prepare(sql).bind(...params).first();
+      const result = await this.db
+        .prepare(sql)
+        .bind(...params)
+        .first();
       return (result as T) || null;
     } catch (error) {
       console.error("D1 QUERY_ONE failed", { sql, params, error });
@@ -245,90 +291,7 @@ export class D1Client {
     } catch (error) {
       console.error("Failed to migrate legacy relationships", error);
     }
-
-    // Run legacy data migration
-    await this.migrateLegacyRelationships();
   }
-
-  /**
-   * Migrate data from legacy model_relationships table to canonical relationships table
-   */
-  async migrateLegacyRelationships(): Promise<void> {
-    try {
-      // Check if legacy table has any data
-      const legacyCount = await this.queryOne<{ count: number }>(
-        `SELECT COUNT(*) as count FROM model_relationships`
-      );
-
-      if (!legacyCount || legacyCount.count === 0) {
-        console.log("No legacy relationships to migrate");
-        return;
-      }
-
-      console.log(`Found ${legacyCount.count} legacy relationships to migrate`);
-
-      // Get all legacy relationships
-      const legacyRels = await this.query<{
-        id: number;
-        source_code: string;
-        target_code: string;
-        relationship_type: string;
-        confidence: string;
-        evidence: string | null;
-        created_at: string;
-      }>(`SELECT * FROM model_relationships`);
-
-      let migrated = 0;
-      let skipped = 0;
-
-      for (const rel of legacyRels) {
-        try {
-          // Generate ID for new relationship
-          const id = `R${String(rel.id).padStart(3, "0")}`;
-
-          // Insert into canonical relationships table
-          // Default direction to 'a→b' for legacy data
-          await this.execute(
-            `INSERT INTO relationships (
-              id, model_a, model_b, relationship_type, direction, confidence,
-              logical_derivation, validated_by, validated_at, review_status,
-              created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            id,
-            rel.source_code,
-            rel.target_code,
-            rel.relationship_type,
-            "a→b",
-            rel.confidence,
-            rel.evidence || "Migrated from legacy data",
-            "system",
-            rel.created_at,
-            "confirmed",
-            rel.created_at,
-            rel.created_at
-          );
-
-          migrated++;
-        } catch (error) {
-          // Skip duplicates
-          if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
-            skipped++;
-            console.log(
-              `Skipped duplicate relationship: ${rel.source_code} → ${rel.target_code} (${rel.relationship_type})`
-            );
-          } else {
-            throw error;
-          }
-        }
-      }
-
-      console.log(`Migration complete: ${migrated} migrated, ${skipped} skipped`);
-    } catch (error) {
-      console.error("Failed to migrate legacy relationships:", error);
-      // Don't throw - migration failure shouldn't block server startup
-    }
-  }
-
 
   /** Retrieve enriched mental model from DB */
   async getMentalModel(code: string) {
@@ -348,7 +311,10 @@ export class D1Client {
     }>(sql, code);
 
     if (!result) {
-      return { ok: false as const, error: { type: "NOT_FOUND", message: `Model ${code} not found in database` } };
+      return {
+        ok: false as const,
+        error: { type: "NOT_FOUND", message: `Model ${code} not found in database` },
+      };
     }
 
     return { ok: true as const, value: result };
@@ -378,40 +344,20 @@ export class D1Client {
     let whereClause = "WHERE 1=1";
     const params: unknown[] = [];
 
-      if (filters?.model) {
-        whereClause += " AND (model_a = ? OR model_b = ?)";
-        params.push(filters.model, filters.model);
-      }
-
-      if (filters?.type) {
-        whereClause += " AND relationship_type = ?";
-        params.push(filters.type);
-      }
+    if (filters?.model) {
+      whereClause += " AND (model_a = ? OR model_b = ?)";
+      params.push(filters.model, filters.model);
+    }
 
     if (filters?.type) {
       whereClause += " AND relationship_type = ?";
       params.push(filters.type);
     }
 
-      if (filters?.status) {
-        whereClause += " AND review_status = ?";
-        params.push(filters.status);
-      }
-
-      const limit = filters?.limit || 50;
-      const offset = filters?.offset || 0;
-
-      const sql = `
-        SELECT id, model_a, model_b, relationship_type, direction,
-               confidence, logical_derivation, has_literature_support,
-               literature_citation, literature_url, empirical_observation,
-               validated_by, validated_at, review_status, notes,
-               created_at, updated_at
-        FROM relationships
-        ${whereClause}
-        ORDER BY confidence DESC, created_at DESC
-        LIMIT ? OFFSET ?
-      `;
+    if (filters?.confidence) {
+      whereClause += " AND confidence = ?";
+      params.push(filters.confidence);
+    }
 
     if (filters?.status) {
       whereClause += " AND review_status = ?";
@@ -460,6 +406,24 @@ export class D1Client {
 
   /** Persist a new relationship record */
   async createRelationship(input: RelationshipRecordInput): Promise<ModelRelationship> {
+    // Normalize input: support both model_a/model_b and source_code/target_code
+    const model_a = input.model_a ?? input.source_code;
+    const model_b = input.model_b ?? input.target_code;
+
+    if (!model_a || !model_b) {
+      throw new Error("model_a/model_b or source_code/target_code is required");
+    }
+
+    // Generate ID if not provided
+    const id = input.id ?? `REL-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+    // Provide defaults for required fields
+    const direction = input.direction ?? "a→b";
+    const logical_derivation = input.logical_derivation ?? input.evidence ?? "";
+    const validated_by = input.validated_by ?? "system";
+    const validated_at = input.validated_at ?? new Date().toISOString();
+    const review_status = input.review_status ?? "draft";
+
     const sql = `
       INSERT INTO relationships (
         id,
@@ -483,27 +447,27 @@ export class D1Client {
     try {
       await this.execute(
         sql,
-        input.id,
-        input.model_a,
-        input.model_b,
+        id,
+        model_a,
+        model_b,
         input.relationship_type,
-        input.direction,
+        direction,
         input.confidence,
-        input.logical_derivation,
-        input.has_literature_support ? 1 : 0,
-        input.literature_citation ?? null,
-        input.literature_url ?? null,
+        logical_derivation,
+        input.literature_support?.has_support ? 1 : input.has_literature_support ? 1 : 0,
+        input.literature_support?.citation ?? input.literature_citation ?? null,
+        input.literature_support?.url ?? input.literature_url ?? null,
         input.empirical_observation ?? null,
-        input.validated_by,
-        input.validated_at,
-        input.review_status,
+        validated_by,
+        validated_at,
+        review_status,
         input.notes ?? null
       );
     } catch (error) {
       // Check if it's a UNIQUE constraint violation
       if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
         throw new DuplicateRelationshipError(
-          `Relationship already exists: ${input.source_code} → ${input.target_code} (${input.relationship_type})`
+          `Relationship already exists: ${model_a} → ${model_b} (${input.relationship_type})`
         );
       }
       console.error("Failed to create relationship:", error);
@@ -512,7 +476,7 @@ export class D1Client {
 
     const row = await this.queryOne<DbRelationshipRow>(
       `SELECT ${RELATIONSHIP_COLUMNS} FROM relationships WHERE id = ?`,
-      input.id
+      id
     );
     if (!row) {
       throw new Error("Relationship not found after insert");
@@ -603,58 +567,62 @@ export class D1Client {
       const setParts: string[] = [];
       const params: unknown[] = [];
 
-    if (updates.relationship_type) {
-      setParts.push("relationship_type = ?");
-      params.push(updates.relationship_type);
-    }
-    if (updates.direction) {
-      setParts.push("direction = ?");
-      params.push(updates.direction);
-    }
-    if (updates.confidence) {
-      setParts.push("confidence = ?");
-      params.push(updates.confidence);
-    }
-    if (updates.logical_derivation) {
-      setParts.push("logical_derivation = ?");
-      params.push(updates.logical_derivation);
-    }
-    if (updates.literature_support) {
-      setParts.push("has_literature_support = ?");
-      params.push(updates.literature_support.has_support ? 1 : 0);
-      setParts.push("literature_citation = ?");
-      params.push(updates.literature_support.citation ?? null);
-      setParts.push("literature_url = ?");
-      params.push(updates.literature_support.url ?? null);
-    }
-    if (updates.empirical_observation !== undefined) {
-      setParts.push("empirical_observation = ?");
-      params.push(updates.empirical_observation ?? null);
-    }
-    if (updates.review_status) {
-      setParts.push("review_status = ?");
-      params.push(updates.review_status);
-    }
-    if (updates.notes !== undefined) {
-      setParts.push("notes = ?");
-      params.push(updates.notes ?? null);
-    }
+      if (updates.relationship_type) {
+        setParts.push("relationship_type = ?");
+        params.push(updates.relationship_type);
+      }
+      if (updates.direction) {
+        setParts.push("direction = ?");
+        params.push(updates.direction);
+      }
+      if (updates.confidence) {
+        setParts.push("confidence = ?");
+        params.push(updates.confidence);
+      }
+      if (updates.logical_derivation) {
+        setParts.push("logical_derivation = ?");
+        params.push(updates.logical_derivation);
+      }
+      if (updates.literature_support) {
+        setParts.push("has_literature_support = ?");
+        params.push(updates.literature_support.has_support ? 1 : 0);
+        setParts.push("literature_citation = ?");
+        params.push(updates.literature_support.citation ?? null);
+        setParts.push("literature_url = ?");
+        params.push(updates.literature_support.url ?? null);
+      }
+      if (updates.empirical_observation !== undefined) {
+        setParts.push("empirical_observation = ?");
+        params.push(updates.empirical_observation ?? null);
+      }
+      if (updates.review_status) {
+        setParts.push("review_status = ?");
+        params.push(updates.review_status);
+      }
+      if (updates.notes !== undefined) {
+        setParts.push("notes = ?");
+        params.push(updates.notes ?? null);
+      }
 
-    if (setParts.length === 0) {
-      throw new Error("No valid updates provided");
+      if (setParts.length === 0) {
+        throw new Error("No valid updates provided");
+      }
+
+      setParts.push("updated_at = CURRENT_TIMESTAMP");
+      params.push(id);
+
+      const sql = `UPDATE relationships SET ${setParts.join(", ")} WHERE id = ?`;
+      await this.execute(sql, ...params);
+
+      const relationship = await this.getRelationship(id);
+      if (!relationship) {
+        throw new Error("Relationship not found after update");
+      }
+      return relationship;
+    } catch (error) {
+      console.error("Failed to update relationship:", error);
+      throw error;
     }
-
-    setParts.push("updated_at = CURRENT_TIMESTAMP");
-    params.push(id);
-
-    const sql = `UPDATE relationships SET ${setParts.join(", ")} WHERE id = ?`;
-    await this.execute(sql, ...params);
-
-    const relationship = await this.getRelationship(id);
-    if (!relationship) {
-      throw new Error("Relationship not found after update");
-    }
-    return relationship;
   }
 
   async deleteRelationship(id: string): Promise<boolean> {
@@ -700,9 +668,6 @@ const buildLiteratureSupport = (
     url: row.literature_url || undefined,
   };
 };
-
-const isUniqueConstraintError = (error: unknown): boolean =>
-  error instanceof Error && error.message.includes("UNIQUE constraint failed: relationships");
 
 /** Create a D1Client instance */
 export function createD1Client(db: D1Database): D1Client {

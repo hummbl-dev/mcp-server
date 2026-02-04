@@ -101,7 +101,7 @@ describe("D1Client relationships", () => {
       model_b: "P2",
       relationship_type: "enables",
       direction: "a→b",
-      confidence: "H",
+      confidence: "A",
       logical_derivation: "logic",
       literature_support: {
         has_support: true,
@@ -138,19 +138,23 @@ describe("D1Client relationships", () => {
       model_b: "P2",
       relationship_type: "enables",
       direction: "a→b",
-      confidence: "H",
+      confidence: "A",
       logical_derivation: "logic",
       validated_by: "tester",
       validated_at: "2026-02-02T00:00:00Z",
       review_status: "draft",
     };
 
-    await expect(client.createRelationship(input)).rejects.toBeInstanceOf(DuplicateRelationshipError);
+    await expect(client.createRelationship(input)).rejects.toBeInstanceOf(
+      DuplicateRelationshipError
+    );
   });
 
   it("rejects update with no valid fields", async () => {
     const client = new D1Client(createMockDb());
-    await expect(client.updateRelationship("REL-3", {})).rejects.toThrow("No valid updates provided");
+    await expect(client.updateRelationship("REL-3", {})).rejects.toThrow(
+      "No valid updates provided"
+    );
   });
 
   it("updates relationship and returns the refreshed record", async () => {
@@ -168,7 +172,7 @@ describe("D1Client relationships", () => {
       empirical_observation: "observed",
       validated_by: "tester",
       validated_at: "2026-02-02T00:00:00Z",
-      review_status: "approved",
+      review_status: "reviewed",
       notes: "updated",
       created_at: "2026-02-02T00:00:00Z",
       updated_at: "2026-02-02T01:00:00Z",
@@ -181,12 +185,12 @@ describe("D1Client relationships", () => {
         lastRun = { sql, params };
         return { success: true, meta: { changes: 1 } };
       },
-      onFirst: () => row,
+      onAll: () => ({ success: true, results: [row] }),
     });
 
     const client = new D1Client(db);
     const result = await client.updateRelationship("REL-4", {
-      review_status: "approved",
+      review_status: "reviewed",
       notes: "updated",
       literature_support: {
         has_support: false,
@@ -194,9 +198,10 @@ describe("D1Client relationships", () => {
       empirical_observation: "observed",
     });
 
-    expect(result.review_status).toBe("approved");
+    expect(result.review_status).toBe("reviewed");
     expect(result.notes).toBe("updated");
     expect(result.literature_support).toBeUndefined();
-    expect(lastRun?.sql).toContain("UPDATE relationships");
+    expect(lastRun).toBeTruthy();
+    expect(lastRun!.sql).toContain("UPDATE relationships");
   });
 });

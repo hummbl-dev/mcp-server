@@ -199,6 +199,43 @@ export interface RelationshipInput {
   evidence?: string;
 }
 
+// Database-level input type for creating relationships
+// Supports both flattened properties (has_literature_support, literature_citation, literature_url)
+// and nested structure (literature_support object)
+// Most fields are optional to support both simple and canonical relationship APIs
+export interface RelationshipRecordInput {
+  // Required ID or auto-generated
+  id?: string;
+
+  // Support both naming conventions
+  model_a?: string;
+  model_b?: string;
+  source_code?: string;
+  target_code?: string;
+
+  relationship_type: string;
+  direction?: Direction;
+  confidence: string;
+  logical_derivation?: string;
+
+  // Support both nested and flattened forms
+  literature_support?: {
+    has_support: boolean;
+    citation?: string;
+    url?: string;
+  };
+  has_literature_support?: number | boolean;
+  literature_citation?: string | null;
+  literature_url?: string | null;
+
+  empirical_observation?: string | null;
+  validated_by?: string;
+  validated_at?: string;
+  review_status?: ReviewStatus;
+  notes?: string | null;
+  evidence?: string;
+}
+
 export type SimpleRelationshipResult<T = SimpleRelationship> =
   | { ok: true; value: T }
   | { ok: false; error: string };
