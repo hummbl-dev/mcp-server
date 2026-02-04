@@ -16,7 +16,7 @@ import { registerMethodologyResources } from "./resources/methodology.js";
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "hummbl-mcp-server",
-    version: "1.0.0-beta.2",
+    version: "1.0.2",
   });
 
   // Register all tools

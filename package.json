@@ -1,6 +1,6 @@
 {
   "name": "@hummbl/mcp-server",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.2",
   "description": "Model Context Protocol server for HUMMBL Base120 mental models framework",
   "type": "module",
   "main": "./dist/index.js",
@@ -60,7 +60,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.25.2",
+    "@modelcontextprotocol/sdk": "^1.0.0",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^2.4.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.211.0",
