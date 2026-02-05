@@ -1,6 +1,6 @@
 {
   "name": "@hummbl/mcp-server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Model Context Protocol server for HUMMBL Base120 mental models framework",
   "type": "module",
   "main": "./dist/index.js",
