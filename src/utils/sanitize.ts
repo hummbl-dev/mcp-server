@@ -17,7 +17,7 @@ const MAX_QUERY_LENGTH = 500;
  * Patterns that indicate potential malicious content
  */
 const SUSPICIOUS_PATTERNS = [
-  /<script[^>]*>.*?<\/script>/gi, // Script tags
+  /<script[^>]*>[\s\S]*?<\/script>/gi, // Script tags ([\s\S] matches across newlines)
   /javascript:/gi, // JavaScript protocol
   /on\w+\s*=/gi, // Event handlers
   /<iframe[^>]*>/gi, // Iframes
