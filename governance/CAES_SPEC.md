@@ -68,3 +68,40 @@ Downstream repos that adopt CAES SHOULD include:
 - `governance/CAES_CANONICAL.sha256` (sha256 pinned to canonical)
 
 Automation for distribution/verification lives in `tools/caes/`.
+
+## 6) Fork Exclusion Policy
+
+When running CAES compliance verification across the hummbl-dev organization, the following exclusions apply:
+
+### External Project Forks
+
+Repositories that are forks of external (non-hummbl-dev) projects are **excluded from CAES compliance checks**. These repos:
+- Originate from upstream projects outside hummbl-dev control
+- May have their own governance standards
+- Should not be modified to include CAES artifacts without upstream coordination
+
+**Rationale**: CAES compliance is a hummbl-dev internal standard. Imposing it on external project forks would:
+1. Create merge conflicts when syncing with upstream
+2. Violate the principle of least surprise for external contributors
+3. Diverge our forks unnecessarily from canonical upstreams
+
+**Identification**: Forks are identified by checking if the repo's origin URL points to an external organization (non-hummbl-dev).
+
+**Examples of excluded forks**:
+- `openclaw-fork` (fork of external openclaw project)
+- `OpenAgent`, `claude-code-infrastructure-showcase`, `clawdbot`, `clawdhub`, `everything-claude-code`, `workflow` (external community forks)
+
+### Duplicate Clones
+
+When multiple working copies of the same repository exist under the scan root (e.g., different paths but same origin URL), only the first encountered clone is verified. Subsequent duplicates are skipped to avoid redundant checks.
+
+**Rationale**: Multiple clones of the same repo will have identical CAES artifacts (same origin, same commits). Verifying duplicates wastes time and inflates compliance statistics.
+
+**Identification**: Duplicate clones are detected by comparing origin URLs during the scan.
+
+### Deploy-Sensitive Repositories
+
+Certain repos may be marked as deploy-sensitive and require special handling:
+- `hummbl-production` - production deployment configurations
+
+These repos are **not excluded** but compliance operations should be read-only (no automatic spec distribution without explicit authorization).
