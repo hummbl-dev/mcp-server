@@ -7,6 +7,7 @@
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServer } from "./server.js";
+import { SERVER_VERSION } from "./version.js";
 
 async function main(): Promise<void> {
   const server = createServer();
@@ -15,7 +16,7 @@ async function main(): Promise<void> {
   await server.connect(transport);
 
   // Log to stderr (stdout is reserved for MCP protocol)
-  console.error("HUMMBL MCP Server v1.0.3 running on stdio");
+  console.error(`HUMMBL MCP Server v${SERVER_VERSION} running on stdio`);
   console.error("Ready to serve Base120 mental models via Model Context Protocol");
 }
 
