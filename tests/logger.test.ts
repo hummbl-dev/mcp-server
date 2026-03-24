@@ -7,33 +7,28 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 describe('Logger', () => {
   let logger: Logger;
-  let consoleLogSpy: any;
   let consoleErrorSpy: any;
-  let consoleWarnSpy: any;
 
   beforeEach(() => {
     logger = new Logger(1.0); // 100% sampling for tests
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    // All logging goes to stderr (console.error) for MCP protocol safety
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    consoleLogSpy.mockRestore();
     consoleErrorSpy.mockRestore();
-    consoleWarnSpy.mockRestore();
   });
 
   test('logs info messages with JSON structure', () => {
     logger.info('Test message', { key: 'value' });
 
-    expect(consoleLogSpy).toHaveBeenCalledWith(
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('"level":"info"')
     );
-    expect(consoleLogSpy).toHaveBeenCalledWith(
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('"message":"Test message"')
     );
-    expect(consoleLogSpy).toHaveBeenCalledWith(
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('"key":"value"')
     );
   });
@@ -62,7 +57,7 @@ describe('Logger', () => {
     logger.withCorrelation(correlationId, () => {
       logger.info('Inside correlation context');
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining(`"correlationId":"${correlationId}"`)
       );
     });
@@ -76,10 +71,10 @@ describe('Logger', () => {
     });
 
     expect(result).toBe('result');
-    expect(consoleLogSpy).toHaveBeenCalledWith(
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('"message":"Starting operation: test.operation"')
     );
-    expect(consoleLogSpy).toHaveBeenCalledWith(
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
       expect.stringContaining('"message":"Completed operation: test.operation"')
     );
   });
@@ -101,7 +96,7 @@ describe('Logger', () => {
 
     sampledLogger.info('This should not be logged');
 
-    expect(consoleLogSpy).not.toHaveBeenCalled();
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
   });
 
   test('child logger inherits context', () => {
@@ -110,13 +105,13 @@ describe('Logger', () => {
 
       childLogger.info('Child message');
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('"correlationId":"parent-correlation"')
       );
-      expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('"userId":"user123"')
       );
-      expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
         expect.stringContaining('"sessionId":"session456"')
       );
     });
