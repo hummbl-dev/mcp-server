@@ -94,7 +94,7 @@ router.get("/relationships", async (c: AppContext) => {
 router.get("/relationships/:id", async (c: AppContext) => {
   try {
     const db = createD1Client(c.env.DB);
-    const id = c.req.param("id");
+    const id = c.req.param("id")!;
 
     const result = await db.getRelationship(id);
     if (!result) {
@@ -114,7 +114,7 @@ router.get("/relationships/:id", async (c: AppContext) => {
 router.get("/models/:code/relationships", async (c: AppContext) => {
   try {
     const db = createD1Client(c.env.DB);
-    const code = c.req.param("code").toUpperCase();
+    const code = c.req.param("code")!.toUpperCase();
 
     const relationshipsData = await db.getRelationships({ model: code });
     const relationships: ModelRelationshipsResponse["relationships"] = relationshipsData.map(
@@ -227,7 +227,7 @@ router.patch("/relationships/:id", async (c: AppContext) => {
     }
 
     const db = createD1Client(c.env.DB);
-    const id = c.req.param("id");
+    const id = c.req.param("id")!;
     const body: UpdateRelationshipRequest = await c.req.json();
 
     // Validate fields if provided
@@ -273,7 +273,7 @@ router.delete("/relationships/:id", async (c: AppContext) => {
     }
 
     const db = createD1Client(c.env.DB);
-    const id = c.req.param("id");
+    const id = c.req.param("id")!;
 
     // Check if relationship exists
     const existing = await db.getRelationship(id);
