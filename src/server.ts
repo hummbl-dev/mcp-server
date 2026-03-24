@@ -9,6 +9,7 @@ import { registerWorkflowTools } from "./tools/workflows.js";
 import { registerModelResources } from "./resources/models.js";
 import { registerMethodologyTools } from "./tools/methodology.js";
 import { registerMethodologyResources } from "./resources/methodology.js";
+import { SERVER_VERSION } from "./version.js";
 
 /**
  * Create and configure the HUMMBL MCP server
@@ -16,7 +17,7 @@ import { registerMethodologyResources } from "./resources/methodology.js";
 export function createServer(): McpServer {
   const server = new McpServer({
     name: "hummbl-mcp-server",
-    version: "1.0.3",
+    version: SERVER_VERSION,
   });
 
   // Register all tools

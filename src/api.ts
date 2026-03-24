@@ -24,6 +24,7 @@ import { createD1Client } from "./storage/d1-client.js";
 import relationshipsRoutes from "./routes/relationships.js";
 import type { ModelRelationship } from "./types/relationships.js";
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
+import { SERVER_VERSION } from "./version.js";
 
 type Bindings = {
   DB: D1Database;
@@ -70,7 +71,7 @@ async function authenticate(c: AppContext, next: Next): Promise<void> {
 app.get("/health", (c: AppContext) => {
   return c.json({
     status: "healthy",
-    version: "1.0.0",
+    version: SERVER_VERSION,
     timestamp: new Date().toISOString(),
     models_count: 120,
   });

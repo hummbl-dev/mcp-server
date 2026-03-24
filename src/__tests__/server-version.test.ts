@@ -3,7 +3,9 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join, dirname } from "node:path";
 
+import app from "../api.js";
 import { createServer } from "../server.js";
+import { SERVER_VERSION } from "../version.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageJson = JSON.parse(readFileSync(join(__dirname, "../../package.json"), "utf-8"));
@@ -16,8 +18,12 @@ const getServerVersion = (): string => {
 };
 
 describe("Server version contract", () => {
+  it("ensures shared runtime version constant matches package.json version", () => {
+    expect(SERVER_VERSION).toBe(packageVersion);
+  });
+
   it("ensures createServer metadata matches package.json version", () => {
-    expect(getServerVersion()).toBe(packageVersion);
+    expect(getServerVersion()).toBe(SERVER_VERSION);
   });
 
   it("ensures index banner string stays in sync with package.json version", () => {
@@ -26,7 +32,18 @@ describe("Server version contract", () => {
       ? join(__dirname, "../../src/index.ts")
       : join(__dirname, "../index.ts");
     const indexSource = readFileSync(srcDir, "utf-8");
-    const expectedBanner = `HUMMBL MCP Server v${packageVersion} running on stdio`;
-    expect(indexSource.includes(expectedBanner)).toBe(true);
+    const expectedResolvedBanner = `HUMMBL MCP Server v${SERVER_VERSION} running on stdio`;
+    const expectedTemplateBanner = "HUMMBL MCP Server v${SERVER_VERSION} running on stdio";
+    expect(
+      indexSource.includes(expectedResolvedBanner) || indexSource.includes(expectedTemplateBanner)
+    ).toBe(true);
+  });
+
+  it("ensures /health endpoint version stays in sync with package.json version", async () => {
+    const response = await app.request("http://localhost/health");
+    expect(response.status).toBe(200);
+
+    const body = (await response.json()) as { version: string };
+    expect(body.version).toBe(SERVER_VERSION);
   });
 });
