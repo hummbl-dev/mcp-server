@@ -16,9 +16,10 @@ export const MCP_CONFIG = {
 // Server mode is determined by API key presence
 export const SERVER_MODE = MCP_CONFIG.HUMMBL_API_KEY ? "hybrid" : "local-only";
 
-// Informational logging (not a warning, since local-only mode is fully functional)
+// Informational logging — must use stderr, not stdout.
+// MCP uses stdout for JSON-RPC transport; any non-protocol output breaks the connection.
 if (SERVER_MODE === "local-only") {
-  console.info(
+  console.error(
     "ℹ️  Running in local-only mode (all 120 Base120 mental models available)\n" +
       "   Set HUMMBL_API_KEY environment variable to enable enhanced API recommendations"
   );
