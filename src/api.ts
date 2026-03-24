@@ -78,7 +78,7 @@ app.get("/health", (c: AppContext) => {
 
 // Get specific model by code
 app.get("/v1/models/:code", authenticate, async (c: AppContext) => {
-  const code = c.req.param("code").toUpperCase();
+  const code = c.req.param("code")!.toUpperCase();
 
   const result = getModelByCode(code);
   if (!isOk(result)) {
@@ -111,7 +111,7 @@ app.get("/v1/models/:code", authenticate, async (c: AppContext) => {
 // Get relationships for a specific model
 app.get("/v1/models/:code/relationships", async (c: AppContext) => {
   try {
-    const code = c.req.param("code").toUpperCase();
+    const code = c.req.param("code")!.toUpperCase();
     const db = createD1Client(c.env.DB);
 
     const relationships = await db.getRelationshipsForModel(code);
@@ -202,7 +202,7 @@ app.post("/v1/relationships/seed", authenticate, async (c: AppContext) => {
 // Update relationship (authenticated)
 app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
   try {
-    const id = c.req.param("id");
+    const id = c.req.param("id")!;
     const body = await c.req.json();
     const db = createD1Client(c.env.DB);
 
@@ -227,7 +227,7 @@ app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
 // Get single relationship
 app.get("/v1/relationships/:id", async (c: AppContext) => {
   try {
-    const id = c.req.param("id");
+    const id = c.req.param("id")!;
     const db = createD1Client(c.env.DB);
 
     const result = await db.getRelationship(id);
@@ -341,7 +341,7 @@ app.get("/v1/search", authenticate, async (c: AppContext) => {
 
 // Get transformation details
 app.get("/v1/transformations/:key", authenticate, async (c: AppContext) => {
-  const key = c.req.param("key").toUpperCase();
+  const key = c.req.param("key")!.toUpperCase();
 
   if (!isTransformationType(key)) {
     return c.json({ error: "Invalid transformation key" }, 400);
