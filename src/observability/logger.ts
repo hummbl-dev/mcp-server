@@ -64,21 +64,9 @@ export class Logger {
     if (!this.shouldLog()) return;
 
     const formatted = this.formatLog(entry);
-    switch (entry.level) {
-      case "error":
-        console.error(formatted);
-        break;
-      case "warn":
-        console.warn(formatted);
-        break;
-      case "debug":
-        // eslint-disable-next-line no-console
-        console.debug(formatted);
-        break;
-      default:
-        // eslint-disable-next-line no-console
-        console.log(formatted);
-    }
+    // MCP uses stdout for JSON-RPC transport.
+    // ALL logging must go to stderr to avoid corrupting the protocol.
+    console.error(formatted);
   }
 
   private getCurrentContext(): LogContext {

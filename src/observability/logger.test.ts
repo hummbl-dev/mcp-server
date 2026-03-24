@@ -51,10 +51,8 @@ describe("Logger", () => {
     logger.warn("warn log");
     logger.error("error log", { extra: true }, new Error("boom"));
 
-    expect(console.debug).toHaveBeenCalledTimes(1);
-    expect(console.log).toHaveBeenCalledTimes(1);
-    expect(console.warn).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledTimes(1);
+    // All levels route to stderr (console.error) for MCP compatibility
+    expect(console.error).toHaveBeenCalledTimes(4);
   });
 
   it("records timer success", () => {
@@ -63,7 +61,7 @@ describe("Logger", () => {
     const result = logger.timer("demo.op", { operationDetail: "test" }, () => "done");
 
     expect(result).toBe("done");
-    expect(console.log).toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalled();
   });
 
   it("records timer failure", () => {
@@ -81,6 +79,6 @@ describe("Logger", () => {
   it("respects sampling (shouldLog false)", () => {
     const logger = new Logger(0); // 0% sampling
     logger.info("skipped");
-    expect(console.log).not.toHaveBeenCalled();
+    expect(console.error).not.toHaveBeenCalled();
   });
 });
