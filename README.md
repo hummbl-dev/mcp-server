@@ -585,6 +585,20 @@ src/
     └── result.ts         # Result pattern utilities
 ```
 
+## HUMMBL Ecosystem
+
+This repo is part of the [HUMMBL](https://github.com/hummbl-dev) cognitive AI architecture. Related repos:
+
+| Repo | Purpose |
+|------|---------|
+| [base120](https://github.com/hummbl-dev/base120) | Authoritative reference for the 120 mental models served by this MCP server |
+| [hummbl-governance](https://github.com/hummbl-dev/hummbl-governance) | Governance primitives (kill switch, circuit breaker, cost governor) |
+| [arbiter](https://github.com/hummbl-dev/arbiter) | Agent-aware code quality scoring and attribution |
+| [agentic-patterns](https://github.com/hummbl-dev/agentic-patterns) | Stdlib-only safety patterns for agentic AI systems |
+| [governed-iac-reference](https://github.com/hummbl-dev/governed-iac-reference) | Reference architecture for governed infrastructure-as-code |
+
+Learn more at [hummbl.io](https://hummbl.io).
+
 ## License
 
 MIT © HUMMBL, LLC
