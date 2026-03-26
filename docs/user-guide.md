@@ -6,7 +6,7 @@ This guide explains how strategists, operators, and engineers can install, confi
 
 ## 2. Prerequisites
 
-- Node.js 18+ and npm (preferred package manager)
+- Node.js 20+ and npm (preferred package manager)
 - Network access to fetch npm packages
 - An MCP-capable client (e.g., Claude Desktop, Perplexity Labs, VS Code MCP extension)
 - HUMMBL Base120 familiarity (see `README.md` Overview)
@@ -94,7 +94,7 @@ Clients that support MCP resources can fetch the canonical JSON/Markdown directl
 
 ## 7. Troubleshooting Checklist
 
-1. **Server will not start** – ensure Node.js 18+, run `npm install`, then retry `npx @hummbl/mcp-server`.
+1. **Server will not start** – ensure Node.js 20+, run `npm install`, then retry `npx @hummbl/mcp-server`.
 1. **Claude does not list HUMMBL tools** – confirm config JSON syntax, remove trailing commas, restart Claude Desktop.
 1. **Tool errors referencing missing models** – run `get_model` with the exact code (e.g., `DE3`). The audit tool flags typos.
 1. **Network restrictions** – preload the package (`npm pack @hummbl/mcp-server`) inside restricted environments.
