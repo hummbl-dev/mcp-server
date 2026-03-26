@@ -102,5 +102,8 @@
   "bugs": {
     "url": "https://github.com/hummbl-dev/mcp-server/issues"
   },
-  "homepage": "https://github.com/hummbl-dev/mcp-server#readme"
+  "homepage": "https://github.com/hummbl-dev/mcp-server#readme",
+  "overrides": {
+    "flatted": "^3.4.2"
+  }
 }
