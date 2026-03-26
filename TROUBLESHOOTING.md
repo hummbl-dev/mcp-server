@@ -215,9 +215,9 @@ Common issues and solutions for HUMMBL MCP Server.
 **Cause**: Syntax error or wrong Node version
 
 **Fix**:
-- Check Node.js version >= 18
+- Check Node.js version >= 20
 - Verify TypeScript compilation: `npm run build`
-- Check for async/await usage (Node 18+ supports top-level await)
+- Check for async/await usage on a supported runtime (Node 20+)
 
 ### Rate limit errors
 
