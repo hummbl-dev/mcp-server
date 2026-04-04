@@ -1,0 +1,2555 @@
+{
+  "_telemetry": {
+    "aggregation_period": "7d",
+    "collection_enabled": true,
+    "last_updated": "2026-04-04T19:48:16.550970+00:00",
+    "metrics": {
+      "agent_usage_patterns": {},
+      "term_frequency": {},
+      "unregistered_encounters": []
+    },
+    "privacy": {
+      "anonymize_before_export": true,
+      "hash_identifiers": true,
+      "retention_days": 90
+    }
+  },
+  "acronyms": [
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "hummbl-dev/aaa",
+      "definition": "A deterministic enforcement and evidence-emitting boundary between high-level agentic intent and specific system invocation, ensuring that every action is verified and documented with immutable receipts for full auditability.",
+      "deprecated_by": null,
+      "domain": "execution-boundary",
+      "expanded": "Assured Agentic Architecture",
+      "id": "AAA",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173156Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Does not orchestrate",
+        "Does not generate intent",
+        "Emits receipts/evidence",
+        "Maintains constructive/adjudicative split"
+      ],
+      "layer": "L3.5",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "EAL",
+          "type": "adjacent_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "proposed",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "The semantic and evidence requirements layer applied to agentic execution and artifacts, providing a structured framework for expressing epistemic claims and their supporting verification artifacts across the system.",
+      "deprecated_by": null,
+      "domain": "assurance",
+      "expanded": "Epistemic Assurance Layer",
+      "id": "EAL",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173202Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Evidence-first",
+        "Explicit non-claims",
+        "Receipt-centric verification"
+      ],
+      "layer": "L3.5-adjacent",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "AAA",
+          "type": "related_to"
+        },
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        },
+        {
+          "bidirectional": true,
+          "target": "NCC",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "proposed",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "hummbl-dev/base120",
+      "definition": "A structured, machine-readable compliance claim that includes pinned versions, evidence hashes, explicit non-claims, and cryptographic signature requirements to enable automated verification of system state and governance adherence.",
+      "deprecated_by": null,
+      "domain": "compliance",
+      "expanded": "Machine-Readable Compliance Claim",
+      "id": "MRCC",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173220Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Hash-addressed evidence",
+        "Explicit non-claims",
+        "Version pinning",
+        "Schema-validated"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES",
+        "Base120"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "NCC",
+          "type": "paired_with"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v1.0"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "hummbl-dev/base120",
+      "definition": "A human-readable narrative compliance claim that is paired with a corresponding Machine-Readable Compliance Claim (MRCC) to provide clear auditability and communication for human operators and stakeholders.",
+      "deprecated_by": null,
+      "domain": "compliance",
+      "expanded": "Narrative Compliance Claim",
+      "id": "NCC",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173232Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Consistent with MRCC scope",
+        "No claims beyond evidence"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v1.0"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "hummbl-dev/base120",
+      "definition": "A system that forces explicit action-space enumeration into Necessary, Indicated, and Possible categories to reduce operational drift and enforce rigorous engineering discipline across all agentic and human coordination activities.",
+      "deprecated_by": null,
+      "domain": "execution-governance",
+      "expanded": "Canonical Action Enumeration System",
+      "id": "CAES",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173243Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Action-space emitted for qualifying conversations",
+        "Atomic executable steps",
+        "Ordered by necessity"
+      ],
+      "layer": "governance",
+      "related": [
+        "AAA"
+      ],
+      "relations": [
+        {
+          "bidirectional": false,
+          "target": "AAA",
+          "type": "implements"
+        },
+        {
+          "bidirectional": false,
+          "target": "PROPOSAL",
+          "type": "uses"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v1.0"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A downstream reference application architecture built on the Base120 v1.0 specification with a non-canonical posture, intended for rapid prototyping while maintaining governance alignment with the core system principles.",
+      "deprecated_by": null,
+      "domain": "governed-app-architecture",
+      "expanded": "Bounded Cognition Governance Stack",
+      "id": "BCGS",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173254Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Non-canonical",
+        "No modifications to Base120 canon",
+        "Frozen at v1.0"
+      ],
+      "layer": "reference-architecture",
+      "related": [
+        "Base120",
+        "MRCC"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        }
+      ],
+      "status": "frozen",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "frozen",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v1.0"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A governance-first protocol and repository structure for monitoring singularity-related signals with strict anti-drift controls, designed to maintain stability and human oversight in highly autonomous agentic environments.",
+      "deprecated_by": null,
+      "domain": "protocol",
+      "expanded": "Singularity Monitoring Protocol",
+      "id": "SMP",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173264Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Governance baseline frozen",
+        "External-collaboration-ready",
+        "Single-owner veto"
+      ],
+      "layer": "governance",
+      "related": [],
+      "relations": [],
+      "status": "frozen",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "frozen",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v0.1.0"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A field-wide mental model taxonomy with Base120 as its governed nucleus, providing multi-axis stratification across time and agency to categorize and manage diverse cognitive architectures within the system.",
+      "deprecated_by": null,
+      "domain": "taxonomy",
+      "expanded": "Stratified Mental Model Field",
+      "id": "SMMF",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173274Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Frozen at v1",
+        "Base120 is minimal nucleus"
+      ],
+      "layer": "ontology",
+      "related": [
+        "Base120"
+      ],
+      "relations": [],
+      "status": "frozen",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "frozen",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v1"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A governance protocol and reference implementation skeleton designed for preserving cognitive integrity under conditions of bounded autonomy, ensuring that agentic systems remain aligned with human intent and safety constraints.",
+      "deprecated_by": null,
+      "domain": "integrity",
+      "expanded": "Cognitive Integrity System",
+      "id": "CIS",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173283Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Design finalized and frozen (v4)",
+        "No architectural changes without governed authorization"
+      ],
+      "layer": "governance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "v4"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "An automated build, test, and validation pipeline that is triggered on every code change to ensure deterministic behavior and verify that all system invariants are maintained before merging.",
+      "deprecated_by": null,
+      "disambiguation": {
+        "case_sensitive": false,
+        "default_sense": "Continuous Integration",
+        "rules": [
+          {
+            "confidence": 0.95,
+            "pattern": "continuous.?integration|build.?pipeline|github.?actions",
+            "sense": "Continuous Integration"
+          },
+          {
+            "confidence": 0.9,
+            "pattern": "cognitive.?integrity|bounded.?autonomy",
+            "redirect_to": "CIS",
+            "sense": "Cognitive Integrity (deprecated, use CIS)"
+          },
+          {
+            "confidence": 0.85,
+            "external": true,
+            "pattern": "configuration.?item",
+            "sense": "Configuration Item (ITIL)"
+          }
+        ]
+      },
+      "domain": "devops",
+      "expanded": "Continuous Integration",
+      "id": "CI",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173293Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Deterministic checks preferred",
+        "Pinned dependencies/actions where applicable"
+      ],
+      "layer": "tooling",
+      "related": [
+        "MRCC"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "An approach where infrastructure is defined and managed through versioned code and automation, ensuring that environments are reproducible, auditable, and subject to the same governance as application code.",
+      "deprecated_by": null,
+      "domain": "infrastructure",
+      "expanded": "Infrastructure as Code",
+      "id": "IaC",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173313Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Reproducible environments",
+        "Auditable change history"
+      ],
+      "layer": "L0-L1",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CI",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "An engineering approach to operations that emphasizes reliability, automation, and the use of error budgets to balance the need for new features with the requirement for system stability and performance.",
+      "deprecated_by": null,
+      "domain": "discipline",
+      "expanded": "Site Reliability Engineering",
+      "id": "SRE",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173324Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Focus on automation and toil reduction",
+        "SLI/SLO/SLA driven",
+        "Error budgets used for prioritization"
+      ],
+      "layer": "ops",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "The field of study focused on the design and evaluation of interactions between human operators and computational systems, with a particular emphasis on reducing cognitive load and improving safety.",
+      "deprecated_by": null,
+      "domain": "discipline",
+      "expanded": "Human-Computer Interaction",
+      "id": "HCI",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173334Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "User-centric design",
+        "Evaluates cognitive load",
+        "Focuses on usability and accessibility"
+      ],
+      "layer": "research",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A neural language model trained at massive scale for language generation and complex inference, requiring containment and structured interfaces to be safely integrated into deterministic agentic pipelines.",
+      "deprecated_by": null,
+      "domain": "ai-systems",
+      "expanded": "Large Language Model",
+      "id": "LLM",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173344Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Probabilistic output",
+        "Requires containment for deterministic pipelines"
+      ],
+      "layer": "model",
+      "related": [
+        "AAA"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "AAA",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A standardized protocol for exposing tools, capabilities, and resources to large language models via structured, parameterized interfaces that maintain explicit boundaries between the model and the host system.",
+      "deprecated_by": null,
+      "domain": "tool-protocol",
+      "expanded": "Model Context Protocol",
+      "id": "MCP",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173354Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Tool boundary is explicit",
+        "Invocation is parameterized"
+      ],
+      "layer": "L1-L2",
+      "related": [
+        "AAA"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "AAA",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A high-throughput batch-processing pipeline referenced for arXiv-scale data analysis, focusing on the issuance of verifiable receipts and artifacts for every document processed within the research workflow.",
+      "deprecated_by": null,
+      "domain": "research-ops",
+      "expanded": "unverified",
+      "id": "H-LACE",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173364Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "High-throughput batch operation",
+        "Receipt issuance focus"
+      ],
+      "layer": "pipeline",
+      "related": [
+        "MRCC"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "proposed",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A formal request to merge code changes into a repository, serving as a critical governance gate where changes are peer-reviewed and validated against system invariants before being accepted into the codebase.",
+      "deprecated_by": null,
+      "domain": "devops",
+      "expanded": "Pull Request",
+      "id": "PR",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173374Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Requires peer review",
+        "Must pass CI before merge",
+        "Documents intent of changes"
+      ],
+      "layer": "tooling",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CI",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "An organized and structured approach to addressing and managing security breaches, system failures, or cyberattacks, with a focus on containment, recovery, and subsequent root cause analysis to prevent recurrence.",
+      "deprecated_by": null,
+      "domain": "discipline",
+      "expanded": "Incident Response",
+      "id": "IR",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173383Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Follows structured timeline",
+        "Root cause analysis (RCA) required",
+        "Minimizes Mean Time To Recovery (MTTR)"
+      ],
+      "layer": "ops",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "SRE",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A feature-frozen version of a product that has undergone significant testing and is considered ready for production release unless critical bugs are identified during the final validation phase.",
+      "deprecated_by": null,
+      "domain": "devops",
+      "expanded": "Release Candidate",
+      "id": "RC",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173392Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Feature-frozen",
+        "Undergoes final validation",
+        "Promotion path to production"
+      ],
+      "layer": "tooling",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CI",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "The broad field concerned with building systems capable of performing tasks that typically require human-like intelligence, necessitating robust safety guardrails and continuous monitoring when employed in autonomous contexts.",
+      "deprecated_by": null,
+      "domain": "discipline",
+      "expanded": "Artificial Intelligence",
+      "id": "AI",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173402Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Non-deterministic by nature",
+        "Requires safety guardrails",
+        "Performance monitored via benchmarks"
+      ],
+      "layer": "research",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "LLM",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A standard operational snapshot summarizing the current state, deltas, risks, and next actions for a specific system or workstream, providing clear situational awareness for both human and agentic operators.",
+      "deprecated_by": null,
+      "domain": "ops-artifact",
+      "expanded": "Situation Report",
+      "id": "SITREP",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173416Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Time-scoped",
+        "Delta-oriented",
+        "Action-linked"
+      ],
+      "layer": "ops",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A protocol for governed agent-to-agent task delegation that utilizes cryptographically signed contexts and capability attenuation to ensure that delegated actions are authorized, bounded, and fully auditable.",
+      "deprecated_by": null,
+      "disambiguation": {
+        "context_required": true,
+        "default_sense": "Intelligent Delegation Protocol",
+        "rules": [
+          {
+            "confidence": 0.95,
+            "pattern": "intelligent.?delegation|agent.?delegation|DCT|DCTX",
+            "sense": "Intelligent Delegation Protocol"
+          },
+          {
+            "confidence": 0.9,
+            "external": true,
+            "pattern": "identity.?provider|oauth|saml|authentication",
+            "sense": "Identity Provider (generic)"
+          }
+        ]
+      },
+      "domain": "protocol",
+      "expanded": "Intelligent Delegation Protocol",
+      "id": "IDP",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173425Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Signed delegation context",
+        "Capability attenuation",
+        "Non-repudiable audit trail"
+      ],
+      "layer": "governance",
+      "related": [
+        "AAA"
+      ],
+      "relations": [
+        {
+          "bidirectional": false,
+          "target": "DCTX",
+          "type": "produces"
+        },
+        {
+          "bidirectional": false,
+          "target": "AAA",
+          "type": "implements"
+        },
+        {
+          "bidirectional": false,
+          "target": "CONTRACT",
+          "type": "governs"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A cryptographically signed container carrying the specific parameters, constraints, and metadata required for an agent-to-agent task assignment, ensuring that the delegated agent operates within authorized boundaries.",
+      "deprecated_by": null,
+      "domain": "protocol",
+      "expanded": "Delegation Context",
+      "id": "DCTX",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173434Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Cryptographically signed",
+        "Attenuates capabilities",
+        "Time-bounded"
+      ],
+      "layer": "governance",
+      "related": [
+        "IDP"
+      ],
+      "relations": [
+        {
+          "bidirectional": false,
+          "target": "DCT",
+          "type": "contains"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A short-lived bearer token that encodes attenuated capabilities scoped to a specific delegated task, providing a secure mechanism for fine-grained authorization in multi-agent orchestration systems.",
+      "deprecated_by": null,
+      "domain": "protocol",
+      "expanded": "Delegation Capability Token",
+      "id": "DCT",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173444Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Short-lived",
+        "Capability-scoped",
+        "Bearer-typed"
+      ],
+      "layer": "governance",
+      "related": [
+        "IDP"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "IDP",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "DCTX",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to suggest a specific action or change, providing the necessary context and rationale for other agents or human operators to acknowledge or decide upon.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Coordination Proposal",
+      "id": "PROPOSAL",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173458Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Requires ACK or explicit decision"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "ACK",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "DECISION",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to confirm the receipt and acceptance of a prior message or proposal, establishing a shared state and moving the coordination workflow to the next phase.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Acknowledgment",
+      "id": "ACK",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173468Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Receipt confirmation"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "PROPOSAL",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to convey the current progress or state of a task without requiring immediate action, facilitating asynchronous awareness across the agent fleet.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Status Update",
+      "id": "STATUS",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173479Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Informational only"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "SITREP",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to signal an impediment that prevents further progress on a task, requiring explicit intervention or a change in conditions to resolve and resume work.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Blocked",
+      "id": "BLOCKED",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173493Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Requires explicit unblock"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to record a committed choice with its associated rationale, serving as an authoritative reference for the path chosen during a coordination or execution workflow.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Decision",
+      "id": "DECISION",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173502Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Committed state",
+        "Includes rationale reference"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "PROPOSAL",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to request information or clarification from another agent or human operator, ensuring that all participants have the necessary data to proceed correctly.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Question",
+      "id": "QUESTION",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173511Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Response required"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A coordination bus message type used to mark the successful completion of a significant phase or deliverable, providing a clear indicator of progress towards the ultimate objective of a workstream.",
+      "deprecated_by": null,
+      "domain": "coordination",
+      "expanded": "Milestone",
+      "id": "MILESTONE",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173519Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Achievement marker",
+        "Linked to verifiable outcome"
+      ],
+      "layer": "governance",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A pattern of direct communication and delegation between autonomous agents, governed by protocols that ensure every interaction is authenticated, authorized, and captured in the system's audit trail.",
+      "deprecated_by": null,
+      "domain": "protocol",
+      "expanded": "Agent-to-Agent",
+      "id": "A2A",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173524Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Peer-to-peer semantics"
+      ],
+      "layer": "governance",
+      "related": [
+        "AAA"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "IDP",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "AAA",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A comprehensive testing approach that exercises complete user workflows through all system layers, from the user interface to the underlying infrastructure, to ensure full system integrity and functionality.",
+      "deprecated_by": null,
+      "domain": "discipline",
+      "expanded": "End-to-End",
+      "id": "E2E",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173529Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "User-centric",
+        "Full-stack scope"
+      ],
+      "layer": "testing",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CI",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A stylesheet language used for describing the presentation and visual layout of web documents, strictly separated from the application's business logic and interactive behavior to maintain clean architectural boundaries.",
+      "deprecated_by": null,
+      "domain": "web-technology",
+      "expanded": "Cascading Style Sheets",
+      "id": "CSS",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173534Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Presentation-only (logic-free)",
+        "Hierarchical application (cascading)",
+        "Declarative syntax"
+      ],
+      "layer": "L1-L2",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A security mechanism that allows web resources to be requested from a different domain than the one that served the original resource, enforced by the browser and controlled by server-side policies.",
+      "deprecated_by": null,
+      "domain": "web-technology",
+      "expanded": "Cross-Origin Resource Sharing",
+      "id": "CORS",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173539Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Browser-enforced security",
+        "Policy-driven access",
+        "Requires server-side opt-in"
+      ],
+      "layer": "L1-L2",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "The unified and governed cognitive architecture and execution system built on the principles of Assured Agentic Architecture (AAA) and the Canonical Action Enumeration System (CAES) for founding multi-agent platforms.",
+      "deprecated_by": null,
+      "domain": "product",
+      "expanded": "Hummbl System",
+      "id": "HUMMBL",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173544Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Spec-driven",
+        "Agent-first",
+        "Evidence-emitting"
+      ],
+      "layer": "system",
+      "related": [
+        "AAA",
+        "CAES",
+        "MRCC"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "AAA",
+          "type": "related_to"
+        },
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "related_to"
+        },
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A user or system goal expressed in either natural language or a structured format, which must be processed through a constructive and adjudicative split before being translated into executable actions.",
+      "deprecated_by": null,
+      "domain": "execution-boundary",
+      "expanded": "Intent",
+      "id": "INTENT",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173552Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Pre-execution",
+        "Subject to verification"
+      ],
+      "layer": "L3",
+      "related": [
+        "AAA",
+        "EAL"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "AAA",
+          "type": "same_domain"
+        },
+        {
+          "bidirectional": true,
+          "target": "EAL",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "ietf/rfc2119",
+      "definition": "An RFC 2119 requirement level indicating an absolute obligation that must be met for a system or component to be considered compliant with the specified standard or protocol.",
+      "deprecated_by": null,
+      "domain": "normative-keyword",
+      "expanded": "Must",
+      "id": "MUST",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173557Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Absolute obligation",
+        "Testable compliance"
+      ],
+      "layer": "specification",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "SHOULD",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "ietf/rfc2119",
+      "definition": "An RFC 2119 requirement level indicating a strong recommendation where there may be valid reasons in particular circumstances to ignore a specific item, but the full implications must be understood.",
+      "deprecated_by": null,
+      "domain": "normative-keyword",
+      "expanded": "Should",
+      "id": "SHOULD",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173562Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Strong recommendation",
+        "Exceptions require justification"
+      ],
+      "layer": "specification",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MUST",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A state indicating that an item or claim complies with all specified constraints and has successfully passed all verification procedures, backed by reproducible evidence and immutable receipts.",
+      "deprecated_by": null,
+      "domain": "verification-state",
+      "expanded": "Valid",
+      "id": "VALID",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173567Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Evidence-backed",
+        "Reproducible"
+      ],
+      "layer": "assurance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "INVALID",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "VERIFIED",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A state indicating that an item or claim fails to comply with specified constraints or has failed a verification procedure, requiring remediation or rejection before the workflow can proceed.",
+      "deprecated_by": null,
+      "domain": "verification-state",
+      "expanded": "Invalid",
+      "id": "INVALID",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173577Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Evidence-backed",
+        "Reproducible"
+      ],
+      "layer": "assurance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "VALID",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "VERIFIED",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A state indicating the successful completion of a specific verification procedure, where the resulting evidence has been attached to the claim and can be independently reproduced by other participants.",
+      "deprecated_by": null,
+      "domain": "verification-state",
+      "expanded": "Verified",
+      "id": "VERIFIED",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173585Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Evidence-attached",
+        "Reproducible"
+      ],
+      "layer": "assurance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "VALID",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A state indicating that an item, term, or action has been suggested for inclusion or execution but has not yet been accepted, reviewed, or activated by the governing authority.",
+      "deprecated_by": null,
+      "domain": "lifecycle-state",
+      "expanded": "Proposed",
+      "id": "PROPOSED",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173591Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Pre-commitment",
+        "Requires review"
+      ],
+      "layer": "governance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "PROPOSAL",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A state indicating that a token, claim, or credential has been successfully generated and distributed to its intended recipient, marking the activation of a specific capability or authorization.",
+      "deprecated_by": null,
+      "domain": "lifecycle-state",
+      "expanded": "Issued",
+      "id": "ISSUED",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173596Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Post-generation",
+        "Distributable"
+      ],
+      "layer": "governance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "DCT",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "DCTX",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "An HTTP-based protocol for server-to-client push messaging, enabling real-time updates and live coordination bus streams to be efficiently delivered to web-based dashboards and monitoring tools.",
+      "deprecated_by": null,
+      "domain": "web-technology",
+      "expanded": "Server-Sent Events",
+      "id": "SSE",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173600Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Unidirectional",
+        "HTTP-based"
+      ],
+      "layer": "L1-L2",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A line-delimited JSON format ideal for streaming data and log files, where each line is a valid JSON object, allowing for efficient processing of large datasets and continuous logs.",
+      "deprecated_by": null,
+      "domain": "data-format",
+      "expanded": "JSON Lines",
+      "id": "JSONL",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173605Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Line-delimited",
+        "Streaming-friendly"
+      ],
+      "layer": "L1-L2",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A geographically distributed network of proxy servers and data centers that work together to provide high availability and performance by distributing content spatially relative to end users.",
+      "deprecated_by": null,
+      "domain": "infrastructure",
+      "expanded": "Content Delivery Network",
+      "id": "CDN",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173610Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Geographically distributed",
+        "Caching for low latency",
+        "Edge-optimized delivery"
+      ],
+      "layer": "L0-L1",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A binding specification that defines the interface, behavior, and constraints between system components or agents, ensuring that all interactions are predictable, testable, and subject to governance.",
+      "deprecated_by": null,
+      "domain": "protocol",
+      "expanded": "Contract",
+      "id": "CONTRACT",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173615Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Versioned",
+        "Testable",
+        "Attestable"
+      ],
+      "layer": "governance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "IDP",
+          "type": "same_layer"
+        },
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "The hash-addressed artifacts, log entries, or attestations that support a specific compliance claim, providing an immutable and verifiable record of system behavior and state transitions.",
+      "deprecated_by": null,
+      "domain": "verification",
+      "expanded": "Evidence",
+      "id": "EVIDENCE",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173619Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Hash-addressed",
+        "Immutable",
+        "Verifiable"
+      ],
+      "layer": "assurance",
+      "related": [
+        "EAL"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        },
+        {
+          "bidirectional": true,
+          "target": "EAL",
+          "type": "related_to"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A cryptographically signed statement of verification that binds a specific identity to a claim about code, configuration, or system state, serving as a high-confidence indicator of assurance.",
+      "deprecated_by": null,
+      "domain": "verification",
+      "expanded": "Attestation",
+      "id": "ATTEST",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173624Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Cryptographically signed",
+        "Non-repudiable"
+      ],
+      "layer": "assurance",
+      "related": [],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "MRCC",
+          "type": "related_to"
+        },
+        {
+          "bidirectional": true,
+          "target": "EVIDENCE",
+          "type": "same_layer"
+        }
+      ],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "An architectural style for networked hypermedia applications that uses stateless operations and standard HTTP methods to interact with resources, emphasizing scalability, simplicity, and performance.",
+      "deprecated_by": null,
+      "domain": "web-architecture",
+      "expanded": "Representational State Transfer",
+      "id": "REST",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173632Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Stateless",
+        "Resource-oriented"
+      ],
+      "layer": "L1-L2",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "nist/fips180-4",
+      "definition": "A NIST-approved cryptographic hash function that produces a fixed-size 256-bit digest, used extensively across the system for hash-addressing evidence and ensuring data integrity.",
+      "deprecated_by": null,
+      "domain": "hash-function",
+      "expanded": "SHA-256",
+      "id": "SHA256",
+      "introduced_by": {
+        "migrated_at": "2026-03-03T15:19:05.173640Z",
+        "migrated_from": "LEGACY_EXEMPTIONS.v0.1.txt",
+        "ref": "lexicon-v0.1.0",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "Deterministic",
+        "Collision-resistant"
+      ],
+      "layer": "cryptography",
+      "related": [],
+      "relations": [],
+      "status": "active",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-03-02T00:00:00Z",
+          "note": "Initial v0.1.0 registration",
+          "status": "active",
+          "version": "0.1.0"
+        }
+      ],
+      "version_introduced": "unverified"
+    },
+    {
+      "_telemetry": {
+        "last_used": null,
+        "primary_agents": [],
+        "trending": null,
+        "usage_count": 0
+      },
+      "authority_repo": "unverified",
+      "definition": "A state indicating that a term, protocol, or component is no longer supported and has been superseded by a newer standard, retained only for historical context and backwards compatibility.",
+      "deprecated_by": "CAES",
+      "deprecation": {
+        "last_compatible_version": "v0.1.0",
+        "migration_guide": "Use CAES instead of OBSOLETE protocol",
+        "sunset_date": "2026-06-01"
+      },
+      "domain": "deprecated",
+      "expanded": "Obsolete Protocol",
+      "id": "OBSOLETE",
+      "introduced_by": {
+        "date": "2026-01-01",
+        "ref": "abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123",
+        "repo": "hummbl-dev/founder-mode"
+      },
+      "invariants": [
+        "No longer supported",
+        "Replaced by newer standards",
+        "Retained only for historical context"
+      ],
+      "layer": "legacy",
+      "related": [
+        "CAES"
+      ],
+      "relations": [
+        {
+          "bidirectional": true,
+          "target": "CAES",
+          "type": "related_to"
+        }
+      ],
+      "status": "deprecated",
+      "supersedes": null,
+      "version_history": [
+        {
+          "changed_at": "2026-01-01T00:00:00Z",
+          "status": "active",
+          "version": "0.1.0"
+        },
+        {
+          "changed_at": "2026-03-03T00:00:00Z",
+          "note": "Deprecated in favor of CAES",
+          "status": "deprecated",
+          "version": "0.2.0"
+        }
+      ],
+      "version_introduced": "v0.1.0"
+    }
+  ],
+  "generated_at": "2026-03-03",
+  "migrated_from": "v0.1",
+  "notes": [
+    "Governance-safe seed: anything not commit-pinned is marked proposed.",
+    "Promote to active/frozen only when introduced_by.repo+ref are set and 'unverified' fields resolved.",
+    "Migrated from v0.1 to v0.2 format.",
+    "Added experimental status, introduced_by enforcement, deprecation metadata."
+  ],
+  "registry_version": "v0.2",
+  "reserved_common": [
+    "CI",
+    "IR",
+    "RC",
+    "PR"
+  ],
+  "reserved_prefixes": [
+    "AAA-",
+    "EAL-",
+    "HUM-",
+    "MRCC-",
+    "NCC-",
+    "SMMF-",
+    "SMP-",
+    "BCGS-",
+    "CAES-"
+  ],
+  "schema": "https://hummbl.dev/lexicon/acronym.schema.json"
+}
