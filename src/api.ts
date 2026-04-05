@@ -19,7 +19,8 @@ import {
   getModelsByTransformation,
 } from "./framework/base120.js";
 import { isOk, isTransformationType } from "./types/domain.js";
-import { validateApiKey } from "./auth/api-keys.js";
+import { validateApiKey, checkRateLimit } from "./auth/api-keys.js";
+import type { RateLimitStatus } from "./auth/api-keys.js";
 import { createD1Client } from "./storage/d1-client.js";
 import relationshipsRoutes from "./routes/relationships.js";
 import type { ModelRelationship } from "./types/relationships.js";
@@ -44,21 +45,36 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 app.use("*", cors());
 app.use("*", logger());
 
+function applyRateLimitHeaders(c: AppContext, status: RateLimitStatus): void {
+  c.header("X-RateLimit-Limit-Hour", String(status.hourLimit));
+  c.header("X-RateLimit-Remaining-Hour", String(status.hourRemaining));
+  c.header("X-RateLimit-Reset-Hour", String(status.hourResetSec));
+  c.header("X-RateLimit-Limit-Day", String(status.dayLimit));
+  c.header("X-RateLimit-Remaining-Day", String(status.dayRemaining));
+  c.header("X-RateLimit-Reset-Day", String(status.dayResetSec));
+}
+
 // Authentication middleware
-async function authenticate(c: AppContext, next: Next): Promise<void> {
+async function authenticate(c: AppContext, next: Next): Promise<Response | void> {
   const authHeader = c.req.header("Authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    c.json({ error: "Missing or invalid authorization header" }, 401);
-    return;
+    return c.json({ error: "Missing or invalid authorization header" }, 401);
   }
 
   const apiKey = authHeader.substring(7); // Remove "Bearer "
 
   const authResult = await validateApiKey(c.env.API_KEYS, apiKey);
   if (!authResult.ok) {
-    c.json({ error: authResult.error.message }, 401);
-    return;
+    return c.json({ error: authResult.error.message }, 401);
+  }
+
+  const rateLimit = await checkRateLimit(c.env.API_KEYS, authResult.value);
+  applyRateLimitHeaders(c, rateLimit.status);
+
+  if (!rateLimit.allowed) {
+    c.header("Retry-After", String(rateLimit.retryAfterSec));
+    return c.json({ error: rateLimit.error.message }, 429);
   }
 
   // Store authenticated user info in context for use in routes
@@ -220,6 +236,26 @@ app.patch("/v1/relationships/:id", authenticate, async (c: AppContext) => {
     const result = await db.updateRelationship(id, updates);
 
     return c.json({ success: true, relationship: result });
+  } catch {
+    return c.json({ error: "Internal server error" }, 500);
+  }
+});
+
+// Delete relationship (admin only)
+app.delete("/v1/relationships/:id", authenticate, async (c: AppContext) => {
+  const user = c.get("user");
+  if (!user?.permissions.includes("admin:*")) {
+    return c.json({ error: "Admin permissions required" }, 403);
+  }
+
+  try {
+    const db = createD1Client(c.env.DB);
+    const id = c.req.param("id")!;
+    const deleted = await db.deleteRelationship(id);
+    if (!deleted) {
+      return c.json({ error: "Relationship not found" }, 404);
+    }
+    return c.json({ success: true, id });
   } catch {
     return c.json({ error: "Internal server error" }, 500);
   }

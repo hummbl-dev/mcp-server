@@ -275,15 +275,12 @@ router.delete("/relationships/:id", async (c: AppContext) => {
     const db = createD1Client(c.env.DB);
     const id = c.req.param("id")!;
 
-    // Check if relationship exists
-    const existing = await db.getRelationship(id);
-    if (!existing) {
+    const deleted = await db.deleteRelationship(id);
+    if (!deleted) {
       return c.json({ error: "Relationship not found" }, 404);
     }
 
-    // TODO: Implement deleteRelationship method in D1Client
-    // For now, return error
-    return c.json({ error: "Delete not yet implemented" }, 501);
+    return c.json({ success: true, id });
   } catch {
     return c.json({ error: "Internal server error" }, 500);
   }
