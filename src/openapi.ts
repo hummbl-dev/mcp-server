@@ -68,6 +68,27 @@ const relationshipSchema: JsonSchema = {
   ],
 };
 
+/**
+ * Request body accepted by POST /v1/relationships — distinct from
+ * `relationshipSchema` (the shape of persisted rows). The handler at
+ * src/api.ts validates `source_code`, `target_code`, `relationship_type`,
+ * `confidence`, and `evidence`, so that's what we document here.
+ */
+const createRelationshipRequestSchema: JsonSchema = {
+  type: "object",
+  properties: {
+    source_code: { type: "string", example: "P1" },
+    target_code: { type: "string", example: "IN3" },
+    relationship_type: {
+      type: "string",
+      enum: ["enables", "reinforces", "conflicts", "contains", "sequences", "complements"],
+    },
+    confidence: { type: "string", enum: ["A", "B", "C"] },
+    evidence: { type: "string" },
+  },
+  required: ["source_code", "target_code", "relationship_type", "confidence"],
+};
+
 const bearerAuth = [{ bearerAuth: [] }];
 
 const paths: Record<string, PathItem> = {
@@ -198,7 +219,7 @@ const paths: Record<string, PathItem> = {
                 type: "object",
                 properties: {
                   query: { type: "string" },
-                  matchCount: { type: "integer" },
+                  resultCount: { type: "integer" },
                   results: { type: "array", items: modelSchema },
                 },
               },
@@ -315,7 +336,7 @@ const paths: Record<string, PathItem> = {
       security: bearerAuth,
       requestBody: {
         required: true,
-        content: { "application/json": { schema: relationshipSchema } },
+        content: { "application/json": { schema: createRelationshipRequestSchema } },
       },
       responses: {
         "201": { description: "Relationship created." },

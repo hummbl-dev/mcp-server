@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const apiSource = readFileSync(join(__dirname, "../api.ts"), "utf8");
+const subRouterSource = readFileSync(join(__dirname, "../routes/relationships.ts"), "utf8");
 
 describe("OpenAPI specification", () => {
   it("is a valid OpenAPI 3.0 document shape", () => {
@@ -40,26 +41,51 @@ describe("OpenAPI specification", () => {
     expect(a).toEqual(b); // same content
   });
 
-  it("every documented path is either registered on the app or matches a Hono pattern in api.ts", () => {
+  it("every documented path is actually registered on the app or the sub-router", () => {
     // Convert each documented path to the corresponding Hono route string by
-    // replacing {param} -> :param, then look for that literal in api.ts or in
-    // the relationships router (which is mounted at /v1). This is a
-    // drift-guard: if someone documents a path without actually adding the
-    // route, this test flags it.
+    // replacing {param} -> :param. Each path must appear either:
+    //   (a) as a literal route string in api.ts (main app), OR
+    //   (b) as a literal route string (with the /v1 prefix stripped) in
+    //       src/routes/relationships.ts (the /v1 sub-router).
+    // A typo or orphan doc entry will fail this check.
     const documented = Object.keys(OPENAPI_DOCUMENT.paths as Record<string, unknown>);
+    const subRouterMounted =
+      apiSource.includes(`app.route("/v1"`) || apiSource.includes(`app.route('/v1'`);
+
     for (const path of documented) {
       if (path === "/openapi.json") continue; // registered directly in this PR
       const honoPath = path.replace(/\{(\w+)\}/g, ":$1");
-      // Either appears in api.ts directly, or the path after /v1/ prefix is in relationships.ts
+
       const inApiTs = apiSource.includes(`"${honoPath}"`);
-      const inSubRouter =
-        honoPath.startsWith("/v1/") &&
-        (apiSource.includes(`app.route("/v1"`) || apiSource.includes(`app.route('/v1'`));
+
+      // Strip the /v1 mount prefix to get the sub-router's local path,
+      // e.g. /v1/relationships/:id -> /relationships/:id.
+      let inSubRouter = false;
+      if (subRouterMounted && honoPath.startsWith("/v1/")) {
+        const subPath = honoPath.slice(3); // drop "/v1"
+        inSubRouter = subRouterSource.includes(`"${subPath}"`);
+      }
+
       expect(
         inApiTs || inSubRouter,
-        `Documented path ${path} (hono: ${honoPath}) not found in api.ts`
+        `Documented path ${path} (hono: ${honoPath}) not found in api.ts or routes/relationships.ts`
       ).toBe(true);
     }
+  });
+
+  it("drift guard rejects a fabricated /v1 path that isn't in either source", () => {
+    // Sanity check the drift guard: an obviously-fake /v1 path must NOT
+    // be found in api.ts or routes/relationships.ts.
+    const fakeHonoPath = "/v1/this-route-does-not-exist-in-either-source";
+    const subRouterMounted =
+      apiSource.includes(`app.route("/v1"`) || apiSource.includes(`app.route('/v1'`);
+    const inApiTs = apiSource.includes(`"${fakeHonoPath}"`);
+    let inSubRouter = false;
+    if (subRouterMounted && fakeHonoPath.startsWith("/v1/")) {
+      inSubRouter = subRouterSource.includes(`"${fakeHonoPath.slice(3)}"`);
+    }
+    expect(inApiTs).toBe(false);
+    expect(inSubRouter).toBe(false);
   });
 
   it("DOCUMENTED_OPERATIONS enumerates every method+path combination", () => {
