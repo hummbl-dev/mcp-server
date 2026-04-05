@@ -1117,4 +1117,107 @@ export function registerModelTools(server: McpServer): void {
       }
     }
   );
+
+  // Tool: Retrieve past recommendations for the authenticated caller
+  server.registerTool(
+    "get_recommendation_history",
+    {
+      title: "Get Recommendation History",
+      description:
+        "Fetch the caller's past recommendation calls (problems submitted and the model codes that were returned), newest first. Useful for 'what did we explore last time?' and for avoiding re-recommending the same models.",
+      inputSchema: z.object({
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(100)
+          .optional()
+          .describe("Max rows to return (default 20, max 100)"),
+        offset: z.number().int().min(0).optional().describe("Pagination offset (default 0)"),
+      }),
+      outputSchema: z.object({
+        count: z.number(),
+        limit: z.number(),
+        offset: z.number(),
+        recommendations: z.array(
+          z.object({
+            id: z.string(),
+            problem: z.string(),
+            model_codes: z.array(z.string()),
+            top_pattern: z.string().nullable(),
+            created_at: z.string(),
+          })
+        ),
+      }),
+    },
+    async ({ limit, offset }) => {
+      if (!API_CONFIG.apiKey) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: "HUMMBL API key not configured. Set HUMMBL_API_KEY to retrieve recommendation history.",
+            },
+          ],
+          isError: true,
+          structuredContent: undefined,
+        } as const;
+      }
+
+      const params = new URLSearchParams();
+      if (limit !== undefined) params.set("limit", String(limit));
+      if (offset !== undefined) params.set("offset", String(offset));
+      const qs = params.toString();
+      const url = `${API_CONFIG.baseUrl}/v1/recommendations${qs ? `?${qs}` : ""}`;
+
+      try {
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${API_CONFIG.apiKey}` },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          return {
+            content: [
+              {
+                type: "text",
+                text: `API request failed: ${response.status} ${response.statusText}\n${errorText}`,
+              },
+            ],
+            isError: true,
+            structuredContent: undefined,
+          } as const;
+        }
+
+        const payload = (await response.json()) as {
+          count: number;
+          limit: number;
+          offset: number;
+          recommendations: Array<{
+            id: string;
+            problem: string;
+            model_codes: string[];
+            top_pattern: string | null;
+            created_at: string;
+          }>;
+        };
+
+        return {
+          content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+          structuredContent: payload,
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Failed to fetch recommendation history: ${error instanceof Error ? error.message : "Unknown error"}`,
+            },
+          ],
+          isError: true,
+          structuredContent: undefined,
+        } as const;
+      }
+    }
+  );
 }

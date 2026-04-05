@@ -193,6 +193,18 @@ export class D1Client {
       `CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_unique 
        ON relationships(model_a, model_b, relationship_type, direction)`,
 
+      // Recommendation history — one row per POST /v1/recommend call.
+      `CREATE TABLE IF NOT EXISTS recommendations (
+        id TEXT PRIMARY KEY,
+        api_key_id TEXT NOT NULL,
+        problem TEXT NOT NULL,
+        model_codes TEXT NOT NULL,
+        top_pattern TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )`,
+      `CREATE INDEX IF NOT EXISTS idx_recommendations_api_key_created
+       ON recommendations(api_key_id, created_at DESC)`,
+
       // Legacy model_relationships table (kept for migration)
       `CREATE TABLE IF NOT EXISTS model_relationships (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -628,6 +640,83 @@ export class D1Client {
   async deleteRelationship(id: string): Promise<boolean> {
     const deleted = await this.execute(`DELETE FROM relationships WHERE id = ?`, id);
     return deleted > 0;
+  }
+
+  /**
+   * Persist a recommendation response so it can be retrieved later via
+   * getRecommendationHistory. Model codes and the top matched pattern are
+   * stored denormalised for cheap read-out — callers that need the full
+   * recommendation payload should look it up via the problem text.
+   */
+  async insertRecommendation(input: {
+    id: string;
+    apiKeyId: string;
+    problem: string;
+    modelCodes: string[];
+    topPattern?: string;
+  }): Promise<void> {
+    await this.execute(
+      `INSERT INTO recommendations (id, api_key_id, problem, model_codes, top_pattern)
+       VALUES (?, ?, ?, ?, ?)`,
+      input.id,
+      input.apiKeyId,
+      input.problem,
+      JSON.stringify(input.modelCodes),
+      input.topPattern ?? null
+    );
+  }
+
+  /**
+   * Return the most recent recommendation rows for an API key, newest first.
+   * `model_codes` is deserialised back to a string array; rows with malformed
+   * JSON fall back to an empty array rather than throwing.
+   */
+  async getRecommendationHistory(
+    apiKeyId: string,
+    limit = 20,
+    offset = 0
+  ): Promise<
+    Array<{
+      id: string;
+      problem: string;
+      modelCodes: string[];
+      topPattern: string | null;
+      createdAt: string;
+    }>
+  > {
+    const rows = await this.query<{
+      id: string;
+      problem: string;
+      model_codes: string;
+      top_pattern: string | null;
+      created_at: string;
+    }>(
+      `SELECT id, problem, model_codes, top_pattern, created_at
+       FROM recommendations
+       WHERE api_key_id = ?
+       ORDER BY created_at DESC
+       LIMIT ? OFFSET ?`,
+      apiKeyId,
+      limit,
+      offset
+    );
+
+    return rows.map((r) => {
+      let modelCodes: string[] = [];
+      try {
+        const parsed = JSON.parse(r.model_codes);
+        if (Array.isArray(parsed)) modelCodes = parsed.filter((v) => typeof v === "string");
+      } catch {
+        // Malformed row — surface an empty list rather than throwing.
+      }
+      return {
+        id: r.id,
+        problem: r.problem,
+        modelCodes,
+        topPattern: r.top_pattern,
+        createdAt: r.created_at,
+      };
+    });
   }
 }
 

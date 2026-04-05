@@ -205,3 +205,145 @@ describe("D1Client relationships", () => {
     expect(lastRun!.sql).toContain("UPDATE relationships");
   });
 });
+
+describe("D1Client recommendations", () => {
+  it("insertRecommendation persists JSON-encoded model codes with correct column order", async () => {
+    let insertSql: string | undefined;
+    let insertParams: unknown[] | undefined;
+
+    const db = createMockDb({
+      onRun: (sql, params) => {
+        if (sql.includes("INSERT INTO recommendations")) {
+          insertSql = sql;
+          insertParams = params;
+        }
+        return { success: true, meta: { changes: 1 } };
+      },
+    });
+
+    const client = new D1Client(db);
+    await client.insertRecommendation({
+      id: "rec-1",
+      apiKeyId: "key-xyz",
+      problem: "how do we scale the nightly job?",
+      modelCodes: ["P1", "IN3", "CO7"],
+      topPattern: "scaling pains",
+    });
+
+    expect(insertSql).toBeDefined();
+    expect(insertParams).toEqual([
+      "rec-1",
+      "key-xyz",
+      "how do we scale the nightly job?",
+      JSON.stringify(["P1", "IN3", "CO7"]),
+      "scaling pains",
+    ]);
+  });
+
+  it("insertRecommendation stores NULL top_pattern when omitted", async () => {
+    let capturedParams: unknown[] | undefined;
+    const db = createMockDb({
+      onRun: (sql, params) => {
+        if (sql.includes("INSERT INTO recommendations")) {
+          capturedParams = params;
+        }
+        return { success: true, meta: { changes: 1 } };
+      },
+    });
+    const client = new D1Client(db);
+    await client.insertRecommendation({
+      id: "r",
+      apiKeyId: "k",
+      problem: "p",
+      modelCodes: ["P1"],
+    });
+    expect(capturedParams![4]).toBeNull();
+  });
+
+  it("getRecommendationHistory parses model_codes JSON back into string arrays", async () => {
+    const db = createMockDb({
+      onAll: (sql) => {
+        if (!sql.includes("FROM recommendations")) {
+          return { success: true, results: [] };
+        }
+        return {
+          success: true,
+          results: [
+            {
+              id: "r1",
+              problem: "first problem",
+              model_codes: JSON.stringify(["P1", "P2"]),
+              top_pattern: "pattern-A",
+              created_at: "2026-04-05T10:00:00Z",
+            },
+            {
+              id: "r2",
+              problem: "second problem",
+              model_codes: JSON.stringify(["CO1"]),
+              top_pattern: null,
+              created_at: "2026-04-05T09:00:00Z",
+            },
+          ],
+        };
+      },
+    });
+    const client = new D1Client(db);
+    const rows = await client.getRecommendationHistory("api-key-id");
+
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toEqual({
+      id: "r1",
+      problem: "first problem",
+      modelCodes: ["P1", "P2"],
+      topPattern: "pattern-A",
+      createdAt: "2026-04-05T10:00:00Z",
+    });
+    expect(rows[1]!.modelCodes).toEqual(["CO1"]);
+    expect(rows[1]!.topPattern).toBeNull();
+  });
+
+  it("getRecommendationHistory recovers with an empty array when model_codes JSON is malformed", async () => {
+    const db = createMockDb({
+      onAll: () => ({
+        success: true,
+        results: [
+          {
+            id: "r1",
+            problem: "p",
+            model_codes: "not-valid-json!!!",
+            top_pattern: null,
+            created_at: "2026-04-05T10:00:00Z",
+          },
+          {
+            id: "r2",
+            problem: "p2",
+            model_codes: JSON.stringify({ not: "an array" }),
+            top_pattern: null,
+            created_at: "2026-04-05T09:00:00Z",
+          },
+        ],
+      }),
+    });
+    const client = new D1Client(db);
+    const rows = await client.getRecommendationHistory("api-key-id");
+
+    expect(rows).toHaveLength(2);
+    expect(rows[0]!.modelCodes).toEqual([]);
+    expect(rows[1]!.modelCodes).toEqual([]);
+  });
+
+  it("getRecommendationHistory passes limit and offset to the SQL", async () => {
+    let capturedParams: unknown[] | undefined;
+    const db = createMockDb({
+      onAll: (sql, params) => {
+        if (sql.includes("FROM recommendations")) {
+          capturedParams = params;
+        }
+        return { success: true, results: [] };
+      },
+    });
+    const client = new D1Client(db);
+    await client.getRecommendationHistory("key-a", 5, 10);
+    expect(capturedParams).toEqual(["key-a", 5, 10]);
+  });
+});

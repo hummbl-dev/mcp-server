@@ -91,6 +91,20 @@ CREATE INDEX IF NOT EXISTS idx_relationships_validated_by ON relationships(valid
 CREATE UNIQUE INDEX IF NOT EXISTS idx_relationships_unique 
 ON relationships(model_a, model_b, relationship_type, direction);
 
+-- Recommendation history: every call to POST /v1/recommend is persisted here
+-- so authenticated callers can query their prior recommendations.
+CREATE TABLE IF NOT EXISTS recommendations (
+  id TEXT PRIMARY KEY,
+  api_key_id TEXT NOT NULL,
+  problem TEXT NOT NULL,
+  model_codes TEXT NOT NULL,
+  top_pattern TEXT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_recommendations_api_key_created
+  ON recommendations(api_key_id, created_at DESC);
+
 -- Model relationships table (simplified version)
 CREATE TABLE IF NOT EXISTS model_relationships (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
