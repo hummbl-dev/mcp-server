@@ -36,7 +36,13 @@ function resolveModels(input: { codes?: string[]; transformation?: string }): {
     }
   }
 
-  if (input.codes && input.codes.length > 0) {
+  // When `codes` is explicitly provided — even as an empty array — treat
+  // it as an explicit filter. `codes: []` means "export exactly zero
+  // models", NOT "fall through to transformation/all". This matches the
+  // precedence documented in the tool description and prevents a
+  // programmatic caller that supplies an empty list from receiving a
+  // surprise 120-model payload.
+  if (input.codes !== undefined) {
     const models: ModelWithTransformation[] = [];
     for (const rawCode of input.codes) {
       const code = rawCode.toUpperCase();

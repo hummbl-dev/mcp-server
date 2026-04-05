@@ -78,6 +78,21 @@ describe("export_models tool", () => {
     }
   });
 
+  it("treats `codes: []` as an explicit empty filter, not a fall-through", async () => {
+    const tool = mockServer.getTool("export_models");
+    const result = await tool.handler({
+      format: "json",
+      codes: [],
+      transformation: "P", // must NOT be consulted when codes is provided
+    });
+    // Explicit empty list → zero models exported, no missing codes.
+    expect(result.structuredContent.modelCount).toBe(0);
+    expect(result.structuredContent.missingCodes).toEqual([]);
+    const parsed = JSON.parse(result.structuredContent.content);
+    expect(parsed.count).toBe(0);
+    expect(parsed.models).toEqual([]);
+  });
+
   it("returns 0 models for an invalid transformation key", async () => {
     const tool = mockServer.getTool("export_models");
     const result = await tool.handler({
