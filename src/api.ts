@@ -26,6 +26,7 @@ import relationshipsRoutes from "./routes/relationships.js";
 import type { ModelRelationship } from "./types/relationships.js";
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 import { SERVER_VERSION } from "./version.js";
+import { OPENAPI_DOCUMENT } from "./openapi.js";
 
 type Bindings = {
   DB: D1Database;
@@ -82,6 +83,9 @@ async function authenticate(c: AppContext, next: Next): Promise<Response | void>
 
   await next();
 }
+
+// OpenAPI specification (unauthenticated — serves as machine-readable docs)
+app.get("/openapi.json", (c: AppContext) => c.json(OPENAPI_DOCUMENT));
 
 // Health check
 app.get("/health", (c: AppContext) => {
