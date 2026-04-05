@@ -8,6 +8,33 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 - Temporarily lowered global branch coverage threshold to 74% (was 75%) pending logger/session-manager test expansion.
 
+## [1.1.0] - 2026-04-05
+
+### Added
+- Per-API-key rate limiting now enforced. Fixed-window counters in KV track `requestsPerHour` and `requestsPerDay` from the key's tier and the auth middleware returns `429 Too Many Requests` with a `Retry-After` header once a window is exhausted (previously the check was a stub).
+- `X-RateLimit-Limit-Hour`, `X-RateLimit-Remaining-Hour`, `X-RateLimit-Reset-Hour` and the matching `*-Day` headers are set on every authenticated response so clients can track their quota without guessing.
+- `DELETE /v1/relationships/:id` is wired end-to-end (admin-only). Previously the handler was a 501 stub and the sub-router version was unreachable because no auth middleware ran ahead of its admin check.
+- gzip compression of Redis history entries >1024 bytes. Compressed payloads are base64-encoded with a `gz:` prefix so `getHistory` can transparently detect and decompress them. Small messages stay as plain JSON; mixed compressed/uncompressed entries in a session are handled transparently.
+- 29 new tests (195 → 224): rate-limit unit tests, auth-middleware integration tests, DELETE integration tests, and compression round-trip tests (incl. multibyte UTF-8).
+
+### Fixed
+- `authenticate()` middleware was declared `Promise<void>` and never returned its `c.json()` responses, so failed-auth requests fell through with no body. The signature is now `Promise<Response | void>` and error responses are returned properly.
+- `npm audit` now reports 0 vulnerabilities (was 1 HIGH, 1 MODERATE). Transitive `path-to-regexp` and `brace-expansion` advisories resolved via `npm audit fix` plus the path-to-regexp 8.4 bump.
+
+### Changed
+- `@modelcontextprotocol/sdk` 1.28 → 1.29.
+
+### Dev / Infra
+- ESLint 9 → 10 (major).
+- TypeScript 5.9 → 6.0 (major).
+- `codecov/codecov-action` 5 → 6.
+- `@cloudflare/workers-types`, `vitest`, `@vitest/ui`, `@vitest/coverage-istanbul`, `@typescript-eslint/*` patch bumps.
+- CI: relaxed repository Actions allowlist to unblock workflow runs that were failing at "Set up job"; added Workers-native globals (`Blob`, `btoa`, `atob`, `CompressionStream`, `DecompressionStream`, `Response`, `Request`, `fetch`) to the ESLint config.
+
+### Docs
+- Added `docs/HISTORY.md` documenting the project's position in the MCP ecosystem timeline.
+- Fixed `1.0.0-beta.1` date typo in this CHANGELOG (`2024-11-14` → `2025-11-14`).
+
 ## [1.0.0-beta.2] - 2025-11-21
 
 ### Added
