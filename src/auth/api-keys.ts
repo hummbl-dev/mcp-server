@@ -3,8 +3,26 @@
  * Handles API key validation, rate limiting, and KV-based authentication
  */
 
-import type { ApiKeyInfo, ApiKeyTier, AuthResult } from "../types/domain.js";
+import type { ApiKeyInfo, ApiKeyTier, AuthError, AuthResult } from "../types/domain.js";
 import type { KVNamespace } from "@cloudflare/workers-types";
+
+/**
+ * Current rate-limit window state for an API key.
+ * `*Remaining` is the quota left AFTER accounting for the current request.
+ * `*ResetSec` is seconds remaining until the fixed window rolls over.
+ */
+export type RateLimitStatus = {
+  hourLimit: number;
+  hourRemaining: number;
+  hourResetSec: number;
+  dayLimit: number;
+  dayRemaining: number;
+  dayResetSec: number;
+};
+
+export type RateLimitCheck =
+  | { allowed: true; status: RateLimitStatus }
+  | { allowed: false; status: RateLimitStatus; retryAfterSec: number; error: AuthError };
 
 /**
  * Rate limits by tier
@@ -106,12 +124,6 @@ export async function validateApiKey(kv: KVNamespace, apiKey: string): Promise<A
       };
     }
 
-    // Rate limiting check using fixed-window counters in KV
-    const rateLimitResult = await checkRateLimit(kv, keyInfo);
-    if (!rateLimitResult.ok) {
-      return rateLimitResult;
-    }
-
     return {
       ok: true,
       value: keyInfo,
@@ -135,47 +147,86 @@ export async function validateApiKey(kv: KVNamespace, apiKey: string): Promise<A
  *   rl:{key}:h:{hourBucket}  (expires after 1h)
  *   rl:{key}:d:{dayBucket}   (expires after 24h)
  *
- * Returns an AuthResult: ok=true when the request is allowed, ok=false with
- * RATE_LIMIT_EXCEEDED otherwise.
+ * When the request is allowed, both counters are incremented and the returned
+ * status reflects the post-increment remaining quota. When a window is
+ * exhausted, neither counter is incremented and `retryAfterSec` is the
+ * seconds until the blocking window resets.
  */
-export async function checkRateLimit(kv: KVNamespace, keyInfo: ApiKeyInfo): Promise<AuthResult> {
+export async function checkRateLimit(
+  kv: KVNamespace,
+  keyInfo: ApiKeyInfo
+): Promise<RateLimitCheck> {
   const now = Date.now();
-  const hourBucket = Math.floor(now / 3_600_000);
-  const dayBucket = Math.floor(now / 86_400_000);
+  const hourMs = 3_600_000;
+  const dayMs = 86_400_000;
+  const hourBucket = Math.floor(now / hourMs);
+  const dayBucket = Math.floor(now / dayMs);
   const hourKey = `rl:${keyInfo.key}:h:${hourBucket}`;
   const dayKey = `rl:${keyInfo.key}:d:${dayBucket}`;
+  const hourResetSec = Math.ceil(((hourBucket + 1) * hourMs - now) / 1000);
+  const dayResetSec = Math.ceil(((dayBucket + 1) * dayMs - now) / 1000);
 
   const [hourRaw, dayRaw] = await Promise.all([kv.get(hourKey), kv.get(dayKey)]);
   const hourCount = hourRaw ? parseInt(hourRaw, 10) || 0 : 0;
   const dayCount = dayRaw ? parseInt(dayRaw, 10) || 0 : 0;
 
-  if (hourCount >= keyInfo.rateLimit.requestsPerHour) {
+  const hourLimit = keyInfo.rateLimit.requestsPerHour;
+  const dayLimit = keyInfo.rateLimit.requestsPerDay;
+
+  if (hourCount >= hourLimit) {
     return {
-      ok: false,
+      allowed: false,
+      status: {
+        hourLimit,
+        hourRemaining: 0,
+        hourResetSec,
+        dayLimit,
+        dayRemaining: Math.max(0, dayLimit - dayCount),
+        dayResetSec,
+      },
+      retryAfterSec: hourResetSec,
       error: {
         type: "RATE_LIMIT_EXCEEDED",
-        message: `Hourly rate limit exceeded (${keyInfo.rateLimit.requestsPerHour} requests/hour)`,
+        message: `Hourly rate limit exceeded (${hourLimit} requests/hour)`,
       },
     };
   }
 
-  if (dayCount >= keyInfo.rateLimit.requestsPerDay) {
+  if (dayCount >= dayLimit) {
     return {
-      ok: false,
+      allowed: false,
+      status: {
+        hourLimit,
+        hourRemaining: Math.max(0, hourLimit - hourCount),
+        hourResetSec,
+        dayLimit,
+        dayRemaining: 0,
+        dayResetSec,
+      },
+      retryAfterSec: dayResetSec,
       error: {
         type: "RATE_LIMIT_EXCEEDED",
-        message: `Daily rate limit exceeded (${keyInfo.rateLimit.requestsPerDay} requests/day)`,
+        message: `Daily rate limit exceeded (${dayLimit} requests/day)`,
       },
     };
   }
 
-  // Increment counters with TTL. Fire-and-forget on writes to keep latency low.
   await Promise.all([
     kv.put(hourKey, String(hourCount + 1), { expirationTtl: 3600 }),
     kv.put(dayKey, String(dayCount + 1), { expirationTtl: 86400 }),
   ]);
 
-  return { ok: true, value: keyInfo };
+  return {
+    allowed: true,
+    status: {
+      hourLimit,
+      hourRemaining: hourLimit - hourCount - 1,
+      hourResetSec,
+      dayLimit,
+      dayRemaining: dayLimit - dayCount - 1,
+      dayResetSec,
+    },
+  };
 }
 
 /**
