@@ -13,6 +13,7 @@ import { z } from "zod";
 import {
   TRANSFORMATIONS,
   PROBLEM_PATTERNS,
+  PATTERN_BM25_INDEX,
   getAllModels,
   getModelByCode,
   searchModels,
@@ -321,17 +322,21 @@ export function registerModelTools(server: McpServer): void {
             pattern: z.string(),
             transformations: z.array(z.string()),
             topModels: z.array(z.string()),
+            score: z.number(),
           })
         ),
       }),
     },
     async ({ query }) => {
-      const lowerQuery = query.toLowerCase();
-
-      // Search patterns by pattern text
-      const matchingPatterns = PROBLEM_PATTERNS.filter((p) =>
-        p.pattern.toLowerCase().includes(lowerQuery)
-      );
+      // BM25-ranked search: patterns are ordered by relevance score.
+      // Only patterns with score > 0 are returned.
+      const ranked = PATTERN_BM25_INDEX.score(query);
+      const matchingPatterns = ranked
+        .filter((r) => r.score > 0)
+        .map((r) => ({
+          ...PROBLEM_PATTERNS[r.index]!,
+          score: Math.round(r.score * 1000) / 1000,
+        }));
 
       const payload = {
         query,

@@ -12,6 +12,7 @@ import type { ApiKeyInfo } from "./types/domain.js";
 import {
   TRANSFORMATIONS,
   PROBLEM_PATTERNS,
+  PATTERN_BM25_INDEX,
   getAllModels,
   getModelByCode,
   getTransformationByKey,
@@ -427,17 +428,18 @@ app.post("/v1/recommend", authenticate, async (c: AppContext) => {
     return c.json({ error: "Problem description must be at least 10 characters" }, 400);
   }
 
-  const problemLower = problem.toLowerCase();
-
-  const matchedPatterns = PROBLEM_PATTERNS.filter((p) => {
-    const patternWords = p.pattern.toLowerCase().split(" ");
-    return patternWords.some((word) => problemLower.includes(word));
-  });
-
-  const recommendations = matchedPatterns.length > 0 ? matchedPatterns : PROBLEM_PATTERNS;
+  // BM25-ranked matching: score all patterns, return those with score > 0
+  // in relevance order. Fall back to all patterns if nothing scores.
+  const ranked = PATTERN_BM25_INDEX.score(problem);
+  const scoredPatterns = ranked
+    .filter((r) => r.score > 0)
+    .map((r) => ({ ...PROBLEM_PATTERNS[r.index]!, score: r.score }));
+  const recommendations =
+    scoredPatterns.length > 0 ? scoredPatterns : PROBLEM_PATTERNS.map((p) => ({ ...p, score: 0 }));
 
   const enrichedRecommendations = recommendations.map((rec) => ({
     pattern: rec.pattern,
+    score: Math.round(rec.score * 1000) / 1000,
     transformations: rec.transformations.map((tKey) => {
       const t = TRANSFORMATIONS[tKey];
       return {

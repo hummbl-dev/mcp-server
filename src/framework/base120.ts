@@ -887,6 +887,28 @@ export function getModelsByPriority(priority: number): Result<MentalModel[], Dom
   return ok(models);
 }
 
+// ---------- BM25 pattern index ----------
+
+import { BM25Index } from "./bm25.js";
+
+/**
+ * Pre-built BM25 index over PROBLEM_PATTERNS. Each pattern's searchable
+ * "document" is the pattern text + its transformation name(s) + top-model
+ * names, giving BM25 a richer term set to match against.
+ */
+export const PATTERN_BM25_INDEX = new BM25Index(
+  PROBLEM_PATTERNS.map((p) => {
+    const transNames = p.transformations.map((t) => TRANSFORMATIONS[t]?.name ?? t).join(" ");
+    const modelNames = p.topModels
+      .map((code) => {
+        const model = getAllModels().find((m) => m.code === code);
+        return model ? model.name : code;
+      })
+      .join(" ");
+    return `${p.pattern} ${transNames} ${modelNames}`;
+  })
+);
+
 export function getModelsByTransformation(
   transformationKey: TransformationType
 ): Result<MentalModel[], DomainError> {
