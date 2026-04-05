@@ -8,6 +8,25 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 - Temporarily lowered global branch coverage threshold to 74% (was 75%) pending logger/session-manager test expansion.
 
+## [1.2.0] - 2026-04-05
+
+### Added
+- **PDF export**: `export_models` tool gains `format: "pdf"`. Uses jsPDF to render paginated A4 documents with per-transformation sections. Returns an MCP resource block with `application/pdf` mimeType and base64-encoded blob.
+- **BM25-ranked problem-pattern matching**: `search_problem_patterns` and `POST /v1/recommend` now rank results by BM25 relevance score instead of keyword containment. Each result carries a `score: number` field. Pure-JS implementation (~100 LOC), no external deps, deterministic.
+- **Browser playground** at `GET /playground`: single-file HTML page (vanilla JS, no build step) with model search, problem recommendations with BM25 scores, and clickable transformation browser. API key persisted in localStorage.
+- **MCP prompts primitive**: 5 user-invocable prompts — `root_cause_analysis`, `strategy_design`, `decision_making` (workflow kickoffs), `analyze_with_models` (open-ended), `apply_model` (single-model deep-dive).
+- **Recommendation history**: every `POST /v1/recommend` call is persisted server-side. New `GET /v1/recommendations` endpoint and `get_recommendation_history` MCP tool let callers replay past recommendations.
+- **`export_models` tool**: export any subset of Base120 models as Markdown or JSON. Filters by codes, transformation, or all 120. Empty `codes: []` treated as explicit empty filter.
+- **OpenAPI 3.0 spec** served at `GET /openapi.json` documenting all 14 REST routes with schemas, auth, and a drift-guard test that verifies every documented path exists as a real route.
+- 55+ new tests across all features.
+
+### Infrastructure
+- Releases now dual-publish to GitHub Packages as `@hummbl-dev/mcp-server` in addition to npmjs.org.
+
+### Docs
+- README: benefit-first tagline, npm downloads + Node version badges, Available Prompts section, export_models entry, REST API Specification section, GitHub Packages install instructions.
+- `docs/HISTORY.md`: project provenance and MCP ecosystem timeline.
+
 ## [1.1.0] - 2026-04-05
 
 ### Added
