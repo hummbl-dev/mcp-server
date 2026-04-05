@@ -239,4 +239,100 @@ describe("POST /v1/recommend persists the recommendation", () => {
     // top_pattern is either a string or null, never undefined.
     expect(row.top_pattern === null || typeof row.top_pattern === "string").toBe(true);
   });
+
+  it("still returns 200 when insertRecommendation rejects (fire-and-forget)", async () => {
+    // D1 mock that throws whenever INSERT INTO recommendations is run.
+    const throwingDb = {
+      prepare(sql: string): D1PreparedStatement {
+        const stmt = {
+          bind() {
+            return stmt;
+          },
+          async run() {
+            if (sql.includes("INSERT INTO recommendations")) {
+              throw new Error("D1 write simulated failure");
+            }
+            return { success: true, meta: { changes: 0 }, results: [] };
+          },
+          async all() {
+            return { success: true, results: [], meta: { changes: 0 } };
+          },
+          async first() {
+            return null;
+          },
+        };
+        return stmt as unknown as D1PreparedStatement;
+      },
+    } as unknown as D1Database;
+
+    const apiKeys = createMockKV();
+    const sessions = createMockKV();
+    const k = keyInfo();
+    apiKeys.store.set(k.key, { value: JSON.stringify(k), expiresAt: null });
+
+    const res = await app.request(
+      "http://localhost/v1/recommend",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${k.key}`,
+        },
+        body: JSON.stringify({
+          problem: "persistence is failing but the response must survive",
+        }),
+      },
+      { DB: throwingDb, API_KEYS: apiKeys.kv, SESSIONS: sessions.kv }
+    );
+
+    // The recommend response must not be broken by a persistence failure.
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { recommendationCount: number };
+    expect(body.recommendationCount).toBeGreaterThan(0);
+
+    // Let the fire-and-forget .catch() resolve.
+    await new Promise((r) => setTimeout(r, 10));
+  });
+});
+
+describe("GET /v1/recommendations error path", () => {
+  it("returns 500 when the D1 read throws", async () => {
+    const throwingDb = {
+      prepare(sql: string): D1PreparedStatement {
+        const stmt = {
+          bind() {
+            return stmt;
+          },
+          async run() {
+            return { success: true, meta: { changes: 0 }, results: [] };
+          },
+          async all() {
+            if (sql.includes("FROM recommendations")) {
+              throw new Error("D1 read simulated failure");
+            }
+            return { success: true, results: [], meta: { changes: 0 } };
+          },
+          async first() {
+            return null;
+          },
+        };
+        return stmt as unknown as D1PreparedStatement;
+      },
+    } as unknown as D1Database;
+
+    const apiKeys = createMockKV();
+    const sessions = createMockKV();
+    const k = keyInfo();
+    apiKeys.store.set(k.key, { value: JSON.stringify(k), expiresAt: null });
+
+    const res = await app.request(
+      "http://localhost/v1/recommendations",
+      { headers: { Authorization: `Bearer ${k.key}` } },
+      { DB: throwingDb, API_KEYS: apiKeys.kv, SESSIONS: sessions.kv }
+    );
+
+    expect(res.status).toBe(500);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("Failed to load recommendation history");
+  });
 });
