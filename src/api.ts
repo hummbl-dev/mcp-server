@@ -28,6 +28,7 @@ import type { ModelRelationship } from "./types/relationships.js";
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
 import { SERVER_VERSION } from "./version.js";
 import { OPENAPI_DOCUMENT } from "./openapi.js";
+import { PLAYGROUND_HTML } from "./playground.js";
 
 type Bindings = {
   DB: D1Database;
@@ -84,6 +85,9 @@ async function authenticate(c: AppContext, next: Next): Promise<Response | void>
 
   await next();
 }
+
+// Browser playground (unauthenticated — serves static HTML)
+app.get("/playground", (c: AppContext) => c.html(PLAYGROUND_HTML));
 
 // OpenAPI specification (unauthenticated — serves as machine-readable docs)
 app.get("/openapi.json", (c: AppContext) => c.json(OPENAPI_DOCUMENT));
