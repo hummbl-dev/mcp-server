@@ -76,6 +76,9 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Infrastructure
+- Releases now dual-publish to **GitHub Packages** as `@hummbl-dev/mcp-server` in addition to npmjs.org. Same bytes, alternate registry; the npm primary (`@hummbl/mcp-server`) is unchanged.
+
 ### Planned Features
 - Prompt templates for guided workflows
 - Enhanced problem pattern matching with ML scoring
