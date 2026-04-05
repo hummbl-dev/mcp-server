@@ -10,6 +10,7 @@ import { registerModelResources } from "./resources/models.js";
 import { registerMethodologyTools } from "./tools/methodology.js";
 import { registerMethodologyResources } from "./resources/methodology.js";
 import { registerWorkflowPrompts } from "./prompts/workflows.js";
+import { registerExportTools } from "./tools/export.js";
 import { SERVER_VERSION } from "./version.js";
 
 /**
@@ -25,6 +26,7 @@ export function createServer(): McpServer {
   registerModelTools(server);
   registerMethodologyTools(server);
   registerWorkflowTools(server); // Phase 2: Guided workflows
+  registerExportTools(server);
 
   // Register all resources
   registerModelResources(server);
