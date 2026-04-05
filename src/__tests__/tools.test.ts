@@ -15,8 +15,8 @@ describe("MCP Tools Integration", () => {
   });
 
   describe("Tool Registration", () => {
-    it("should register all 8 tools", () => {
-      expect(mockServer.tools.size).toBe(8);
+    it("should register all 9 tools", () => {
+      expect(mockServer.tools.size).toBe(9);
     });
 
     it("should register get_model tool", () => {

@@ -31,6 +31,10 @@ export default [
         atob: "readonly",
         CompressionStream: "readonly",
         DecompressionStream: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
       },
     },
     plugins: {

@@ -22,6 +22,7 @@ import { isOk, isTransformationType } from "./types/domain.js";
 import { validateApiKey, checkRateLimit } from "./auth/api-keys.js";
 import type { RateLimitStatus } from "./auth/api-keys.js";
 import { createD1Client } from "./storage/d1-client.js";
+import { nanoid } from "nanoid";
 import relationshipsRoutes from "./routes/relationships.js";
 import type { ModelRelationship } from "./types/relationships.js";
 import type { D1Database, KVNamespace } from "@cloudflare/workers-types";
@@ -458,11 +459,65 @@ app.post("/v1/recommend", authenticate, async (c: AppContext) => {
       .filter((m): m is NonNullable<typeof m> => m !== null),
   }));
 
+  // Persist the recommendation so the caller can replay their history.
+  // Fire-and-forget: a D1 write failure must not break the recommend response.
+  const user = c.get("user");
+  if (user) {
+    const modelCodes = Array.from(
+      new Set(enrichedRecommendations.flatMap((r) => r.topModels.map((m) => m.code)))
+    );
+    const topPattern = enrichedRecommendations[0]?.pattern;
+    const db = createD1Client(c.env.DB);
+    void db
+      .insertRecommendation({
+        id: nanoid(),
+        apiKeyId: user.id,
+        problem,
+        modelCodes,
+        topPattern,
+      })
+      .catch(() => {
+        // Best-effort persistence — swallow errors.
+      });
+  }
+
   return c.json({
     problem,
     recommendationCount: enrichedRecommendations.length,
     recommendations: enrichedRecommendations,
   });
+});
+
+// List recent recommendation history for the authenticated caller
+app.get("/v1/recommendations", authenticate, async (c: AppContext) => {
+  const user = c.get("user");
+  if (!user) {
+    return c.json({ error: "Unauthenticated" }, 401);
+  }
+
+  const limitParam = c.req.query("limit");
+  const offsetParam = c.req.query("offset");
+  const limit = Math.min(Math.max(parseInt(limitParam ?? "20", 10) || 20, 1), 100);
+  const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
+
+  const db = createD1Client(c.env.DB);
+  try {
+    const rows = await db.getRecommendationHistory(user.id, limit, offset);
+    return c.json({
+      count: rows.length,
+      limit,
+      offset,
+      recommendations: rows.map((r) => ({
+        id: r.id,
+        problem: r.problem,
+        model_codes: r.modelCodes,
+        top_pattern: r.topPattern,
+        created_at: r.createdAt,
+      })),
+    });
+  } catch {
+    return c.json({ error: "Failed to load recommendation history" }, 500);
+  }
 });
 
 // Add relationships routes
