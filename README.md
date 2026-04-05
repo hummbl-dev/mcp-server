@@ -540,6 +540,20 @@ Discover which workflow best fits your problem.
 
 ---
 
+## Available Prompts
+
+MCP prompts are user-invocable templates. In Claude Desktop they appear in the "Attach from MCP" menu and can be selected to kick off a conversation. All prompts take a free-text `problem` argument; `apply_model` also takes a `model_code`.
+
+| Prompt | What it does |
+|---|---|
+| `root_cause_analysis` | Kicks off the Root Cause Analysis workflow (Perspective → Inversion → Decomposition → Meta-Systems) against your problem. |
+| `strategy_design` | Kicks off the Strategy Design workflow. |
+| `decision_making` | Kicks off the Decision Making workflow. |
+| `analyze_with_models` | Open-ended: calls `recommend_models`, fetches the top matches, and synthesises them into concrete guidance for your problem. |
+| `apply_model` | Applies one specific model (e.g. `P1`, `IN3`) to your problem via its "how to apply" guidance. |
+
+---
+
 ## Available Resources
 
 Direct URI-based access to models and transformations:
