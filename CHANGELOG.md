@@ -23,7 +23,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Strengthened transformation validation for resource handlers (no `any` casting)
 - Improved type guards in shared domain utilities for reuse across tooling
 
-## [1.0.0-beta.1] - 2024-11-14
+## [1.0.0-beta.1] - 2025-11-14
 
 ### Added
 - Initial beta release of HUMMBL MCP Server
