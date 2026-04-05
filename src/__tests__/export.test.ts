@@ -158,4 +158,54 @@ describe("export_models tool", () => {
     const md = result.structuredContent.content as string;
     expect(md).toContain("_No models matched the filter._");
   });
+
+  // --- PDF format tests ---
+
+  it("returns a resource content block with application/pdf mimeType for pdf format", async () => {
+    const tool = mockServer.getTool("export_models");
+    const result = await tool.handler({
+      format: "pdf",
+      codes: ["P1", "IN3"],
+    });
+    expect(result.content).toHaveLength(1);
+    expect(result.content[0].type).toBe("resource");
+    expect(result.content[0].resource.mimeType).toBe("application/pdf");
+    expect(result.structuredContent.format).toBe("pdf");
+    expect(result.structuredContent.modelCount).toBe(2);
+  });
+
+  it("produces a valid PDF (starts with %PDF magic bytes)", async () => {
+    const tool = mockServer.getTool("export_models");
+    const result = await tool.handler({
+      format: "pdf",
+      codes: ["P1"],
+    });
+    const base64 = result.structuredContent.content as string;
+    const binary = atob(base64);
+    expect(binary.slice(0, 5)).toBe("%PDF-");
+  });
+
+  it("reports correct byteLength matching the decoded base64 length", async () => {
+    const tool = mockServer.getTool("export_models");
+    const result = await tool.handler({
+      format: "pdf",
+      codes: ["P1", "CO1", "DE1"],
+    });
+    const base64 = result.structuredContent.content as string;
+    const decodedLength = atob(base64).length;
+    expect(result.structuredContent.byteLength).toBe(decodedLength);
+  });
+
+  it("surfaces missingCodes in PDF mode just like other formats", async () => {
+    const tool = mockServer.getTool("export_models");
+    const result = await tool.handler({
+      format: "pdf",
+      codes: ["P1", "ZZ99"],
+    });
+    expect(result.structuredContent.modelCount).toBe(1);
+    expect(result.structuredContent.missingCodes).toEqual(["ZZ99"]);
+    // Still produces a valid PDF for the one matched model.
+    const binary = atob(result.structuredContent.content as string);
+    expect(binary.slice(0, 5)).toBe("%PDF-");
+  });
 });
