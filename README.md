@@ -175,6 +175,19 @@ Example:
 }
 ```
 
+### `export_models`
+
+Export a curated subset of Base120 models as Markdown or JSON — useful for docs, decks, or feeding models into another LLM's context. Pass `codes` for a specific list, `transformation` for a whole group, or neither for all 120.
+
+Example:
+
+```json
+{
+  "format": "markdown",
+  "codes": ["P1", "IN3", "CO5", "DE1"]
+}
+```
+
 ## Usage Examples
 
 ### Example 1: Getting a Specific Model
