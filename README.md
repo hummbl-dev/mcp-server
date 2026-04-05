@@ -631,6 +631,16 @@ src/
     └── result.ts         # Result pattern utilities
 ```
 
+## REST API Specification
+
+The REST API is self-documenting via OpenAPI 3.0. Fetch the spec from:
+
+```
+GET https://api.hummbl.io/openapi.json
+```
+
+Import it into Postman, Insomnia, Hoppscotch, Swagger UI, or any OpenAPI-compatible client. No authentication is required to read the spec.
+
 ## HUMMBL Ecosystem
 
 This repo is part of the [HUMMBL](https://github.com/hummbl-dev) cognitive AI architecture. Related repos:
