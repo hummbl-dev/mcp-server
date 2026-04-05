@@ -106,8 +106,11 @@ export async function validateApiKey(kv: KVNamespace, apiKey: string): Promise<A
       };
     }
 
-    // TODO: Implement rate limiting check using usage tracking
-    // For now, just return success
+    // Rate limiting check using fixed-window counters in KV
+    const rateLimitResult = await checkRateLimit(kv, keyInfo);
+    if (!rateLimitResult.ok) {
+      return rateLimitResult;
+    }
 
     return {
       ok: true,
@@ -123,6 +126,56 @@ export async function validateApiKey(kv: KVNamespace, apiKey: string): Promise<A
       },
     };
   }
+}
+
+/**
+ * Check and increment rate limit counters for an API key.
+ *
+ * Uses fixed-window counters stored in KV with TTL:
+ *   rl:{key}:h:{hourBucket}  (expires after 1h)
+ *   rl:{key}:d:{dayBucket}   (expires after 24h)
+ *
+ * Returns an AuthResult: ok=true when the request is allowed, ok=false with
+ * RATE_LIMIT_EXCEEDED otherwise.
+ */
+export async function checkRateLimit(kv: KVNamespace, keyInfo: ApiKeyInfo): Promise<AuthResult> {
+  const now = Date.now();
+  const hourBucket = Math.floor(now / 3_600_000);
+  const dayBucket = Math.floor(now / 86_400_000);
+  const hourKey = `rl:${keyInfo.key}:h:${hourBucket}`;
+  const dayKey = `rl:${keyInfo.key}:d:${dayBucket}`;
+
+  const [hourRaw, dayRaw] = await Promise.all([kv.get(hourKey), kv.get(dayKey)]);
+  const hourCount = hourRaw ? parseInt(hourRaw, 10) || 0 : 0;
+  const dayCount = dayRaw ? parseInt(dayRaw, 10) || 0 : 0;
+
+  if (hourCount >= keyInfo.rateLimit.requestsPerHour) {
+    return {
+      ok: false,
+      error: {
+        type: "RATE_LIMIT_EXCEEDED",
+        message: `Hourly rate limit exceeded (${keyInfo.rateLimit.requestsPerHour} requests/hour)`,
+      },
+    };
+  }
+
+  if (dayCount >= keyInfo.rateLimit.requestsPerDay) {
+    return {
+      ok: false,
+      error: {
+        type: "RATE_LIMIT_EXCEEDED",
+        message: `Daily rate limit exceeded (${keyInfo.rateLimit.requestsPerDay} requests/day)`,
+      },
+    };
+  }
+
+  // Increment counters with TTL. Fire-and-forget on writes to keep latency low.
+  await Promise.all([
+    kv.put(hourKey, String(hourCount + 1), { expirationTtl: 3600 }),
+    kv.put(dayKey, String(dayCount + 1), { expirationTtl: 86400 }),
+  ]);
+
+  return { ok: true, value: keyInfo };
 }
 
 /**
