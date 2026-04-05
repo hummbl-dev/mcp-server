@@ -19,6 +19,44 @@ import {
 import { trace } from "../observability/tracing.js";
 import { parseJsonSafe, safeD1Call, safeRedisCall } from "./storage-utils.js";
 
+/**
+ * Magic prefix for gzip-compressed base64-encoded payloads stored in Redis.
+ * Chosen because it cannot appear at the start of a valid JSON value.
+ */
+const GZIP_PREFIX = "gz:";
+
+/** Compression threshold: messages whose JSON is larger than this are gzipped. */
+const COMPRESSION_THRESHOLD_BYTES = 1024;
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+function base64ToBytes(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
+async function gzipString(input: string): Promise<Uint8Array> {
+  const stream = new Blob([input]).stream().pipeThrough(new CompressionStream("gzip"));
+  const buffer = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
+async function gunzipToString(input: Uint8Array): Promise<string> {
+  const stream = new Blob([input]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return await new Response(stream).text();
+}
+
 export class HistoryManager {
   constructor(
     private redis: RedisClient,
@@ -38,10 +76,12 @@ export class HistoryManager {
       this.logger.debug("Adding message to history", { sessionId, messageId, role: message.role });
 
       try {
-        // Compress large messages (>1KB) for Redis storage
+        // Compress large messages (> COMPRESSION_THRESHOLD_BYTES) for Redis storage
         const messageJson = JSON.stringify(message);
         const compressedMessage =
-          messageJson.length > 1024 ? await this.compressMessage(message) : messageJson;
+          messageJson.length > COMPRESSION_THRESHOLD_BYTES
+            ? await this.compressMessage(messageJson)
+            : messageJson;
 
         // Add to Redis cache (blocking, fast)
         const redisStartTime = Date.now();
@@ -135,11 +175,27 @@ export class HistoryManager {
         const redisDuration = Date.now() - redisStartTime;
 
         if (cachedMessages.length > 0) {
-          // Parse cached messages (use up to limit)
+          // Parse cached messages (use up to limit). Each entry is either plain
+          // JSON or a gzip-compressed payload with the GZIP_PREFIX marker.
           const messages: Message[] = [];
           const messagesToUse = cachedMessages.slice(-limit);
           for (const cached of messagesToUse) {
-            const parsed = parseJsonSafe<Message>(cached, "cached history message", this.logger, {
+            let json: string;
+            if (cached.startsWith(GZIP_PREFIX)) {
+              try {
+                json = await this.decompressMessage(cached);
+              } catch (error) {
+                this.logger.warn("Failed to decompress cached message", {
+                  sessionId,
+                  error: (error as Error).message,
+                });
+                continue;
+              }
+            } else {
+              json = cached;
+            }
+
+            const parsed = parseJsonSafe<Message>(json, "cached history message", this.logger, {
               sessionId,
             });
             if (!parsed) {
@@ -348,25 +404,22 @@ export class HistoryManager {
   }
 
   /**
-   * Compress large messages for Redis storage
-   * In a real implementation, this would use compression like gzip
-   * For now, just return the JSON (placeholder)
+   * Compress a JSON payload with gzip and return a base64-encoded string
+   * prefixed with GZIP_PREFIX. The prefix lets readers distinguish compressed
+   * entries from plain JSON without a separate metadata channel.
    */
-  private async compressMessage(message: Message): Promise<string> {
-    // TODO: Implement compression (gzip, lz4, etc.)
-    return JSON.stringify(message);
+  private async compressMessage(messageJson: string): Promise<string> {
+    const compressed = await gzipString(messageJson);
+    return GZIP_PREFIX + bytesToBase64(compressed);
   }
 
   /**
-   * Decompress messages from Redis
-   * In a real implementation, this would decompress
-   * For now, just parse JSON (placeholder)
-   * @internal
-   * Reserved for future compression implementation
+   * Reverse of compressMessage: strip the prefix, base64-decode, and gunzip
+   * back into the original JSON string.
    */
-  // @ts-expect-error - Unused method, reserved for future compression implementation
-  private async _decompressMessage(_compressed: string): Promise<Message> {
-    // TODO: Implement decompression
-    return JSON.parse(_compressed);
+  private async decompressMessage(compressed: string): Promise<string> {
+    const payload = compressed.slice(GZIP_PREFIX.length);
+    const bytes = base64ToBytes(payload);
+    return await gunzipToString(bytes);
   }
 }

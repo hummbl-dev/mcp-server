@@ -26,6 +26,11 @@ export default [
         Response: "readonly",
         Request: "readonly",
         fetch: "readonly",
+        Blob: "readonly",
+        btoa: "readonly",
+        atob: "readonly",
+        CompressionStream: "readonly",
+        DecompressionStream: "readonly",
       },
     },
     plugins: {
