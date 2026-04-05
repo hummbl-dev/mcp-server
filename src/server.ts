@@ -9,6 +9,7 @@ import { registerWorkflowTools } from "./tools/workflows.js";
 import { registerModelResources } from "./resources/models.js";
 import { registerMethodologyTools } from "./tools/methodology.js";
 import { registerMethodologyResources } from "./resources/methodology.js";
+import { registerWorkflowPrompts } from "./prompts/workflows.js";
 import { SERVER_VERSION } from "./version.js";
 
 /**
@@ -28,6 +29,9 @@ export function createServer(): McpServer {
   // Register all resources
   registerModelResources(server);
   registerMethodologyResources(server);
+
+  // Register all prompts (MCP prompt primitive — user-invocable templates)
+  registerWorkflowPrompts(server);
 
   return server;
 }
