@@ -37,6 +37,23 @@ npm install -g @hummbl/mcp-server
 npx @hummbl/mcp-server
 ```
 
+### From GitHub Packages (alternate registry)
+
+The same build is mirrored to GitHub Packages as `@hummbl-dev/mcp-server`. GitHub Packages requires a GitHub personal access token with `read:packages` scope even for public installs — create one at <https://github.com/settings/tokens>.
+
+Add to your project's `.npmrc`:
+
+```
+@hummbl-dev:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
+```
+
+Then install:
+
+```bash
+npm install @hummbl-dev/mcp-server
+```
+
 ## Configuration
 
 ### Claude Desktop
