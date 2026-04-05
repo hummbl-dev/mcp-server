@@ -71,7 +71,7 @@ function renderAnalyzeKickoff(problem: string): string {
     "",
     `Please:`,
     `1. Call \`recommend_models\` with this problem to get a ranked list of relevant mental models across the six transformations (Perspective, Inversion, Composition, Decomposition, Recursion, Meta-Systems).`,
-    `2. For the top 3–5 recommended models, call \`get_model\` to retrieve their definitions and "when to use" guidance.`,
+    `2. For the top 3–5 recommended models, call \`get_model\` to retrieve each one's definition and transformation.`,
     `3. Synthesise the models into a concrete analysis of the problem — what each model surfaces, where they agree, where they disagree, and what actions they jointly suggest.`,
   ].join("\n");
 }
@@ -88,8 +88,8 @@ function renderApplyModelKickoff(modelCode: string, problem: string): string {
     problem.trim(),
     "",
     `Please:`,
-    `1. Call \`get_model\` with code \`${normalized}\` to retrieve its definition, example, "when to use", and "how to apply" fields.`,
-    `2. Walk me through applying that model to my problem step by step, using its "how to apply" guidance.`,
+    `1. Call \`get_model\` with code \`${normalized}\` to retrieve its name, definition, transformation, and priority.`,
+    `2. Reason from the definition to walk me through how the model applies to my problem, step by step.`,
     `3. Produce a concrete output I can act on.`,
   ].join("\n");
 }

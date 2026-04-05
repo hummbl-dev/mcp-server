@@ -101,14 +101,19 @@ describe("MCP prompts", () => {
     expect(text).toContain("get_model");
   });
 
-  it("apply_model uppercases the model code and references the how-to-apply field", () => {
+  it("apply_model uppercases the model code and only references real get_model fields", () => {
     const result = prompts.get("apply_model")!.handler({
       model_code: "in3",
       problem: "Deciding whether to sunset a product line.",
     });
     const text = result.messages[0]!.content.text;
     expect(text).toContain("IN3");
-    expect(text).toContain("how to apply");
+    // Real fields returned by get_model — must be mentioned.
+    expect(text).toContain("definition");
+    expect(text).toContain("transformation");
+    // Fields that get_model does NOT return — must not be referenced.
+    expect(text).not.toContain("how to apply");
+    expect(text).not.toContain("when to use");
     expect(text).toContain("Deciding whether to sunset a product line.");
   });
 
