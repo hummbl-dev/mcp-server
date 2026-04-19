@@ -51,7 +51,7 @@
     "problem-solving"
   ],
   "author": "Reuben <reuben@hummbl.io>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/hummbl-dev/mcp-server.git"

@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hummbl.dev/lexicon/acronym.schema.json",
+  "title": "CAES Lexicon Acronym Registry",
+  "description": "Schema for acronym registry validation (LEX-001 enforcement)",
+  "type": "object",
+  "required": ["registry_version", "acronyms"],
+  "properties": {
+    "registry_version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "SemVer version of the registry format"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date of generation"
+    },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reserved_prefixes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2,}-$"
+      }
+    },
+    "reserved_common": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2,}$"
+      }
+    },
+    "acronyms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/acronymEntry" }
+    }
+  },
+  "$defs": {
+    "acronymEntry": {
+      "type": "object",
+      "required": ["id", "expanded", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Za-z0-9-]{1,15}$",
+          "description": "Acronym identifier (start uppercase, allow mixed case)"
+        },
+        "expanded": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Full expansion or 'unverified' placeholder"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "experimental", "active", "frozen", "deprecated"],
+          "description": "Lifecycle state of the acronym"
+        },
+        "layer": {
+          "type": "string",
+          "description": "Architectural layer (e.g., L0-L1, governance, ops)"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain classification (e.g., protocol, discipline)"
+        },
+        "definition": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Human-readable definition"
+        },
+        "invariants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Required properties that must hold"
+        },
+        "authority_repo": {
+          "type": "string",
+          "description": "Source repository or 'unverified'"
+        },
+        "version_introduced": {
+          "type": "string",
+          "description": "Version when term was introduced"
+        },
+        "introduced_by": {
+          "type": "object",
+          "required": ["repo", "ref"],
+          "properties": {
+            "repo": { "type": "string" },
+            "ref": { 
+              "type": "string",
+              "pattern": "^[a-f0-9]{40}|lexicon-v[0-9]+\\.[0-9]+\\.[0-9]+$",
+              "description": "Git commit SHA (40 hex) or signed tag"
+            },
+            "date": { "type": "string", "format": "date" },
+            "migrated_at": { "type": "string" },
+            "migrated_from": { "type": "string" }
+          }
+        },
+        "supersedes": {
+          "type": ["string", "null"],
+          "description": "ID of term this replaces"
+        },
+        "deprecated_by": {
+          "type": ["string", "null"],
+          "description": "ID of replacement term"
+        },
+        "deprecation": {
+          "type": "object",
+          "description": "Deprecation metadata (required if status=deprecated)",
+          "properties": {
+            "sunset_date": {
+              "type": "string",
+              "format": "date"
+            },
+            "migration_guide": {
+              "type": "string"
+            },
+            "last_compatible_version": {
+              "type": "string",
+              "pattern": "^v\\d+\\.\\d+(\\.\\d+)?$"
+            }
+          }
+        },
+        "related": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "deprecated" } }
+          },
+          "then": {
+            "required": ["deprecated_by", "deprecation"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "status": { "enum": ["active", "frozen", "deprecated"] } }
+          },
+          "then": {
+            "required": ["introduced_by"]
+          }
+        }
+      ]
+    }
+  }
+}

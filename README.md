@@ -6,7 +6,7 @@ Give Claude access to **120 validated mental models** — for sharper analysis, 
 [![npm version](https://badge.fury.io/js/@hummbl%2Fmcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
 [![npm downloads](https://img.shields.io/npm/dm/@hummbl/mcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
 [![Node](https://img.shields.io/node/v/@hummbl/mcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 
 <a href="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server/badge" alt="HUMMBL Server MCP server" />
@@ -657,7 +657,7 @@ Learn more at [hummbl.io](https://hummbl.io).
 
 ## License
 
-MIT © HUMMBL, LLC
+Apache 2.0 © HUMMBL, LLC
 
 ## Version
 
