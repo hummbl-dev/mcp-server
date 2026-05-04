@@ -71,7 +71,7 @@
     "hono": "^4.12.15",
     "jspdf": "^4.2.1",
     "nanoid": "^5.1.9",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260426.1",
