@@ -45,7 +45,7 @@ node scripts/validate-base120-refs.cjs
 Expected CI coverage:
 
 - `.github/workflows/ci.yml` runs type checking and coverage tests on Node.js 20.x and 22.x.
-- `.github/workflows/ci.yml` runs lint, format check, Base120 reference lint, npm audit, build, and build artifact checks.
+- `.github/workflows/ci.yml` runs the `Lint` job with `npm run lint:fix`, `npm run format:check`, and Base120 reference lint, plus npm audit, build, and build artifact checks.
 - `.github/workflows/dependabot-auto-merge.yml` auto-merges eligible Dependabot patch/minor updates.
 - `.github/workflows/release.yml` publishes tagged releases to npm and GitHub Packages.
 
@@ -54,7 +54,7 @@ Expected CI coverage:
 `main` should be treated as protected:
 
 - All non-trivial changes should land through pull requests.
-- Required checks should include the Node matrix, lint/format, Base120 reference lint, and build jobs before merge.
+- Required checks should include the Node matrix, the `Lint` job, and build jobs before merge. If branch protection separates lint from formatting or Base120 reference lint later, update this contract with the exact required check names.
 - Package publishing changes should include release workflow review.
 - Direct pushes to `main` should be limited to emergency operator action.
 
