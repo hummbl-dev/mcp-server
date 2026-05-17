@@ -6,8 +6,8 @@ We release patches for security vulnerabilities. Which versions are eligible for
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.0.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| 1.2.x   | :white_check_mark: |
+| < 1.2   | :x:                |
 
 ## Reporting a Vulnerability
 
@@ -53,16 +53,27 @@ When using HUMMBL MCP Server:
 
 ### Dependencies
 
-- We use minimal dependencies (only @modelcontextprotocol/sdk and zod)
-- Dependencies are regularly updated via Dependabot
-- All dependencies are scanned for known vulnerabilities
+- Runtime dependencies (v1.2.x): `@modelcontextprotocol/sdk`, `zod`,
+  `@opentelemetry/api`, `@opentelemetry/core`, `@opentelemetry/sdk-trace-node`,
+  `@opentelemetry/exporter-trace-otlp-http`, `@opentelemetry/resources`,
+  `@opentelemetry/semantic-conventions`, `@upstash/redis`, `hono`, `jspdf`,
+  `nanoid`. See `package.json` for current pinned versions.
+- Dependencies are regularly updated via Dependabot.
+- All dependencies are scanned for known vulnerabilities in CI.
 
 ### Runtime Security
 
-- The server runs with minimal privileges
-- No file system access beyond read-only configuration
-- No network connections except MCP protocol communication
-- All errors are logged without exposing sensitive information
+- The server runs with minimal privileges.
+- No file system access beyond read-only configuration.
+- **Two operating modes** (selected at startup):
+  - **`local-only`** (default when `HUMMBL_API_KEY` is unset): no outbound
+    network connections except MCP protocol communication over stdio.
+  - **`hybrid`** (when `HUMMBL_API_KEY` is set): the `recommend_models` tool
+    makes authenticated HTTPS requests to the HUMMBL recommendation API.
+    No other tools make network requests. The OpenTelemetry exporter may
+    emit traces to a configured OTLP collector (operator-opt-in).
+- All errors are logged to stderr (MCP protocol requires clean stdout) without
+  exposing sensitive information.
 
 ### Integration Security
 
