@@ -16,6 +16,7 @@ export function registerMethodologyTools(server: McpServer): void {
       title: "Get Self-Dialectical AI Methodology",
       description:
         "Retrieve the canonical Self-Dialectical AI Systems methodology with HUMMBL Base120 mappings.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({}),
       outputSchema: z.object({
         id: z.string(),
@@ -72,6 +73,7 @@ export function registerMethodologyTools(server: McpServer): void {
       title: "Audit HUMMBL Model References",
       description:
         "Audit a list of HUMMBL model references for existence, transformation alignment, and duplicates.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         items: z
           .array(

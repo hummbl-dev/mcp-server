@@ -250,6 +250,7 @@ export function registerExportTools(server: McpServer): void {
       title: "Export HUMMBL Models",
       description:
         "Export a curated subset of Base120 mental models as Markdown, JSON, or PDF. Pass `codes` for a specific list, `transformation` for a whole group, or neither for all 120.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         format: z
           .enum(["markdown", "json", "pdf"])
