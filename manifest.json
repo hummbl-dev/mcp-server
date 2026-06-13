@@ -1,0 +1,39 @@
+{
+  "manifest_version": "0.3",
+  "name": "hummbl-mcp-server",
+  "display_name": "HUMMBL Base120 Mental Models",
+  "version": "1.2.0",
+  "description": "Model Context Protocol server for HUMMBL Base120 mental models framework — gives Claude access to 120 validated mental models for structured reasoning",
+  "long_description": "HUMMBL Base120 is a comprehensive cognitive framework consisting of 120 validated mental models organized across 6 transformations: Perspective (P), Inversion (IN), Composition (CO), Decomposition (DE), Recursion (RE), and Meta-Systems (SY). This MCP server enables Claude to select appropriate mental models for any problem, apply transformation types to reframe challenges, and provide comprehensive analysis using multiple cognitive frameworks.",
+  "author": {
+    "name": "Reuben",
+    "email": "reuben@hummbl.io",
+    "url": "https://hummbl.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hummbl-dev/mcp-server.git"
+  },
+  "homepage": "https://hummbl.io",
+  "documentation": "https://github.com/hummbl-dev/mcp-server#readme",
+  "support": "https://github.com/hummbl-dev/mcp-server/issues",
+  "license": "Apache-2.0",
+  "privacy_policies": ["https://hummbl.io/privacy"],
+  "keywords": ["mental-models", "cognitive-framework", "problem-solving", "decision-making", "structured-reasoning", "base120"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"]
+    }
+  },
+  "tools_generated": true,
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}

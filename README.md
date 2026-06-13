@@ -655,6 +655,41 @@ This repo is part of the [HUMMBL](https://github.com/hummbl-dev) cognitive AI ar
 
 Learn more at [hummbl.io](https://hummbl.io).
 
+## Privacy Policy
+
+### Data Collection
+
+The HUMMBL MCP Server operates locally on your machine and does not collect, transmit, or store any personal data. All processing happens entirely within your local environment.
+
+### Data Usage
+
+- The server reads mental models framework data from its internal database
+- Problem descriptions and user inputs are processed locally to generate model recommendations
+- No data is sent to external servers or third-party services
+- No telemetry or analytics are collected
+
+### Data Storage
+
+- No persistent storage of user inputs or problem descriptions
+- All processing is ephemeral and happens in memory
+- No logs or audit trails are retained beyond the current session
+
+### Third-Party Sharing
+
+- We do not share any data with third parties
+- The server does not make network requests except for MCP protocol communication with Claude Desktop
+- No data is transmitted to HUMMBL servers or any external services
+
+### Data Retention
+
+- No data is retained after processing
+- All data is cleared from memory when the server process terminates
+- No historical records or user data are stored
+
+### Contact
+
+For privacy-related questions or concerns, contact: privacy@hummbl.io
+
 ## License
 
 Apache 2.0 © HUMMBL, LLC
@@ -662,3 +697,8 @@ Apache 2.0 © HUMMBL, LLC
 ## Version
 
 1.0.0-beta.2
+
+## Repository Health
+
+See [DOCS/REPO_HEALTH.md](DOCS/REPO_HEALTH.md) for health contract, validation
+commands, canonical source, and branch-protection expectations.
