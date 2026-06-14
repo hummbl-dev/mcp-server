@@ -7,6 +7,7 @@ Give Claude access to **120 validated mental models** — for sharper analysis, 
 [![npm downloads](https://img.shields.io/npm/dm/@hummbl/mcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
 [![Node](https://img.shields.io/node/v/@hummbl/mcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/hummbl-dev/mcp-server/main)](https://github.com/hummbl-dev/mcp-server/commits/main)
 
 <a href="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server/badge" alt="HUMMBL Server MCP server" />
@@ -22,6 +23,8 @@ HUMMBL Base120 is a comprehensive cognitive framework consisting of 120 validate
 - DE (Decomposition): Break down complexity into manageable components
 - RE (Recursion): Apply patterns at multiple scales and iterations
 - SY (Meta-Systems): Understand rules, patterns, and systems governing systems
+
+Learn more at [hummbl.io](https://hummbl.io).
 
 ## Installation
 

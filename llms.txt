@@ -1,0 +1,79 @@
+# mcp-server — llms.txt
+# AI-readable index of the HUMMBL MCP Server.
+# Give Claude access to 120 validated mental models via Model Context Protocol. Last updated: 2026-06-14.
+#
+# Query API: LLMs can parse this file to understand MCP server capabilities
+# Installation: npm install -g @hummbl/mcp-server
+# Documentation: https://github.com/hummbl-dev/mcp-server
+#
+# mcp-server categories:
+#   HUMMBL:MCP Model Context Protocol server for Base120 integration
+#   HUMMBL:BASE120 120 mental models across 6 cognitive transformations
+#   HUMMBL:COGNITION Structured reasoning and problem-solving
+
+## Overview
+
+HUMMBL MCP Server gives Claude access to 120 validated mental models organized across 6 cognitive transformations:
+- P (Perspective): Change viewpoint to see problems differently
+- IN (Inversion): Flip problem to find solution by avoiding failure
+- CO (Composition): Combine elements to create emergent properties
+- DE (Decomposition): Break down complexity into manageable components
+- RE (Recursion): Apply patterns at multiple scales and iterations
+- SY (Meta-Systems): Understand rules, patterns, and systems governing systems
+
+## Installation
+
+```bash
+# Global installation (recommended)
+npm install -g @hummbl/mcp-server
+
+# Local installation
+npm install @hummbl/mcp-server
+```
+
+## Usage
+
+```bash
+# Start MCP server
+hummbl-mcp-server
+
+# List available operators
+hummbl-mcp-server list
+
+# Get operator details
+hummbl-mcp-server get P1
+```
+
+## MCP Integration
+
+Add to Claude Desktop MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "hummbl": {
+      "command": "hummbl-mcp-server"
+    }
+  }
+}
+```
+
+## Available Operators
+
+All 120 Base120 operators are available via MCP tools:
+- Perspective (P): P1-P20
+- Inversion (IN): IN1-IN20
+- Composition (CO): CO1-CO20
+- Decomposition (DE): DE1-DE20
+- Recursion (RE): RE1-RE20
+- Meta-Systems (SY): SY1-SY20
+
+## License
+
+Apache 2.0
+
+## Links
+
+- GitHub: https://github.com/hummbl-dev/mcp-server
+- npm: https://www.npmjs.com/package/@hummbl/mcp-server
+- Glama MCP Registry: https://glama.ai/mcp/servers/@hummbl-dev/mcp-server
