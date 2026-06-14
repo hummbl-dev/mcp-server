@@ -25,6 +25,7 @@ export function registerWorkflowTools(server: McpServer): void {
       title: "List Available Workflows",
       description:
         "Get all available guided workflows for problem-solving with Base120 mental models.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({}),
       outputSchema: z.object({
         count: z.number(),
@@ -275,6 +276,7 @@ export function registerWorkflowTools(server: McpServer): void {
     {
       title: "Find Workflow for Problem",
       description: "Discover which workflow best fits your problem type or situation.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         problem_keywords: z
           .string()

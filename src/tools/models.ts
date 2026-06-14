@@ -40,6 +40,7 @@ export function registerModelTools(server: McpServer): void {
       title: "Get Mental Model by Code",
       description:
         "Retrieve detailed information about a specific HUMMBL mental model using its code (e.g., P1, IN3, CO5).",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         code: z
           .string()
@@ -102,6 +103,7 @@ export function registerModelTools(server: McpServer): void {
     {
       title: "List All Mental Models",
       description: "Retrieve complete list of all 120 HUMMBL mental models with basic information.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         transformation_filter: z
           .enum(["P", "IN", "CO", "DE", "RE", "SY"])
@@ -177,6 +179,7 @@ export function registerModelTools(server: McpServer): void {
     {
       title: "Search Mental Models",
       description: "Search HUMMBL mental models by keyword across codes, names, and definitions.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         query: z.string().min(2).describe("Search query (minimum 2 characters)"),
       }),
@@ -247,6 +250,7 @@ export function registerModelTools(server: McpServer): void {
       title: "Get Transformation Details",
       description:
         "Retrieve information about a specific transformation type and all its models (P, IN, CO, DE, RE, SY).",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         key: z
           .enum(["P", "IN", "CO", "DE", "RE", "SY"])
@@ -311,6 +315,7 @@ export function registerModelTools(server: McpServer): void {
       title: "Search Problem Patterns",
       description:
         "Find pre-defined problem patterns with recommended transformations and top models based on a search query.",
+      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         query: z.string().min(2).describe("Search query (minimum 2 characters)"),
       }),
