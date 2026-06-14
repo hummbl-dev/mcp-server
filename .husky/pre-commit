@@ -1,1 +1,2 @@
+export PATH="/Users/others/.nvm/versions/node/v20.20.2/bin:$PATH"
 npm run validate
