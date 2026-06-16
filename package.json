@@ -105,6 +105,7 @@
   },
   "homepage": "https://github.com/hummbl-dev/mcp-server#readme",
   "overrides": {
-    "flatted": "^3.4.2"
+    "flatted": "^3.4.2",
+    "@babel/core": ">=7.29.6"
   }
 }
