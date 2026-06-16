@@ -9,6 +9,8 @@ Give Claude access to **120 validated mental models** — for sharper analysis, 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Last commit](https://img.shields.io/github/last-commit/hummbl-dev/mcp-server/main)](https://github.com/hummbl-dev/mcp-server/commits/main)
 
+Repository health contract: [docs/REPO_HEALTH.md](docs/REPO_HEALTH.md)
+
 <a href="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server">
   <img width="380" height="200" src="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server/badge" alt="HUMMBL Server MCP server" />
 </a>
