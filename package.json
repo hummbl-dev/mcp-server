@@ -112,6 +112,7 @@
   "overrides": {
     "flatted": "^3.4.2",
     "@babel/core": ">=7.29.6",
-    "dompurify": ">=3.4.9"
+    "dompurify": ">=3.4.9",
+    "qs": ">=6.15.2"
   }
 }
