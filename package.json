@@ -70,7 +70,7 @@
     "@opentelemetry/sdk-trace-node": "^2.8.0",
     "@opentelemetry/semantic-conventions": "^1.41.1",
     "@upstash/redis": "^1.38.0",
-    "express": "^4.18.2",
+    "express": "^4.22.0",
     "express-rate-limit": "^7.5.0",
     "hono": "^4.12.25",
     "jspdf": "^4.2.1",
