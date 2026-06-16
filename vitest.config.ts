@@ -7,7 +7,7 @@ export default defineConfig({
     include: ["src/**/*.{test,spec}.ts", "tests/**/*.{test,spec}.ts"],
     exclude: [...configDefaults.exclude, "**/dist/**"],
     coverage: {
-      provider: "istanbul",
+      provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       exclude: [
         "node_modules/",
