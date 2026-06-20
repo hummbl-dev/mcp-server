@@ -16,6 +16,7 @@ Welcome to the HUMMBL MCP Server documentation site.
 - [Repository Health](REPO_HEALTH.md) - Repo health contract
 - [User Guide](user-guide.md) - User guide
 - [History](HISTORY.md) - Version history
+- [ChatGPT Apps Marketplace Proposal](chatgpt-apps-marketplace-proposal.md) - Proposal for productizing HUMMBL MCP servers as ChatGPT Apps
 
 ## Case Studies
 

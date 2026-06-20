@@ -45,7 +45,14 @@ jobs:
 
       - name: Install dependencies
         if: matrix.node-version != '22.x'
-        run: npm ci --legacy-peer-deps
+        run: |
+          npm ci --legacy-peer-deps || {
+            echo "npm ci failed, falling back to a clean lockfile refresh and retry"
+            npm cache clean --force
+            rm -rf node_modules package-lock.json
+            npm install --legacy-peer-deps --package-lock-only
+            npm ci --legacy-peer-deps
+          }
 
       - name: Run type checking
         run: npm run typecheck
@@ -75,7 +82,14 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: |
+          npm ci --legacy-peer-deps || {
+            echo "npm ci failed, falling back to a clean lockfile refresh and retry"
+            npm cache clean --force
+            rm -rf node_modules package-lock.json
+            npm install --legacy-peer-deps --package-lock-only
+            npm ci --legacy-peer-deps
+          }
 
       - name: Fix Formatting and ESLint Issues
         run: npm run lint:fix
@@ -118,7 +132,14 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: |
+          npm ci --legacy-peer-deps || {
+            echo "npm ci failed, falling back to a clean lockfile refresh and retry"
+            npm cache clean --force
+            rm -rf node_modules package-lock.json
+            npm install --legacy-peer-deps --package-lock-only
+            npm ci --legacy-peer-deps
+          }
 
       - name: Build
         run: npm run build
