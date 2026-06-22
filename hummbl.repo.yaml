@@ -1,0 +1,50 @@
+schema: "hummbl-repo-manifest@0.1"
+
+repo:
+  full_name: "hummbl-dev/mcp-server"
+  name: "mcp-server"
+  visibility: "public"
+  default_branch: "main"
+  status: "active"
+
+purpose:
+  type: "library"
+  summary: "Model Context Protocol server exposing the HUMMBL Base120 mental-models framework (120 validated models across 6 transformations), plus an HTTP server and Cloudflare Workers API surface. Published to npm as @hummbl/mcp-server."
+  source_of_record: "git"
+
+authority:
+  steward: "HUMMBL Research Institute"
+  approving_human: "Reuben Bowlby"
+  codeowners: "CODEOWNERS"
+  agents_file: "AGENTS.md"
+
+governance:
+  agents_required: true
+  krineia_required: true
+  receipts_dir: "_receipts/"
+  handoffs_dir: "docs/handoffs/"
+  adr_dir: "docs/adr/"
+  model_provider_neutral: true
+
+validation:
+  command: "npm run validate"
+  required_before_merge: false
+  required_before_release: true
+
+docs:
+  readme: "README.md"
+  constitution: "CONSTITUTION.md"
+  agents: "AGENTS.md"
+  krineia: "KRINEIA.md"
+
+krineia:
+  manifest: "KRINEIA.md"
+  chains:
+    primary:
+      chain_id: "mcp-server-primary"
+      storage: "_receipts/krineia/primary.jsonl"
+      genesis_policy: "repo_bootstrap"
+      hash_algorithm: "sha256"
+      canonicalization: "json.dumps(sort_keys=True,separators=(',',':'))"
+  operators_allowed: ["append", "project", "cut"]
+  operators_forbidden: ["update", "delete", "rewrite", "summarize_and_replace", "score_and_train"]
