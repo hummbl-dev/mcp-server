@@ -1,0 +1,20 @@
+# CODEOWNERS — hummbl-dev/mcp-server
+# Review authority per path. Steward approval required for normative spec files.
+
+# Governance artifacts
+CONSTITUTION.md          @reubenbowlby
+KRINEIA.md               @reubenbowlby
+hummbl.repo.yaml         @reubenbowlby
+CODEOWNERS               @reubenbowlby
+
+# Receipts — steward only
+_receipts/               @reubenbowlby
+
+# Normative files
+data/models.json                         @reubenbowlby
+data/all-models.json                     @reubenbowlby
+src/tools/                               @reubenbowlby
+AGENTS.md                                @reubenbowlby
+
+# Default: steward
+*                        @reubenbowlby
