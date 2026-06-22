@@ -5,7 +5,7 @@
 
 ## Scope
 - In scope: the MCP server (`src/`), HTTP server and Cloudflare Workers API (`src/http-server.ts`, `src/api.ts`), tool implementations (`get_model`, `list_all_models`, `search_models`, `recommend_models`, `get_transformation`, `search_problem_patterns`, `export_models`, `get_methodology`, `audit_model_references`), and the Base120 model dataset
-- Out of scope: the Base120 framework specification itself (tracked in other HUMMBL repos), client-side Claude Desktop configuration
+- Out of scope: the Base120 framework specification itself (tracked in other HUMMBL repos), client-side MCP client configuration
 
 ## Setup
 Requires Node.js (check `.npmrc`/engines). Uses Vitest for tests, ESLint + Prettier for linting/formatting, Husky for git hooks.
