@@ -71,7 +71,7 @@
     "@opentelemetry/semantic-conventions": "^1.41.1",
     "@upstash/redis": "^1.38.0",
     "express": "^5.2.1",
-    "express-rate-limit": "^7.5.0",
+    "express-rate-limit": "^8.5.2",
     "hono": "^4.12.26",
     "jspdf": "^4.2.1",
     "nanoid": "^5.1.15",
