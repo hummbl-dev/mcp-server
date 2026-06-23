@@ -1,0 +1,21 @@
+name = "hummbl-mcp"
+main = "dist/mcp-agent.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# MCP Streamable HTTP endpoint
+# Deploy: wrangler deploy -c wrangler.mcp.toml
+
+# Custom domain configuration
+[[routes]]
+pattern = "mcp.hummbl.io/*"
+zone_name = "hummbl.io"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Note: For OAuth 2.1 protected deployment, add:
+# - OAuth provider configuration (Phase 2)
+# - Cloudflare Access integration
+# - Protected Resource Metadata (RFC 9728) at /.well-known/oauth-protected-resource
