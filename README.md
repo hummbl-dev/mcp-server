@@ -1,709 +1,133 @@
-# HUMMBL MCP Server
+# HUMMBL MCP Servers
 
-Give Claude access to **120 validated mental models** — for sharper analysis, clearer decision-making, and systematic problem-solving across six cognitive transformations.
+Monorepo for all HUMMBL Model Context Protocol (MCP) servers — TypeScript and Python.
 
-[![CI](https://github.com/hummbl-dev/mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/hummbl-dev/mcp-server/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/@hummbl%2Fmcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
-[![npm downloads](https://img.shields.io/npm/dm/@hummbl/mcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
-[![Node](https://img.shields.io/node/v/@hummbl/mcp-server.svg)](https://www.npmjs.com/package/@hummbl/mcp-server)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/hummbl-dev/mcp-server/main)](https://github.com/hummbl-dev/mcp-server/commits/main)
 
-Repository health contract: [docs/REPO_HEALTH.md](docs/REPO_HEALTH.md)
+## Servers
 
-<a href="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@hummbl-dev/mcp-server/badge" alt="HUMMBL Server MCP server" />
-</a>
+### TypeScript
 
-## Overview
+| Server | Package | Description |
+|--------|---------|-------------|
+| **Base120** | [`@hummbl/mcp-server`](https://www.npmjs.com/package/@hummbl/mcp-server) | HUMMBL Base120 mental models framework — 120 validated mental models across 6 cognitive transformations |
 
-HUMMBL Base120 is a comprehensive cognitive framework consisting of 120 validated mental models organized across 6 transformations:
+→ [`packages/ts/`](packages/ts/) — TypeScript server source, tests, and docs
 
-- P (Perspective): Change viewpoint to see problems differently
-- IN (Inversion): Flip problem to find solution by avoiding failure
-- CO (Composition): Combine elements to create emergent properties
-- DE (Decomposition): Break down complexity into manageable components
-- RE (Recursion): Apply patterns at multiple scales and iterations
-- SY (Meta-Systems): Understand rules, patterns, and systems governing systems
+### Python
 
-Learn more at [hummbl.io](https://hummbl.io).
+| Server | Package | Description |
+|--------|---------|-------------|
+| **Base120** | `hummbl-mcp-base120` | MCP server exposing the Base120 engine (5 tools) |
+| **BIF** | `hummbl-mcp-bif` | BIF methodology tools: session management, templates, validation, status tracking |
+| **Governance** (7 servers) | `hummbl-mcp-governance` | 7 MCP servers exposing all HUMMBL governance primitives (32+ tools): governance, compliance, sandbox, identity, agent monitor, reasoning, physical AI |
+| **UTF** | `hummbl-mcp-utf` | Unified Tier Framework: problem classification, model recommendation, tier assessment |
 
-## Installation
+→ [`packages/python/`](packages/python/) — Python server sources
 
-### Global Installation (Recommended)
+## Repository Structure
+
+```
+mcp-server/
+  packages/
+    ts/                  # TypeScript flagship server (@hummbl/mcp-server on npm)
+      src/
+      tests/
+      package.json
+      wrangler.toml
+      docs/
+      ...
+    python/
+      base120/           # hummbl-mcp-base120 (depends on base120 PyPI package)
+        mcp_server.py
+        pyproject.toml
+        README.md
+      bif/               # hummbl-mcp-bif (stdlib only)
+        mcp_server.py
+        pyproject.toml
+        README.md
+      governance/        # hummbl-mcp-governance (7 servers, depends on hummbl-governance PyPI package)
+        mcp_server.py          # governance (kill switch, circuit breaker, cost governor, audit log)
+        mcp_compliance.py      # compliance (NIST, SOC2, ISO, STRIDE)
+        mcp_sandbox.py         # sandbox (capability fence, output validator)
+        mcp_identity.py        # identity (agent registry, delegation tokens, lamport clock)
+        mcp_agent_monitor.py   # agent monitor (behavior, convergence, lifecycle, evolution)
+        mcp_reasoning.py       # reasoning (reasoning engine, schema validator, contract net)
+        mcp_physical.py        # physical AI (kinematic governor, pHRI safety)
+        pyproject.toml
+        README.md
+      utf/               # hummbl-mcp-utf (stdlib only)
+        mcp_server.py
+        pyproject.toml
+        README.md
+  docs/                  # shared docs (if any)
+  scripts/               # shared scripts (if any)
+  README.md              # this file
+  LICENSE
+  CODE_OF_CONDUCT.md
+  CONTRIBUTING.md
+```
+
+## Install
+
+### TypeScript server
 
 ```bash
-npm install -g @hummbl/mcp-server
+npm install @hummbl/mcp-server
 ```
 
-### Using npx (No Installation Required)
+### Python servers
 
 ```bash
-npx @hummbl/mcp-server
+pip install hummbl-mcp-base120
+pip install hummbl-mcp-bif
+pip install hummbl-mcp-governance
+pip install hummbl-mcp-utf
 ```
-
-### From GitHub Packages (alternate registry)
-
-The same build is mirrored to GitHub Packages as `@hummbl-dev/mcp-server`. GitHub Packages requires a GitHub personal access token with `read:packages` scope even for public installs — create one at <https://github.com/settings/tokens>.
-
-Add to your project's `.npmrc`:
-
-```
-@hummbl-dev:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_PAT
-```
-
-Then install:
-
-```bash
-npm install @hummbl-dev/mcp-server
-```
-
-## Configuration
-
-### Claude Desktop
-
-Add to your Claude Desktop configuration file:
-
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "hummbl": {
-      "command": "npx",
-      "args": ["-y", "@hummbl/mcp-server"]
-    }
-  }
-}
-```
-
-### `get_methodology`
-
-Retrieve the canonical Self-Dialectical AI Systems methodology, including all stages and HUMMBL Base120 references.
-
-Example:
-
-```json
-{}
-```
-
-### `audit_model_references`
-
-Audit a list of HUMMBL model references for validity, duplication, and transformation alignment.
-
-Example:
-
-```json
-{
-  "items": [
-    { "code": "IN11", "expectedTransformation": "IN" },
-    { "code": "CO4" }
-  ]
-}
-```
-
-After configuration, restart Claude Desktop. The HUMMBL tools will appear in the attachment menu.
-
-## Available Tools
-
-### `get_model`
-
-Retrieve detailed information about a specific mental model.
-
-Example:
-
-```json
-{
-  "code": "P1"
-}
-```
-
-### `list_all_models`
-
-List all 120 mental models, optionally filtered by transformation type.
-
-Example:
-
-```json
-{
-  "transformation_filter": "P"
-}
-```
-
-### `search_models`
-
-Search models by keyword across names, descriptions, and examples.
-
-Example:
-
-```json
-{
-  "query": "decision"
-}
-```
-
-### `recommend_models`
-
-Get AI-recommended models based on problem description.
-
-Example:
-
-```json
-{
-  "problem_description": "Our startup is growing rapidly but systems are breaking down. We need to scale operations without losing quality."
-}
-```
-
-### `get_transformation`
-
-Retrieve information about a specific transformation type and all its models.
-
-Example:
-
-```json
-{
-  "type": "IN"
-}
-```
-
-### `search_problem_patterns`
-
-Find pre-defined problem patterns with recommended approaches.
-
-Example:
-
-```json
-{
-  "query": "innovation"
-}
-```
-
-### `export_models`
-
-Export a curated subset of Base120 models as Markdown or JSON — useful for docs, decks, or feeding models into another LLM's context. Pass `codes` for a specific list, `transformation` for a whole group, or neither for all 120.
-
-Example:
-
-```json
-{
-  "format": "markdown",
-  "codes": ["P1", "IN3", "CO5", "DE1"]
-}
-```
-
-## Usage Examples
-
-### Example 1: Getting a Specific Model
-
-**Scenario**: You want to understand "First Principles Thinking" before applying it to a problem.
-
-```json
-// Request
-{
-  "tool": "get_model",
-  "arguments": {
-    "code": "P1"
-  }
-}
-
-// Response
-{
-  "model": {
-    "code": "P1",
-    "name": "First Principles Framing",
-    "definition": "Reduce complex problems to foundational truths that cannot be further simplified",
-    "priority": 1,
-    "transformation": "P"
-  }
-}
-```
-
-**When to use**: Starting a new problem analysis by identifying core assumptions and fundamentals.
-
----
-
-### Example 2: Listing Models by Transformation
-
-**Scenario**: You know you need to look at a problem from different perspectives but want to see all available perspective models.
-
-```json
-// Request
-{
-  "tool": "list_all_models",
-  "arguments": {
-    "transformation_filter": "P"
-  }
-}
-
-// Response
-{
-  "total": 20,
-  "models": [
-    {
-      "code": "P1",
-      "name": "First Principles Framing",
-      "definition": "Reduce complex problems to foundational truths...",
-      "priority": 1,
-      "transformation": "P"
-    },
-    {
-      "code": "P2",
-      "name": "Stakeholder Mapping",
-      "definition": "Identify all parties with interest, influence...",
-      "priority": 1,
-      "transformation": "P"
-    }
-    // ... 18 more models
-  ]
-}
-```
-
-**When to use**: Exploring all models within a specific transformation category to find the right approach.
-
----
-
-### Example 3: Searching for Decision-Related Models
-
-**Scenario**: You're making a strategic decision and want to find all mental models related to decision-making.
-
-```json
-// Request
-{
-  "tool": "search_models",
-  "arguments": {
-    "query": "decision"
-  }
-}
-
-// Response
-{
-  "query": "decision",
-  "resultCount": 8,
-  "results": [
-    {
-      "code": "P2",
-      "name": "Stakeholder Mapping",
-      "definition": "Identify all parties with interest, influence, or impact in a system or decision",
-      "priority": 1,
-      "transformation": "P"
-    },
-    {
-      "code": "SY3",
-      "name": "Decision Trees & Game Theory",
-      "definition": "Model sequential choices and strategic interactions with payoff structures",
-      "priority": 1,
-      "transformation": "SY"
-    }
-    // ... 6 more results
-  ]
-}
-```
-
-**When to use**: Finding relevant models across all transformations for a specific concept or challenge.
-
----
-
-### Example 4: Getting Recommendations for a Complex Problem
-
-**Scenario**: Your startup is scaling rapidly but systems are breaking down—you need guidance on which mental models to apply.
-
-```json
-// Request
-{
-  "tool": "recommend_models",
-  "arguments": {
-    "problem": "Our startup is growing rapidly but systems are breaking down. We need to scale operations without losing quality."
-  }
-}
-
-// Response
-{
-  "problem": "Our startup is growing rapidly but systems are breaking down...",
-  "recommendationCount": 2,
-  "recommendations": [
-    {
-      "pattern": "Complex system to understand",
-      "transformations": [
-        {
-          "key": "DE",
-          "name": "Decomposition",
-          "description": "Break down complexity into manageable components"
-        }
-      ],
-      "topModels": [
-        {
-          "code": "DE1",
-          "name": "Modular Decomposition",
-          "definition": "Break systems into independent, interchangeable components...",
-          "priority": 1
-        },
-        {
-          "code": "DE2",
-          "name": "Layered Architecture",
-          "definition": "Organize systems into hierarchical strata with clear interfaces",
-          "priority": 1
-        }
-      ]
-    },
-    {
-      "pattern": "Strategic or coordination challenge",
-      "transformations": [
-        {
-          "key": "SY",
-          "name": "Meta-Systems",
-          "description": "Understand rules, patterns, and systems governing systems"
-        }
-      ],
-      "topModels": [
-        {
-          "code": "SY1",
-          "name": "Feedback Loops & Causality",
-          "definition": "Trace how outputs loop back as inputs creating reinforcing or balancing dynamics",
-          "priority": 1
-        }
-      ]
-    }
-  ]
-}
-```
-
-**When to use**: You have a complex, multi-faceted problem and need AI-driven recommendations on where to start.
-
----
-
-### Example 5: Exploring the Inversion Transformation
-
-**Scenario**: You've heard about "inversion thinking" and want to understand all the models in that category.
-
-```json
-// Request
-{
-  "tool": "get_transformation",
-  "arguments": {
-    "key": "IN"
-  }
-}
-
-// Response
-{
-  "key": "IN",
-  "name": "Inversion",
-  "description": "Reverse assumptions. Examine opposites, edges, negations.",
-  "modelCount": 20,
-  "models": [
-    {
-      "code": "IN1",
-      "name": "Subtractive Thinking",
-      "definition": "Improve systems by removing elements rather than adding complexity",
-      "priority": 1
-    },
-    {
-      "code": "IN2",
-      "name": "Premortem Analysis",
-      "definition": "Assume failure has occurred and work backward to identify causes",
-      "priority": 1
-    }
-    // ... 18 more models
-  ]
-}
-```
-
-**When to use**: Deep-diving into a transformation to understand its philosophy and available models.
-
----
-
-### Example 6: Finding Problem Patterns
-
-**Scenario**: Your team struggles with innovation—everything feels incremental. You want to find pre-defined patterns that match this challenge.
-
-```json
-// Request
-{
-  "tool": "search_problem_patterns",
-  "arguments": {
-    "query": "innovation"
-  }
-}
-
-// Response
-{
-  "query": "innovation",
-  "patternCount": 1,
-  "patterns": [
-    {
-      "pattern": "Stuck in conventional thinking",
-      "transformations": ["IN"],
-      "topModels": ["IN1", "IN2", "IN3"]
-    }
-  ]
-}
-```
-
-**When to use**: You recognize a common problem type and want to quickly jump to the recommended mental models and approaches.
-
----
-
-## Guided Workflows (NEW in Phase 2)
-
-HUMMBL now includes guided multi-turn workflows that walk you through systematic problem-solving using mental models. Perfect for complex problems that benefit from structured analysis.
-
-### Available Workflows
-
-#### 1. Root Cause Analysis
-**Use when**: Investigating failures, incidents, or recurring problems
-**Duration**: 20-30 minutes
-**Sequence**: P → IN → DE → SY
-
-Systematically find root causes, not just symptoms.
-
-#### 2. Strategy Design
-**Use when**: Creating strategies, planning initiatives, entering markets
-**Duration**: 30-45 minutes
-**Sequence**: P → CO → SY → RE
-
-Design comprehensive strategies with creative combinations and systemic thinking.
-
-#### 3. Decision Making
-**Use when**: High-stakes decisions with uncertainty
-**Duration**: 15-25 minutes
-**Sequence**: P → IN → SY → RE
-
-Make quality decisions through clear framing, stress-testing, and systematic evaluation.
-
-### Workflow Tools
-
-#### `list_workflows`
-List all available guided workflows.
-
-```json
-{
-  "tool": "list_workflows"
-}
-```
-
-#### `start_workflow`
-Begin a guided workflow for your problem.
-
-```json
-{
-  "tool": "start_workflow",
-  "arguments": {
-    "workflow_name": "root_cause_analysis",
-    "problem_description": "Our production API started failing intermittently after yesterday's deployment"
-  }
-}
-```
-
-#### `continue_workflow`
-Proceed to the next step after completing current step.
-
-```json
-{
-  "tool": "continue_workflow",
-  "arguments": {
-    "workflow_name": "root_cause_analysis",
-    "current_step": 1,
-    "step_insights": "Identified 3 affected stakeholders: customers experiencing timeouts, internal services with cascading failures, and ops team receiving alerts. Core assumption: the deployment changed something fundamental in request handling."
-  }
-}
-```
-
-#### `find_workflow_for_problem`
-Discover which workflow best fits your problem.
-
-```json
-{
-  "tool": "find_workflow_for_problem",
-  "arguments": {
-    "problem_keywords": "system failure production"
-  }
-}
-```
-
-### Example: Root Cause Analysis Workflow
-
-**Step 1 (Perspective)**:
-```json
-{
-  "currentStep": 1,
-  "totalSteps": 4,
-  "transformation": "P",
-  "guidance": "Frame the problem clearly from multiple perspectives",
-  "suggestedModels": ["P1", "P2", "P15"],
-  "questions": [
-    "What are the foundational facts we know for certain?",
-    "Who is affected and how?",
-    "What assumptions are we making?"
-  ]
-}
-```
-
-**After completing Step 1, continue:**
-```json
-{
-  "tool": "continue_workflow",
-  "arguments": {
-    "workflow_name": "root_cause_analysis",
-    "current_step": 1,
-    "step_insights": "Your insights here..."
-  }
-}
-```
-
-**Step 2 (Inversion)**: Test boundaries, work backward from failure
-**Step 3 (Decomposition)**: Isolate the failing component
-**Step 4 (Meta-Systems)**: Design systemic fixes and prevention
-
----
-
-## Available Prompts
-
-MCP prompts are user-invocable templates. In Claude Desktop they appear in the "Attach from MCP" menu and can be selected to kick off a conversation. All prompts take a free-text `problem` argument; `apply_model` also takes a `model_code`.
-
-| Prompt | What it does |
-|---|---|
-| `root_cause_analysis` | Kicks off the Root Cause Analysis workflow (Perspective → Inversion → Decomposition → Meta-Systems) against your problem. |
-| `strategy_design` | Kicks off the Strategy Design workflow. |
-| `decision_making` | Kicks off the Decision Making workflow. |
-| `analyze_with_models` | Open-ended: calls `recommend_models`, fetches the top matches, and synthesises them into concrete guidance for your problem. |
-| `apply_model` | Applies one specific model (e.g. `P1`, `IN3`) to your problem via its "how to apply" guidance. |
-
----
-
-## Available Resources
-
-Direct URI-based access to models and transformations:
-
-- `hummbl://model/{code}` – Individual model (e.g., `hummbl://model/P1`)
-- `hummbl://transformation/{type}` – All models in transformation (e.g., `hummbl://transformation/P`)
-- `hummbl://models` – Complete Base120 framework
-- `hummbl://methodology/self-dialectical-ai` – Structured Self-Dialectical AI methodology definition
-- `hummbl://methodology/self-dialectical-ai/overview` – Markdown overview of the methodology for quick operator reference
-
-### Self-Dialectical Methodology Overview
-
-The HUMMBL Self-Dialectical AI Systems methodology (v1.2) enables ethical self-correction via five dialectical stages (thesis, antithesis, synthesis, convergence, meta-reflection) mapped to Base120 mental models plus SY meta-models. Use the tools/resources above to fetch the canonical JSON definition, Markdown overview, or to audit references in external documents.
-
-## Problem Patterns
-
-HUMMBL includes pre-defined problem patterns that map common challenges to recommended transformations and models. See [Problem Patterns Documentation](./docs/problem-patterns.md) for the complete catalog with detailed guidance.
 
 ## Development
 
-### Setup
+### TypeScript
 
 ```bash
-git clone https://github.com/hummbl-dev/mcp-server.git
-cd mcp-server
+cd packages/ts
 npm install
-```
-
-### Build
-
-```bash
 npm run build
-```
-
-### Run Locally
-
-```bash
 npm run dev
 ```
 
-### Type Checking
+### Python
 
 ```bash
-npm run typecheck
+cd packages/python/base120
+pip install -e .
+hummbl-mcp-base120
 ```
 
-## Architecture
+For servers that depend on parent packages (`base120`, `hummbl-governance`), install the parent package in editable mode from a sibling repo:
 
-```text
-src/
-├── index.ts              # stdio entry point
-├── server.ts             # Server configuration
-├── framework/
-│   └── base120.ts        # Complete mental models database
-├── tools/
-│   └── models.ts         # Tool registrations
-├── resources/
-│   └── models.ts         # Resource endpoints
-├── types/
-│   └── domain.ts         # Core type definitions
-└── utils/
-    └── result.ts         # Result pattern utilities
+```bash
+pip install -e ../base120      # for hummbl-mcp-base120
+pip install -e ../hummbl-governance  # for hummbl-mcp-governance
 ```
 
-## REST API Specification
+## Adding a New MCP Server
 
-The REST API is self-documenting via OpenAPI 3.0. Fetch the spec from:
-
-```
-GET https://api.hummbl.io/openapi.json
-```
-
-Import it into Postman, Insomnia, Hoppscotch, Swagger UI, or any OpenAPI-compatible client. No authentication is required to read the spec.
-
-## HUMMBL Ecosystem
-
-This repo is part of the [HUMMBL](https://github.com/hummbl-dev) cognitive AI architecture. Related repos:
-
-| Repo | Purpose |
-|------|---------|
-| [base120](https://github.com/hummbl-dev/base120) | Authoritative reference for the 120 mental models served by this MCP server |
-| [hummbl-governance](https://github.com/hummbl-dev/hummbl-governance) | Governance primitives (kill switch, circuit breaker, cost governor) |
-| [arbiter](https://github.com/hummbl-dev/arbiter) | Agent-aware code quality scoring and attribution |
-| [agentic-patterns](https://github.com/hummbl-dev/agentic-patterns) | Stdlib-only safety patterns for agentic AI systems |
-| [aaa](https://github.com/hummbl-dev/aaa) | Assured Agentic Architecture — validation-first assurance |
-
-Learn more at [hummbl.io](https://hummbl.io).
-
-## Privacy Policy
-
-### Data Collection
-
-The HUMMBL MCP Server operates locally on your machine and does not collect, transmit, or store any personal data. All processing happens entirely within your local environment.
-
-### Data Usage
-
-- The server reads mental models framework data from its internal database
-- Problem descriptions and user inputs are processed locally to generate model recommendations
-- No data is sent to external servers or third-party services
-- No telemetry or analytics are collected
-
-### Data Storage
-
-- No persistent storage of user inputs or problem descriptions
-- All processing is ephemeral and happens in memory
-- No logs or audit trails are retained beyond the current session
-
-### Third-Party Sharing
-
-- We do not share any data with third parties
-- The server does not make network requests except for MCP protocol communication with Claude Desktop
-- No data is transmitted to HUMMBL servers or any external services
-
-### Data Retention
-
-- No data is retained after processing
-- All data is cleared from memory when the server process terminates
-- No historical records or user data are stored
-
-### Contact
-
-For privacy-related questions or concerns, contact: privacy@hummbl.io
+1. Create `packages/python/{name}/` (or `packages/ts/{name}/`)
+2. Add `mcp_server.py` (or `index.ts`)
+3. Add `pyproject.toml` (or `package.json`)
+4. Add `README.md`
+5. Update this root README's server table
+6. Add CI workflow entry if needed
 
 ## License
 
-Apache 2.0 © HUMMBL, LLC
+Apache-2.0 — see [LICENSE](LICENSE)
 
-## Version
+## Related
 
-1.0.0-beta.2
+- [hummbl-governance](https://github.com/hummbl-dev/hummbl-governance) — Python governance primitives
+- [base120](https://github.com/hummbl-dev/base120) — Base120 mental models engine
+- [hummbl.io](https://hummbl.io) — Main site
 
-## Repository Health
-
-See [DOCS/REPO_HEALTH.md](DOCS/REPO_HEALTH.md) for health contract, validation
-commands, canonical source, and branch-protection expectations.
+HUMMBL™ and BASE120™ are trademarks of HUMMBL, LLC.

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hummbl-mcp-base120"
+version = "0.1.0"
+description = "MCP server exposing HUMMBL Base120 mental models engine"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "HUMMBL, LLC", email = "dev@hummbl.io" }]
+keywords = ["mcp", "model-context-protocol", "hummbl", "base120", "mental-models"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "base120>=2.0.0",
+]
+
+[project.scripts]
+hummbl-mcp-base120 = "mcp_server:main"
+
+[project.urls]
+Homepage = "https://hummbl.io"
+Repository = "https://github.com/hummbl-dev/mcp-server"
+Documentation = "https://github.com/hummbl-dev/mcp-server/tree/main/packages/python/base120"
+
+[tool.setuptools]
+py-modules = ["mcp_server"]
