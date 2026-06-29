@@ -74,7 +74,7 @@
     "express-rate-limit": "^8.5.2",
     "hono": "^4.12.26",
     "jspdf": "^4.2.1",
-    "nanoid": "^5.1.15",
+    "nanoid": "^5.1.16",
     "zod": "^4.4.3"
   },
   "devDependencies": {
