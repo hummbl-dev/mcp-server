@@ -72,7 +72,7 @@
     "@upstash/redis": "^1.38.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
-    "hono": "^4.12.26",
+    "hono": "^4.12.27",
     "jspdf": "^4.2.1",
     "nanoid": "^5.1.15",
     "zod": "^4.4.3"
