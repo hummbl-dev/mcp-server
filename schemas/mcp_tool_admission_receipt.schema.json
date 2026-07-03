@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hummbl.dev/schemas/mcp_tool_admission_receipt.schema.json",
+  "title": "MCPToolAdmissionReceipt",
+  "description": "Receipt for MCP tool admission decisions including identity, authorization, sandbox posture, and revocation path.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "tool_name",
+    "server_name",
+    "version_or_ref",
+    "owner",
+    "transport",
+    "authentication_required",
+    "authorization_model",
+    "command_surface",
+    "network_access",
+    "filesystem_access",
+    "secret_access",
+    "sandbox_posture",
+    "logging_and_receipts",
+    "revocation_path",
+    "known_risks",
+    "allowed_scopes",
+    "disabled_by_default_commands",
+    "admission_decision",
+    "evaluated_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "tool_name": { "type": "string", "minLength": 1 },
+    "server_name": { "type": "string", "minLength": 1 },
+    "version_or_ref": { "type": "string", "minLength": 1 },
+    "owner": { "type": "string", "minLength": 1 },
+    "transport": {
+      "type": "string",
+      "enum": ["stdio", "http", "websocket", "sse", "cloudflare_worker"]
+    },
+    "authentication_required": { "type": "boolean" },
+    "authorization_model": {
+      "type": "string",
+      "enum": ["none", "token", "oauth", "mtls", "api_key", "session"]
+    },
+    "command_surface": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "network_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": { "type": "string", "enum": ["none", "loopback", "internal", "external", "unrestricted"] },
+        "allowed_hosts": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "filesystem_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": { "type": "string", "enum": ["none", "read_only", "read_write", "unrestricted"] },
+        "allowed_paths": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "secret_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level"],
+      "properties": {
+        "level": { "type": "string", "enum": ["none", "env_only", "secret_manager", "unrestricted"] },
+        "secrets_list": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "sandbox_posture": {
+      "type": "string",
+      "enum": ["none", "container", "vm", "wasm", "worker", "subprocess"]
+    },
+    "logging_and_receipts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "log_level": { "type": "string", "enum": ["debug", "info", "warn", "error"] },
+        "receipt_preservation": { "type": "boolean" }
+      }
+    },
+    "revocation_path": { "type": "string", "minLength": 1 },
+    "known_risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["risk_id", "description", "severity"],
+        "properties": {
+          "risk_id": { "type": "string" },
+          "description": { "type": "string" },
+          "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+          "mitigation": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "allowed_scopes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "disabled_by_default_commands": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "admission_decision": {
+      "type": "string",
+      "enum": ["admit", "admit_with_scope", "quarantine", "reject"]
+    },
+    "admission_conditions": { "type": "array", "items": { "type": "string" } },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "evaluated_by": { "type": "string" },
+    "receipt_ref": { "type": ["string", "null"] }
+  }
+}

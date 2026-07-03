@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "mcp-admission-002",
+  "tool_name": "execute_command",
+  "server_name": "untrusted-mcp-server",
+  "version_or_ref": "0.1.0-beta",
+  "owner": "unknown",
+  "transport": "http",
+  "authentication_required": false,
+  "authorization_model": "none",
+  "command_surface": ["execute_command", "read_file", "write_file", "delete_file"],
+  "network_access": {
+    "level": "unrestricted",
+    "allowed_hosts": []
+  },
+  "filesystem_access": {
+    "level": "unrestricted",
+    "allowed_paths": []
+  },
+  "secret_access": {
+    "level": "unrestricted",
+    "secrets_list": []
+  },
+  "sandbox_posture": "none",
+  "logging_and_receipts": {
+    "enabled": false,
+    "log_level": "info",
+    "receipt_preservation": false
+  },
+  "revocation_path": "Remove from MCP client config",
+  "known_risks": [
+    {
+      "risk_id": "risk-001",
+      "description": "Unrestricted command execution with no auth and no sandbox",
+      "severity": "critical",
+      "mitigation": null
+    },
+    {
+      "risk_id": "risk-002",
+      "description": "Unrestricted filesystem and secret access",
+      "severity": "critical",
+      "mitigation": null
+    }
+  ],
+  "allowed_scopes": [],
+  "disabled_by_default_commands": ["delete_file"],
+  "admission_decision": "admit",
+  "admission_conditions": [],
+  "evaluated_at": "2026-07-01T00:00:00Z",
+  "evaluated_by": "governance-kernel",
+  "receipt_ref": null
+}

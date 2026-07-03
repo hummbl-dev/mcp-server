@@ -1,0 +1,46 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "mcp-admission-001",
+  "tool_name": "get_model",
+  "server_name": "@hummbl/mcp-server",
+  "version_or_ref": "1.2.0",
+  "owner": "HUMMBL Research Institute",
+  "transport": "stdio",
+  "authentication_required": true,
+  "authorization_model": "token",
+  "command_surface": ["get_model", "list_all_models", "search_models"],
+  "network_access": {
+    "level": "none",
+    "allowed_hosts": []
+  },
+  "filesystem_access": {
+    "level": "read_only",
+    "allowed_paths": ["src/data/models.json"]
+  },
+  "secret_access": {
+    "level": "none",
+    "secrets_list": []
+  },
+  "sandbox_posture": "subprocess",
+  "logging_and_receipts": {
+    "enabled": true,
+    "log_level": "info",
+    "receipt_preservation": true
+  },
+  "revocation_path": "Disable MCP client config and remove from allowed tools list",
+  "known_risks": [
+    {
+      "risk_id": "risk-001",
+      "description": "Model data could contain outdated references",
+      "severity": "low",
+      "mitigation": "audit_model_references tool validates citations"
+    }
+  ],
+  "allowed_scopes": ["read:models", "search:models"],
+  "disabled_by_default_commands": [],
+  "admission_decision": "admit",
+  "admission_conditions": [],
+  "evaluated_at": "2026-07-01T00:00:00Z",
+  "evaluated_by": "governance-kernel",
+  "receipt_ref": null
+}
