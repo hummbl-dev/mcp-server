@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "dep-002",
+  "package_name": "express",
+  "current_version": "4.18.0",
+  "target_version": "5.0.0",
+  "update_source": "dependabot",
+  "security_fix_claimed": true,
+  "security_source": "https://github.com/advisories/GHSA-xxxx",
+  "runtime_surface": "runtime_dependency",
+  "breaking_change_risk": "high",
+  "tests_required": true,
+  "tests_observed": { "status": "passed", "test_count": 80, "coverage_delta": -0.05 },
+  "review_owner": "hummbl-dev",
+  "merge_recommendation": "hold",
+  "residual_risk": "Major version bump with breaking API changes. Security fix is real but migration effort is significant. Hold until migration guide is reviewed.",
+  "do_not_infer": [
+    "Do not infer that the security fix is critical without reading the advisory",
+    "Do not merge based on urgency language in the Dependabot body",
+    "Do not infer that passing tests means the migration is complete"
+  ],
+  "evaluated_at": "2026-07-01T00:00:00Z",
+  "changelog_summary": "Breaking: async middleware, removed deprecated APIs",
+  "receipt_ref": null
+}

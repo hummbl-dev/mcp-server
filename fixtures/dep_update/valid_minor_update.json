@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "dep-001",
+  "package_name": "vitest",
+  "current_version": "1.6.0",
+  "target_version": "1.7.0",
+  "update_source": "dependabot",
+  "security_fix_claimed": false,
+  "security_source": null,
+  "runtime_surface": "test_dependency",
+  "breaking_change_risk": "low",
+  "tests_required": true,
+  "tests_observed": { "status": "passed", "test_count": 145, "coverage_delta": 0.0 },
+  "review_owner": "hummbl-dev",
+  "merge_recommendation": "merge",
+  "residual_risk": "Minor version bump in test framework; no runtime impact expected.",
+  "do_not_infer": [
+    "Do not infer that passing tests means no breaking changes in edge cases",
+    "Do not auto-merge without checking vitest changelog for breaking changes"
+  ],
+  "evaluated_at": "2026-07-01T00:00:00Z",
+  "changelog_summary": "Bug fixes and performance improvements",
+  "receipt_ref": null
+}

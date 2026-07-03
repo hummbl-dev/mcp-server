@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.1",
+  "receipt_id": "dep-bad-001",
+  "package_name": "lodash",
+  "current_version": "4.17.20",
+  "target_version": "4.17.21",
+  "update_source": "dependabot",
+  "security_fix_claimed": true,
+  "security_source": null,
+  "runtime_surface": "runtime_dependency",
+  "breaking_change_risk": "critical",
+  "tests_required": true,
+  "tests_observed": { "status": "not_run", "test_count": null, "coverage_delta": null },
+  "review_owner": "hummbl-dev",
+  "merge_recommendation": "merge",
+  "residual_risk": "Critical risk, security fix claimed but no source, tests not run.",
+  "do_not_infer": ["Do not auto-merge"],
+  "evaluated_at": "2026-07-01T00:00:00Z",
+  "changelog_summary": null,
+  "receipt_ref": null
+}

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hummbl.dev/schemas/dependency_update_receipt.schema.json",
+  "title": "DependencyUpdateReceipt",
+  "description": "Receipt for risk-ranking dependency update churn with security-fix signal, package impact, and review owner.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "package_name",
+    "current_version",
+    "target_version",
+    "update_source",
+    "security_fix_claimed",
+    "runtime_surface",
+    "breaking_change_risk",
+    "tests_required",
+    "tests_observed",
+    "review_owner",
+    "merge_recommendation",
+    "residual_risk",
+    "do_not_infer",
+    "evaluated_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "receipt_id": { "type": "string", "minLength": 1 },
+    "package_name": { "type": "string", "minLength": 1 },
+    "current_version": { "type": "string", "minLength": 1 },
+    "target_version": { "type": "string", "minLength": 1 },
+    "update_source": {
+      "type": "string",
+      "enum": ["dependabot", "renovate", "manual", "security_advisory", "npm_audit", "other"]
+    },
+    "security_fix_claimed": { "type": "boolean" },
+    "security_source": {
+      "type": ["string", "null"],
+      "description": "URL or reference to the security advisory if security_fix_claimed is true"
+    },
+    "runtime_surface": {
+      "type": "string",
+      "enum": ["dev_dependency", "runtime_dependency", "build_tool", "type_definition", "test_dependency", "config_dependency"]
+    },
+    "breaking_change_risk": {
+      "type": "string",
+      "enum": ["none", "low", "medium", "high", "critical"]
+    },
+    "tests_required": { "type": "boolean" },
+    "tests_observed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string", "enum": ["passed", "failed", "skipped", "not_run"] },
+        "test_count": { "type": ["integer", "null"], "minimum": 0 },
+        "coverage_delta": { "type": ["number", "null"] }
+      }
+    },
+    "review_owner": { "type": "string", "minLength": 1 },
+    "merge_recommendation": {
+      "type": "string",
+      "enum": ["merge", "hold", "quarantine", "unknown"]
+    },
+    "residual_risk": { "type": "string", "minLength": 1 },
+    "do_not_infer": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "evaluated_at": { "type": "string", "format": "date-time" },
+    "changelog_summary": { "type": ["string", "null"] },
+    "receipt_ref": { "type": ["string", "null"] }
+  }
+}
