@@ -180,10 +180,7 @@ If any smoke test fails or the endpoint is misbehaving:
   - Workers Routes → `mcp.hummbl.io/*` → Delete
   - Or: revert `wrangler.mcp.toml` route block and redeploy
 
-- [ ] **Or set `ENVIRONMENT=staging`** and redeploy:
-  - This re-enables the fail-closed guard for production-mode requests
-  - Actually no — staging mode with `ALLOW_UNAUTHENTICATED_MCP_HTTP` unset will still require auth
-  - Best: disable the route entirely
+Do not rely on changing `ENVIRONMENT=staging` as the primary rollback path. The safest rollback is to disable the public route entirely.
 
 ### Full rollback
 
