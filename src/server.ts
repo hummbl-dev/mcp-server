@@ -37,3 +37,35 @@ export function createServer(): McpServer {
 
   return server;
 }
+
+/**
+ * Create a read-only HUMMBL MCP server.
+ *
+ * Registers only non-mutating tools, resources, and prompts. Excludes
+ * workflow write tools (start_workflow, continue_workflow) so that
+ * unauthenticated HTTP entrypoints cannot trigger stateful operations.
+ *
+ * Read-only tools registered:
+ * - model tools (get_model, list_all_models, search_models, get_transformation, search_problem_patterns)
+ * - methodology tools (get_methodology, audit_model_references)
+ * - export tools (export_models — read-only data export)
+ * - model + methodology resources
+ * - workflow prompts (templates only, not execution)
+ */
+export function createReadOnlyServer(): McpServer {
+  const server = new McpServer({
+    name: "hummbl-mcp-server",
+    version: SERVER_VERSION,
+  });
+
+  registerModelTools(server);
+  registerMethodologyTools(server);
+  registerExportTools(server);
+
+  registerModelResources(server);
+  registerMethodologyResources(server);
+
+  registerWorkflowPrompts(server);
+
+  return server;
+}
