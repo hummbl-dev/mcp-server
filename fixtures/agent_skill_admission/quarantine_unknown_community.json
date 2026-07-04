@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "skill-adm-002",
+  "skill_name": "unknown-community-skill",
+  "skill_source": "https://github.com/unknown/skill",
+  "skill_version": "unknown",
+  "origin": "community",
+  "owner": "unknown",
+  "permission_model": "unknown",
+  "scope": [],
+  "prompt_injection_risk_controls": [],
+  "command_surface": ["unknown"],
+  "network_access": "unknown",
+  "filesystem_access": "unknown",
+  "secret_access": "unknown",
+  "review_outcome": "quarantine",
+  "review_checklist": {
+    "source_verified": false,
+    "permission_model_reviewed": false,
+    "scope_bounded": false,
+    "prompt_injection_risk_assessed": false,
+    "command_surface_reviewed": false,
+    "network_access_reviewed": false,
+    "filesystem_access_reviewed": false,
+    "secret_access_reviewed": false,
+    "revocation_path_defined": false,
+    "logging_enabled": false
+  },
+  "reviewer": "operator",
+  "evidence_pointers": [],
+  "escalation_path": "do not activate; escalate to operator for manual review",
+  "do_not_infer": [
+    "quarantine means unknown, not rejected",
+    "does not imply the skill is malicious",
+    "further review required before activation"
+  ],
+  "timestamp": "2026-07-01T00:01:00Z"
+}

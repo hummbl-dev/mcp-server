@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "skill-adm-001",
+  "skill_name": "base120",
+  "skill_source": ".agents/skills/base120/SKILL.md",
+  "skill_version": "1.0.0",
+  "origin": "fleet",
+  "owner": "hummbl-dev",
+  "permission_model": "scoped",
+  "scope": ["base120:read", "base120:recommend"],
+  "prompt_injection_risk_controls": ["local_data_only", "no_external_input"],
+  "command_surface": ["get_model", "search_models", "recommend_models"],
+  "network_access": "none",
+  "filesystem_access": "read",
+  "secret_access": "none",
+  "review_outcome": "admit",
+  "review_checklist": {
+    "source_verified": true,
+    "permission_model_reviewed": true,
+    "scope_bounded": true,
+    "prompt_injection_risk_assessed": true,
+    "command_surface_reviewed": true,
+    "network_access_reviewed": true,
+    "filesystem_access_reviewed": true,
+    "secret_access_reviewed": true,
+    "revocation_path_defined": true,
+    "logging_enabled": true
+  },
+  "reviewer": "operator",
+  "evidence_pointers": [".agents/skills/base120/SKILL.md", "src/data/base120_models.json"],
+  "escalation_path": "disable skill in agent config, escalate to operator",
+  "do_not_infer": [
+    "does not imply all fleet skills are safe",
+    "admission is scoped to base120:read and base120:recommend only",
+    "admission is revocable"
+  ],
+  "timestamp": "2026-07-01T00:00:00Z"
+}
