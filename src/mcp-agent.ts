@@ -1,26 +1,28 @@
 /**
  * HUMMBL MCP Server - Streamable HTTP Transport via Cloudflare Agents SDK
  *
- * DEPLOYMENT TEMPLATE — do not bind to a public route until auth is implemented.
+ * Production auth: Cloudflare Access JWT verification + profile-level authorization.
  *
- * This is the MCP-compliant Streamable HTTP endpoint. Until OAuth 2.1 /
- * Protected Resource Metadata (RFC 9728) auth is wired, this server:
- * - Registers only read-only tools (no start_workflow, no continue_workflow)
- * - Refuses requests in production mode (fail-closed)
- * - Is intended for staging/template use only
+ * Auth flow:
+ * 1. Client requests /.well-known/oauth-protected-resource → gets metadata
+ * 2. Client authenticates via Cloudflare Access (OAuth/OIDC)
+ * 3. Access injects CF-Access-Jwt-Assertion header into requests
+ * 4. Worker verifies JWT signature via Web Crypto API
+ * 5. Based on identity groups, selects read-only or full tool profile
+ * 6. Delegates to McpAgent.serve("/mcp") for MCP protocol handling
  *
- * Clients supported (once auth is enabled for production):
+ * Profile-level auth:
+ * - unauthenticated: 401 missing_token
+ * - authenticated default: read-only profile (createReadOnlyServer)
+ * - authenticated + hummbl-mcp-write group: full profile (createServer)
+ *
+ * Clients supported:
  * - Claude Desktop (custom connectors)
  * - Claude Code (.mcp.json with type: "http")
  * - Cursor (.cursor/mcp.json with url)
  * - VS Code (.vscode/mcp.json with url)
  * - Windsurf (mcp_config.json with serverUrl)
  * - Any MCP-compatible client that supports Streamable HTTP
- *
- * Bridging:
- * - stdio-only clients can use `npx mcp-remote https://mcp.hummbl.io/mcp`
- *
- * Follow-up: Implement OAuth 2.1 / RFC 9728 before enabling public route.
  */
 
 import { McpAgent } from "agents/mcp";
@@ -29,74 +31,192 @@ import { SERVER_VERSION } from "./version.js";
 import { registerModelTools } from "./tools/models.js";
 import { registerMethodologyTools } from "./tools/methodology.js";
 import { registerExportTools } from "./tools/export.js";
+import { registerWorkflowTools } from "./tools/workflows.js";
 import { registerModelResources } from "./resources/models.js";
 import { registerMethodologyResources } from "./resources/methodology.js";
 import { registerWorkflowPrompts } from "./prompts/workflows.js";
+import {
+  verifyCloudflareAccessJwt,
+  extractAccessJwt,
+} from "./auth/cloudflare-access.js";
+import {
+  serveProtectedResourceMetadata,
+} from "./auth/protected-resource-metadata.js";
+import {
+  resolveProfile,
+  unauthorizedResponse,
+  invalidTokenResponse,
+} from "./auth/authorization.js";
 
 /**
- * Read-only MCP Agent for Cloudflare Workers.
- *
- * Registers only non-mutating tools until production auth is implemented.
- * Write tools (start_workflow, continue_workflow) are excluded.
+ * Read-only MCP Agent — registers only non-mutating tools.
+ * Used for authenticated users without the hummbl-mcp-write group.
  */
-export class HummblMcpAgent extends McpAgent {
+export class HummblReadOnlyMcpAgent extends McpAgent {
   server = new McpServer({
     name: "hummbl-mcp-server",
     version: SERVER_VERSION,
   });
 
   async init() {
-    // Read-only tools only — no registerWorkflowTools() until auth lands
     registerModelTools(this.server);
     registerMethodologyTools(this.server);
     registerExportTools(this.server);
 
-    // Resources (all read-only)
     registerModelResources(this.server);
     registerMethodologyResources(this.server);
 
-    // Prompts (templates only, not execution)
     registerWorkflowPrompts(this.server);
   }
 }
 
 /**
- * Production fail-closed guard.
- *
- * Wraps the fetch handler. If ENVIRONMENT=production and no auth mode is
- * configured, returns 503 and refuses to serve MCP requests. This prevents
- * accidental public exposure of an unauthenticated endpoint.
- *
- * To disable (UNSAFE — do not use on internet-facing deployments):
- *   set ALLOW_UNAUTHENTICATED_MCP_HTTP=true
+ * Full MCP Agent — registers all tools including workflow write tools.
+ * Used for authenticated users with the hummbl-mcp-write group.
  */
-const isProduction = (globalThis as any).ENVIRONMENT === "production";
-const allowUnauthenticated =
-  (globalThis as any).ALLOW_UNAUTHENTICATED_MCP_HTTP === "true";
+export class HummblFullMcpAgent extends McpAgent {
+  server = new McpServer({
+    name: "hummbl-mcp-server",
+    version: SERVER_VERSION,
+  });
 
-function failClosedResponse(): Response {
+  async init() {
+    registerModelTools(this.server);
+    registerMethodologyTools(this.server);
+    registerExportTools(this.server);
+    registerWorkflowTools(this.server);
+
+    registerModelResources(this.server);
+    registerMethodologyResources(this.server);
+
+    registerWorkflowPrompts(this.server);
+  }
+}
+
+/**
+ * Auth configuration from the Workers environment.
+ */
+interface AuthEnv {
+  ENVIRONMENT?: string;
+  CF_ACCESS_AUDIENCE?: string;
+  CF_ACCESS_TEAM_URL?: string;
+  MCP_RESOURCE_URL?: string;
+  MCP_AUTH_DOCS_URL?: string;
+  ALLOW_UNAUTHENTICATED_MCP_HTTP?: string;
+}
+
+/**
+ * Resolve auth config from the env object passed to fetch().
+ * Falls back to globalThis for non-Workers environments.
+ */
+function resolveAuthEnv(env: unknown): AuthEnv {
+  const envRecord = (env || {}) as Record<string, string | undefined>;
+  const globalRecord = globalThis as unknown as Record<string, string | undefined>;
+  return {
+    ENVIRONMENT: envRecord.ENVIRONMENT || globalRecord.ENVIRONMENT,
+    CF_ACCESS_AUDIENCE: envRecord.CF_ACCESS_AUDIENCE || globalRecord.CF_ACCESS_AUDIENCE,
+    CF_ACCESS_TEAM_URL: envRecord.CF_ACCESS_TEAM_URL || globalRecord.CF_ACCESS_TEAM_URL,
+    MCP_RESOURCE_URL: envRecord.MCP_RESOURCE_URL || globalRecord.MCP_RESOURCE_URL,
+    MCP_AUTH_DOCS_URL: envRecord.MCP_AUTH_DOCS_URL || globalRecord.MCP_AUTH_DOCS_URL,
+    ALLOW_UNAUTHENTICATED_MCP_HTTP:
+      envRecord.ALLOW_UNAUTHENTICATED_MCP_HTTP || globalRecord.ALLOW_UNAUTHENTICATED_MCP_HTTP,
+  };
+}
+
+/**
+ * Health check endpoint — no auth required.
+ */
+function healthResponse(): Response {
   return new Response(
     JSON.stringify({
-      error: "MCP endpoint not available in production without authentication.",
-      hint: "Implement OAuth 2.1 / RFC 9728 before enabling this route.",
+      status: "ok",
+      server: "hummbl-mcp-agent",
+      version: SERVER_VERSION,
+      transport: "streamable-http",
+      auth: "cloudflare-access",
+      timestamp: new Date().toISOString(),
     }),
     {
-      status: 503,
+      status: 200,
       headers: { "Content-Type": "application/json" },
     }
   );
 }
 
 export default {
-  // ExecutionContext is a Cloudflare Workers global; use minimal typing here.
-  // The Agents SDK serve().fetch() accepts (request, env, ctx).
   async fetch(request: Request, env: unknown, ctx: unknown): Promise<Response> {
-    // Fail-closed: refuse production requests unless explicitly overridden
-    if (isProduction && !allowUnauthenticated) {
-      return failClosedResponse();
+    const authEnv = resolveAuthEnv(env);
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    // 1. Health check — no auth required
+    if (path === "/health") {
+      return healthResponse();
     }
 
-    return HummblMcpAgent.serve("/mcp").fetch(
+    // 2. Protected Resource Metadata (RFC 9728) — no auth required
+    if (path === "/.well-known/oauth-protected-resource") {
+      return serveProtectedResourceMetadata(authEnv as Record<string, string | undefined>);
+    }
+
+    // 3. Dev/staging bypass: if not production, allow unauthenticated access
+    //    (for local development and testing)
+    const isProduction = authEnv.ENVIRONMENT === "production";
+    const allowUnauthenticated = authEnv.ALLOW_UNAUTHENTICATED_MCP_HTTP === "true";
+
+    if (!isProduction && allowUnauthenticated) {
+      // Dev mode: serve read-only without auth
+      return HummblReadOnlyMcpAgent.serve("/mcp").fetch(
+        request,
+        env as any,
+        ctx as any
+      );
+    }
+
+    // 4. Extract JWT from Cloudflare Access header
+    const jwt = extractAccessJwt(request);
+    if (!jwt) {
+      return unauthorizedResponse();
+    }
+
+    // 5. Verify JWT
+    //    In production, CF_ACCESS_AUDIENCE and CF_ACCESS_TEAM_URL are required.
+    //    If missing, fail closed with invalid_token (not a bypass).
+    const audience = authEnv.CF_ACCESS_AUDIENCE;
+    const teamUrl = authEnv.CF_ACCESS_TEAM_URL;
+
+    if (!audience || !teamUrl) {
+      // Misconfiguration: auth is required but config is incomplete
+      return new Response(
+        JSON.stringify({
+          error: "server_misconfiguration",
+          hint: "CF_ACCESS_AUDIENCE and CF_ACCESS_TEAM_URL must be set when auth is required.",
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const identity = await verifyCloudflareAccessJwt(jwt, audience, teamUrl);
+    if (!identity) {
+      return invalidTokenResponse();
+    }
+
+    // 6. Resolve tool profile based on identity groups
+    const profile = resolveProfile(identity);
+
+    // 7. Delegate to the appropriate MCP Agent based on profile
+    if (profile === "full") {
+      return HummblFullMcpAgent.serve("/mcp").fetch(
+        request,
+        env as any,
+        ctx as any
+      );
+    }
+
+    return HummblReadOnlyMcpAgent.serve("/mcp").fetch(
       request,
       env as any,
       ctx as any

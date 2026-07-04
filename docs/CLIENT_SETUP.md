@@ -19,9 +19,11 @@ HUMMBL MCP servers support two transports:
 | Transport | Use case | Clients |
 |-----------|----------|---------|
 | **stdio** | Local subprocess (Claude Desktop, CLI) | All clients |
-| **Streamable HTTP** | Remote deployment (template/staging — auth not yet implemented) | Claude Desktop, Claude Code, Cursor, VS Code, Windsurf |
+| **Streamable HTTP** | Remote deployment (Cloudflare Access auth) | Claude Desktop, Claude Code, Cursor, VS Code, Windsurf |
 
-> **WARNING:** The Streamable HTTP endpoint is a **deployment template only**. Do not bind to a public route (`mcp.hummbl.io`) until OAuth 2.1 / Protected Resource Metadata (RFC 9728) auth is implemented. The runtime guard returns 503 in production mode without auth. See follow-up issue: "Implement OAuth 2.1 / Protected Resource Metadata for production Streamable HTTP MCP".
+> **Auth:** The Streamable HTTP endpoint uses **Cloudflare Access** for authentication. The Worker verifies the `CF-Access-Jwt-Assertion` JWT via Web Crypto API and selects a tool profile based on Access groups. See [docs/auth.md](./auth.md) for the full architecture.
+>
+> **Route status:** The `mcp.hummbl.io/*` public route is **disabled by default**. Route enablement is an operator-controlled deployment step that requires configured Access policies, audience tags, and verified auth tests. See [docs/auth.md](./auth.md#route-enablement-operator-controlled) for the enablement checklist.
 
 ---
 
