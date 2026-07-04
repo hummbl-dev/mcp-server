@@ -19,7 +19,9 @@ HUMMBL MCP servers support two transports:
 | Transport | Use case | Clients |
 |-----------|----------|---------|
 | **stdio** | Local subprocess (Claude Desktop, CLI) | All clients |
-| **Streamable HTTP** | Remote deployment (mcp.hummbl.io) | Claude Desktop, Claude Code, Cursor, VS Code, Windsurf |
+| **Streamable HTTP** | Remote deployment (template/staging — auth not yet implemented) | Claude Desktop, Claude Code, Cursor, VS Code, Windsurf |
+
+> **WARNING:** The Streamable HTTP endpoint is a **deployment template only**. Do not bind to a public route (`mcp.hummbl.io`) until OAuth 2.1 / Protected Resource Metadata (RFC 9728) auth is implemented. The runtime guard returns 503 in production mode without auth. See follow-up issue: "Implement OAuth 2.1 / Protected Resource Metadata for production Streamable HTTP MCP".
 
 ---
 

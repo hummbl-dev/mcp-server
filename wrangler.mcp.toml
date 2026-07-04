@@ -3,19 +3,28 @@ main = "dist/mcp-agent.js"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 
-# MCP Streamable HTTP endpoint
-# Deploy: wrangler deploy -c wrangler.mcp.toml
+# MCP Streamable HTTP endpoint — DEPLOYMENT TEMPLATE ONLY
+#
+# WARNING: This config is a template. Do NOT bind to a public route
+# (e.g., mcp.hummbl.io) until OAuth 2.1 / Protected Resource Metadata
+# (RFC 9728) auth is implemented. See follow-up issue:
+#   "Implement OAuth 2.1 / Protected Resource Metadata for production Streamable HTTP MCP"
+#
+# The public route below is DISABLED. To enable after auth lands:
+# 1. Uncomment the [[routes]] block
+# 2. Ensure ENVIRONMENT is set to "production"
+# 3. Verify auth middleware rejects unauthenticated requests
+#
+# [[routes]]
+# pattern = "mcp.hummbl.io/*"
+# zone_name = "hummbl.io"
 
-# Custom domain configuration
-[[routes]]
-pattern = "mcp.hummbl.io/*"
-zone_name = "hummbl.io"
-
-# Environment variables
+# Environment — staging/template until auth is implemented
 [vars]
-ENVIRONMENT = "production"
+ENVIRONMENT = "staging"
 
-# Note: For OAuth 2.1 protected deployment, add:
-# - OAuth provider configuration (Phase 2)
+# Note: For OAuth 2.1 protected deployment (REQUIRED before public route):
+# - OAuth provider configuration
 # - Cloudflare Access integration
 # - Protected Resource Metadata (RFC 9728) at /.well-known/oauth-protected-resource
+# - Runtime guard: refuse requests when ENVIRONMENT=production and no auth is configured
