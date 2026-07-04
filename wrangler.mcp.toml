@@ -23,6 +23,12 @@ compatibility_flags = ["nodejs_compat"]
 # pattern = "mcp.hummbl.io/*"
 # zone_name = "hummbl.io"
 
+# PRODUCTION ROUTE — enabled 2026-07-04 after operator approval.
+# Rollback: comment out this block and redeploy.
+[[routes]]
+pattern = "mcp.hummbl.io/*"
+zone_name = "hummbl.io"
+
 # Durable Object bindings for the two McpAgent classes.
 # The Agents SDK requires these bindings for McpAgent.serve() to work.
 [[durable_objects.bindings]]
@@ -40,7 +46,7 @@ tag = "v1"
 new_sqlite_classes = ["HummblReadOnlyMcpAgent", "HummblFullMcpAgent"]
 
 [vars]
-ENVIRONMENT = "staging"
+ENVIRONMENT = "production"
 
 # Secrets (set via `wrangler secret put` — NOT in this file):
 # - CF_ACCESS_AUDIENCE      — Cloudflare Access audience tag for this Worker
