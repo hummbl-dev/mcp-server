@@ -5,17 +5,24 @@
  * using the Web Crypto API (crypto.subtle). No external dependencies.
  *
  * Works in both Cloudflare Workers and Node.js 20+ (Web Crypto is global).
+ *
+ * IMPORTANT: Cloudflare Access groups (e.g., hummbl-mcp-write) are NOT
+ * included in the JWT by default. They are only available via the
+ * /cdn-cgi/access/get-identity endpoint. This module calls that endpoint
+ * after JWT verification to populate the groups array.
+ *
+ * Reference: https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/application-token/#user-identity
  */
 
-/** Identity extracted from a verified Cloudflare Access JWT. */
+/** Identity extracted from a verified Cloudflare Access JWT + get-identity lookup. */
 export interface VerifiedIdentity {
   /** Subject — unique user identifier from the IdP */
   sub: string;
   /** User email */
   email: string;
-  /** User display name */
+  /** User display name (from get-identity, may be empty) */
   name: string;
-  /** Cloudflare Access groups the user belongs to */
+  /** Cloudflare Access group names the user belongs to (from get-identity) */
   groups: string[];
   /** Token expiry (seconds since epoch) */
   exp: number;
@@ -30,11 +37,21 @@ interface JwtHeader {
 interface AccessClaims {
   sub: string;
   email: string;
-  name: string;
-  groups?: string[];
+  name?: string;
   exp: number;
   aud: string | string[];
   iss: string;
+  iat?: number;
+}
+
+/** Response from /cdn-cgi/access/get-identity */
+interface AccessIdentityResponse {
+  email?: string;
+  name?: string;
+  user_uuid?: string;
+  groups?: Array<{ id: string; name: string }>;
+  idp?: { id: string; type: string };
+  geo?: { country: string };
   iat?: number;
 }
 
@@ -77,6 +94,39 @@ export async function fetchAccessPublicKeys(
     }
   }
   return keyMap;
+}
+
+/**
+ * Fetch the user's full identity (including Access groups) from the
+ * /cdn-cgi/access/get-identity endpoint.
+ *
+ * Cloudflare Access groups are NOT included in the JWT by default.
+ * They must be fetched separately via this endpoint.
+ *
+ * The JWT is passed as the CF_Authorization cookie, per Cloudflare docs.
+ *
+ * @param jwt - The raw JWT string from CF-Access-Jwt-Assertion header
+ * @param teamUrl - Cloudflare Access team URL
+ * @param fetchImpl - Optional fetch override for testing
+ * @returns AccessIdentityResponse if successful, null if the lookup fails
+ */
+export async function fetchAccessIdentity(
+  jwt: string,
+  teamUrl: string,
+  fetchImpl: typeof fetch = fetch
+): Promise<AccessIdentityResponse | null> {
+  try {
+    const identityUrl = `${teamUrl.replace(/\/$/, "")}/cdn-cgi/access/get-identity`;
+    const response = await fetchImpl(identityUrl, {
+      headers: { cookie: `CF_Authorization=${jwt}` },
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as AccessIdentityResponse;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -157,6 +207,12 @@ async function importPublicKey(key: PublicKey): Promise<CryptoKey> {
 /**
  * Verify a Cloudflare Access JWT and extract the authenticated identity.
  *
+ * This function:
+ * 1. Verifies the JWT signature using Cloudflare's public keys
+ * 2. Checks expiry and audience
+ * 3. Calls /cdn-cgi/access/get-identity to fetch the user's Access groups
+ *    (groups are NOT in the JWT by default — they must be fetched separately)
+ *
  * @param jwt - The raw JWT string from CF-Access-Jwt-Assertion header
  * @param audience - The expected audience (CF Access audience tag for this Worker)
  * @param teamUrl - Cloudflare Access team URL (e.g., https://hummbl.cloudflareaccess.com)
@@ -209,12 +265,20 @@ export async function verifyCloudflareAccessJwt(
       return null;
     }
 
-    // 5. Extract identity
+    // 5. Fetch full identity (including Access groups) from get-identity endpoint
+    //    Groups are NOT in the JWT by default — they must be fetched separately.
+    //    If get-identity fails, we still return the identity with empty groups
+    //    (user gets read-only profile — fail safe, not fail open).
+    const identity = await fetchAccessIdentity(jwt, teamUrl, fetchImpl);
+    const groupNames = identity?.groups?.map((g) => g.name) || [];
+    const name = identity?.name || claims.email || "";
+
+    // 6. Return verified identity with groups from get-identity
     return {
       sub: claims.sub,
       email: claims.email,
-      name: claims.name,
-      groups: claims.groups || [],
+      name,
+      groups: groupNames,
       exp: claims.exp,
     };
   } catch {

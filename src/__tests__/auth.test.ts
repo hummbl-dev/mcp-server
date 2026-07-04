@@ -88,14 +88,33 @@ function base64url(input: string | ArrayBuffer): string {
 }
 
 /**
- * Mock fetch that returns our test public key when asked for certs.
+ * Mock fetch that returns:
+ * - Test public key when asked for /cdn-cgi/access/certs
+ * - Identity (with groups) when asked for /cdn-cgi/access/get-identity
+ *
+ * @param groups - The Access group names to include in the identity response
+ * @param name - The user's display name
  */
-function mockFetchForKeys(): typeof fetch {
+function mockFetchForKeys(groups: string[] = [], name: string = "Test User"): typeof fetch {
   return (async (input: any) => {
     const url = typeof input === "string" ? input : input.url;
     if (url.includes("/cdn-cgi/access/certs")) {
       return new Response(
         JSON.stringify({ keys: [testKeyPair.jwk] }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    if (url.includes("/cdn-cgi/access/get-identity")) {
+      return new Response(
+        JSON.stringify({
+          email: "test@hummbl.io",
+          name,
+          user_uuid: "test-user-uuid",
+          groups: groups.map((g) => ({ id: `group-id-${g}`, name: g })),
+          idp: { id: "idp-1", type: "github" },
+          geo: { country: "US" },
+          iat: Math.floor(Date.now() / 1000),
+        }),
         { status: 200, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -153,8 +172,6 @@ describe("Auth: expired token", () => {
     const jwt = await signJwt({
       sub: "user-1",
       email: "test@hummbl.io",
-      name: "Test User",
-      groups: [],
       exp: Math.floor(Date.now() / 1000) - 3600, // expired 1 hour ago
       aud: TEST_AUDIENCE,
       iss: TEST_TEAM_URL,
@@ -171,8 +188,6 @@ describe("Auth: wrong audience", () => {
     const jwt = await signJwt({
       sub: "user-1",
       email: "test@hummbl.io",
-      name: "Test User",
-      groups: [],
       exp: Math.floor(Date.now() / 1000) + 3600,
       aud: "wrong-audience",
       iss: TEST_TEAM_URL,
@@ -185,8 +200,6 @@ describe("Auth: wrong audience", () => {
     const jwt = await signJwt({
       sub: "user-1",
       email: "test@hummbl.io",
-      name: "Test User",
-      groups: [],
       exp: Math.floor(Date.now() / 1000) + 3600,
       aud: ["other-aud", "another-aud"],
       iss: TEST_TEAM_URL,
@@ -203,13 +216,12 @@ describe("Auth: valid read-only user", () => {
     const jwt = await signJwt({
       sub: "user-readonly",
       email: "reader@hummbl.io",
-      name: "Read Only",
-      groups: [],
       exp: Math.floor(Date.now() / 1000) + 3600,
       aud: TEST_AUDIENCE,
       iss: TEST_TEAM_URL,
     });
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    // Mock get-identity returns no groups
+    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys([], "Read Only"));
     expect(result).not.toBeNull();
     expect(result!.sub).toBe("user-readonly");
     expect(result!.email).toBe("reader@hummbl.io");
@@ -231,17 +243,16 @@ describe("Auth: valid read-only user", () => {
 // ─── 6. Valid write-group user ───────────────────────────────────────────────
 
 describe("Auth: valid write-group user", () => {
-  it("verifyCloudflareAccessJwt returns identity with write group", async () => {
+  it("verifyCloudflareAccessJwt returns identity with write group from get-identity", async () => {
     const jwt = await signJwt({
       sub: "user-write",
       email: "writer@hummbl.io",
-      name: "Write User",
-      groups: [WRITE_GROUP],
       exp: Math.floor(Date.now() / 1000) + 3600,
       aud: TEST_AUDIENCE,
       iss: TEST_TEAM_URL,
     });
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    // Mock get-identity returns the write group
+    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys([WRITE_GROUP], "Write User"));
     expect(result).not.toBeNull();
     expect(result!.groups).toContain(WRITE_GROUP);
   });
@@ -266,6 +277,35 @@ describe("Auth: valid write-group user", () => {
       exp: Math.floor(Date.now() / 1000) + 3600,
     };
     expect(resolveProfile(identity)).toBe("full");
+  });
+});
+
+// ─── 6b. get-identity failure (fail-safe to read-only) ───────────────────────
+
+describe("Auth: get-identity failure (fail-safe)", () => {
+  it("verifyCloudflareAccessJwt returns identity with empty groups when get-identity fails", async () => {
+    const jwt = await signJwt({
+      sub: "user-1",
+      email: "test@hummbl.io",
+      exp: Math.floor(Date.now() / 1000) + 3600,
+      aud: TEST_AUDIENCE,
+      iss: TEST_TEAM_URL,
+    });
+    // Mock that returns certs but 404s on get-identity
+    const failingMock = (async (input: any) => {
+      const url = typeof input === "string" ? input : input.url;
+      if (url.includes("/cdn-cgi/access/certs")) {
+        return new Response(
+          JSON.stringify({ keys: [testKeyPair.jwk] }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      return new Response("Not found", { status: 404 });
+    }) as typeof fetch;
+    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, failingMock);
+    expect(result).not.toBeNull();
+    expect(result!.groups).toEqual([]);
+    // User gets read-only profile (fail safe, not fail open)
   });
 });
 

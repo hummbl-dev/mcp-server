@@ -35,9 +35,13 @@ Cloudflare Access handles the entire OAuth/OIDC flow externally. The Worker only
 1. **Discovery**: Client fetches `/.well-known/oauth-protected-resource` to learn where to authenticate
 2. **Authentication**: Client redirects user to Cloudflare Access (the `authorization_servers` URL from metadata)
 3. **Token injection**: Access validates identity and injects `CF-Access-Jwt-Assertion` header into subsequent requests
-4. **Verification**: Worker verifies JWT signature using Cloudflare's public keys (Web Crypto `crypto.subtle.verify`)
-5. **Authorization**: Worker checks the user's Access groups to select a tool profile
-6. **Serving**: Worker delegates to `McpAgent.serve("/mcp")` with the appropriate tool profile
+4. **JWT verification**: Worker verifies JWT signature using Cloudflare's public keys (Web Crypto `crypto.subtle.verify`)
+5. **Identity lookup**: Worker calls `/cdn-cgi/access/get-identity` to fetch the user's Access groups
+   - Groups are NOT in the JWT by default (Cloudflare docs: "Access does not add them automatically")
+   - The get-identity endpoint returns `{ groups: [{ id, name }] }` with full Access group membership
+   - If get-identity fails, user gets read-only profile (fail safe, not fail open)
+6. **Authorization**: Worker checks the user's Access groups to select a tool profile
+7. **Serving**: Worker delegates to `McpAgent.serve("/mcp")` with the appropriate tool profile
 
 ## Profile-level authorization
 
