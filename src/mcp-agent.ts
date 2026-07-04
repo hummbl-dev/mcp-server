@@ -166,7 +166,7 @@ export default {
 
     if (!isProduction && allowUnauthenticated) {
       // Dev mode: serve read-only without auth
-      return HummblReadOnlyMcpAgent.serve("/mcp").fetch(
+      return HummblReadOnlyMcpAgent.serve("/mcp", { binding: "MCP_OBJECT_READONLY" }).fetch(
         request,
         env as any,
         ctx as any
@@ -209,14 +209,14 @@ export default {
 
     // 7. Delegate to the appropriate MCP Agent based on profile
     if (profile === "full") {
-      return HummblFullMcpAgent.serve("/mcp").fetch(
+      return HummblFullMcpAgent.serve("/mcp", { binding: "MCP_OBJECT_FULL" }).fetch(
         request,
         env as any,
         ctx as any
       );
     }
 
-    return HummblReadOnlyMcpAgent.serve("/mcp").fetch(
+    return HummblReadOnlyMcpAgent.serve("/mcp", { binding: "MCP_OBJECT_READONLY" }).fetch(
       request,
       env as any,
       ctx as any
