@@ -218,4 +218,28 @@ describe("Tool registration separation invariant", () => {
 
     expect(publicMock.tools.size).toBeLessThan(internalMock.tools.size);
   });
+
+  it("no write tools overlap between public and internal read-only profiles", () => {
+    // The set of tools in the public agent must be a strict subset
+    // of the read-only tools in the internal agent.
+    // No write tool may appear in both.
+    const WRITE_TOOLS = [
+      "add_relationship",
+      "audit_model_references",
+      "export_models",
+      "start_workflow",
+      "continue_workflow",
+    ] as const;
+
+    const publicMock: any = createMockServer();
+    registerPublicModelTools(publicMock);
+    registerPublicMethodologyTools(publicMock);
+
+    for (const name of WRITE_TOOLS) {
+      expect(
+        publicMock.getTool(name),
+        `Write tool ${name} must NOT be in public agent`
+      ).toBeUndefined();
+    }
+  });
 });

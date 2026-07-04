@@ -1096,11 +1096,12 @@ export function registerModelTools(server: McpServer): void {
             Authorization: `Bearer ${API_CONFIG.apiKey}`,
           },
           body: JSON.stringify({
-            source_code,
-            target_code,
+            model_a: source_code,
+            model_b: target_code,
             relationship_type,
+            direction: "a→b",
             confidence,
-            evidence,
+            logical_derivation: evidence || "No evidence provided",
           }),
         });
 

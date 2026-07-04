@@ -3,15 +3,30 @@
 
 // REST API Configuration
 export const MCP_CONFIG = {
-  // API endpoint - will be updated to api.hummbl.io after DNS migration
-  HUMMBL_API_URL: process.env.HUMMBL_API_URL || "https://hummbl-api.hummbl.workers.dev",
+  // API endpoint - production REST API at api.hummbl.io
+  HUMMBL_API_URL: process.env.HUMMBL_API_URL || "https://api.hummbl.io",
 
   // API key for authenticated requests (optional - enables enhanced recommendations)
   HUMMBL_API_KEY: process.env.HUMMBL_API_KEY,
 
   // Usage tracking for WAU metrics
   ENABLE_USAGE_TRACKING: process.env.NODE_ENV === "production",
-} as const;
+};
+
+/**
+ * Inject runtime environment from the Workers/Durable Object env object.
+ * Called from McpAgent.init() to make secrets (like HUMMBL_API_KEY) available
+ * to tool handlers. In Workers, process.env may not have secrets at module
+ * load time, so we patch them in from this.env.
+ */
+export function injectRuntimeEnv(env: Record<string, string | undefined>): void {
+  if (env.HUMMBL_API_KEY && !MCP_CONFIG.HUMMBL_API_KEY) {
+    MCP_CONFIG.HUMMBL_API_KEY = env.HUMMBL_API_KEY;
+  }
+  if (env.HUMMBL_API_URL && !process.env.HUMMBL_API_URL) {
+    MCP_CONFIG.HUMMBL_API_URL = env.HUMMBL_API_URL;
+  }
+}
 
 // Server mode is determined by API key presence
 export const SERVER_MODE = MCP_CONFIG.HUMMBL_API_KEY ? "hybrid" : "local-only";

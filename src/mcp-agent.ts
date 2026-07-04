@@ -35,6 +35,7 @@ import { registerWorkflowTools } from "./tools/workflows.js";
 import { registerModelResources } from "./resources/models.js";
 import { registerMethodologyResources } from "./resources/methodology.js";
 import { registerWorkflowPrompts } from "./prompts/workflows.js";
+import { injectRuntimeEnv } from "./config/mcp.js";
 import { verifyCloudflareAccessJwt, extractAccessJwt } from "./auth/cloudflare-access.js";
 import { serveProtectedResourceMetadata } from "./auth/protected-resource-metadata.js";
 import {
@@ -55,6 +56,7 @@ export class HummblPublicMcpAgent extends McpAgent {
   });
 
   async init() {
+    injectRuntimeEnv(this.env as unknown as Record<string, string | undefined>);
     registerPublicModelTools(this.server);
     registerPublicMethodologyTools(this.server);
   }
@@ -72,6 +74,7 @@ export class HummblReadOnlyMcpAgent extends McpAgent {
   });
 
   async init() {
+    injectRuntimeEnv(this.env as unknown as Record<string, string | undefined>);
     registerModelTools(this.server);
     registerMethodologyTools(this.server);
     registerExportTools(this.server);
@@ -94,6 +97,7 @@ export class HummblFullMcpAgent extends McpAgent {
   });
 
   async init() {
+    injectRuntimeEnv(this.env as unknown as Record<string, string | undefined>);
     registerModelTools(this.server);
     registerMethodologyTools(this.server);
     registerExportTools(this.server);
@@ -116,6 +120,7 @@ interface AuthEnv {
   MCP_RESOURCE_URL?: string;
   MCP_AUTH_DOCS_URL?: string;
   ALLOW_UNAUTHENTICATED_MCP_HTTP?: string;
+  MCP_PUBLIC_MODE?: string;
 }
 
 /**
@@ -133,6 +138,7 @@ function resolveAuthEnv(env: unknown): AuthEnv {
     MCP_AUTH_DOCS_URL: envRecord.MCP_AUTH_DOCS_URL || globalRecord.MCP_AUTH_DOCS_URL,
     ALLOW_UNAUTHENTICATED_MCP_HTTP:
       envRecord.ALLOW_UNAUTHENTICATED_MCP_HTTP || globalRecord.ALLOW_UNAUTHENTICATED_MCP_HTTP,
+    MCP_PUBLIC_MODE: envRecord.MCP_PUBLIC_MODE || globalRecord.MCP_PUBLIC_MODE,
   };
 }
 
@@ -172,7 +178,19 @@ export default {
       return serveProtectedResourceMetadata(authEnv as Record<string, string | undefined>);
     }
 
-    // 3. Dev/staging bypass: if not production, allow unauthenticated access
+    // 3. Public MCP mode: serve the public agent without auth.
+    //    Used by mcp-public.hummbl.io — only 8 read-only tools, no write access.
+    //    Golden tests in public-tool-profile.test.ts enforce the tool inventory.
+    const isPublicMode = authEnv.MCP_PUBLIC_MODE === "true";
+    if (isPublicMode) {
+      return HummblPublicMcpAgent.serve("/mcp", { binding: "MCP_OBJECT_READONLY" }).fetch(
+        request,
+        env as any,
+        ctx as any
+      );
+    }
+
+    // 4. Dev/staging bypass: if not production, allow unauthenticated access
     //    (for local development and testing)
     const isProduction = authEnv.ENVIRONMENT === "production";
     const allowUnauthenticated = authEnv.ALLOW_UNAUTHENTICATED_MCP_HTTP === "true";

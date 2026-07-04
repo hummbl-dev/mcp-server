@@ -49,3 +49,4 @@ api-key*.json
 *.new
 *.tmp
 *~.nib
+.wrangler/

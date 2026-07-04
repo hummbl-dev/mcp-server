@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from "vitest";
 import { createMockServer } from "./setup.js";
-import { registerModelTools } from "../tools/models.js";
+import { registerModelTools, registerPublicModelTools } from "../tools/models.js";
 import { registerMethodologyTools } from "../tools/methodology.js";
 import { registerExportTools } from "../tools/export.js";
 
@@ -36,19 +36,41 @@ describe("MCP Agent entrypoint — read-only tool profile", () => {
     }
   });
 
-  it("write tools are NOT registered in the read-only profile", () => {
+  it("workflow write tools are NOT registered in the read-only profile", () => {
     const mock: any = createMockServer();
     registerModelTools(mock);
     registerMethodologyTools(mock);
     registerExportTools(mock);
     // registerWorkflowTools intentionally NOT called
 
-    const writeTools = ["start_workflow", "continue_workflow"];
+    const workflowWriteTools = [
+      "start_workflow",
+      "continue_workflow",
+      "list_workflows",
+      "find_workflow_for_problem",
+    ];
 
-    for (const name of writeTools) {
+    for (const name of workflowWriteTools) {
       const tool = mock.getTool(name);
-      expect(tool, `Write tool ${name} must NOT be registered`).toBeUndefined();
+      expect(tool, `Workflow tool ${name} must NOT be registered`).toBeUndefined();
     }
+  });
+
+  it("add_relationship IS registered in internal read-only profile (known behavior)", () => {
+    // This test documents that the internal read-only profile includes
+    // add_relationship. The PUBLIC profile (registerPublicModelTools)
+    // excludes it. See public-tool-profile.test.ts for the public guard.
+    const mock: any = createMockServer();
+    registerModelTools(mock);
+
+    expect(mock.getTool("add_relationship")).toBeDefined();
+  });
+
+  it("add_relationship is NOT registered when using registerPublicModelTools", () => {
+    const mock: any = createMockServer();
+    registerPublicModelTools(mock);
+
+    expect(mock.getTool("add_relationship")).toBeUndefined();
   });
 });
 
