@@ -1,0 +1,27 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "dep-002",
+  "package_name": "hono",
+  "current_version": "4.7.0",
+  "target_version": "4.8.0",
+  "update_source": "dependabot",
+  "security_fix_claimed": true,
+  "security_source": "https://github.com/honojs/hono/security/advisories/GHSA-xxxx",
+  "runtime_surface": "runtime_dependency",
+  "breaking_change_risk": "medium",
+  "tests_required": true,
+  "tests_observed": "not_run",
+  "review_owner": "operator",
+  "merge_recommendation": "hold",
+  "residual_risk": [
+    "security fix claimed but not yet verified against advisory",
+    "tests not yet run",
+    "breaking change risk medium — API surface may have changed"
+  ],
+  "evidence_pointers": ["package.json", "security advisory URL"],
+  "do_not_infer": [
+    "security_fix_claimed does not mean the fix is verified",
+    "hold means tests and advisory verification required before merge"
+  ],
+  "timestamp": "2026-07-01T00:01:00Z"
+}

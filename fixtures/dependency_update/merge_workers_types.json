@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "dep-001",
+  "package_name": "@cloudflare/workers-types",
+  "current_version": "4.20250620.0",
+  "target_version": "4.20250627.0",
+  "update_source": "dependabot",
+  "security_fix_claimed": false,
+  "security_source": null,
+  "runtime_surface": "dev_dependency",
+  "breaking_change_risk": "low",
+  "tests_required": true,
+  "tests_observed": "passed",
+  "review_owner": "operator",
+  "merge_recommendation": "merge",
+  "residual_risk": ["type definitions may not match runtime exactly"],
+  "evidence_pointers": ["package.json", "npm run test"],
+  "do_not_infer": [
+    "does not imply all @cloudflare packages are safe",
+    "merge recommendation is advisory, not automatic"
+  ],
+  "timestamp": "2026-07-01T00:00:00Z"
+}

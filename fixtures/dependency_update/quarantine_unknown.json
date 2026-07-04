@@ -1,0 +1,28 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "dep-003",
+  "package_name": "unknown-package",
+  "current_version": "1.0.0",
+  "target_version": "2.0.0",
+  "update_source": "unknown",
+  "security_fix_claimed": false,
+  "security_source": null,
+  "runtime_surface": "unknown",
+  "breaking_change_risk": "unknown",
+  "tests_required": true,
+  "tests_observed": "unknown",
+  "review_owner": "operator",
+  "merge_recommendation": "quarantine",
+  "residual_risk": [
+    "unknown source",
+    "unknown runtime surface",
+    "unknown breaking change risk",
+    "major version bump (1.x to 2.x)"
+  ],
+  "evidence_pointers": [],
+  "do_not_infer": [
+    "quarantine means unknown, not rejected",
+    "does not imply the package is malicious"
+  ],
+  "timestamp": "2026-07-01T00:02:00Z"
+}
