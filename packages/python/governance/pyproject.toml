@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hummbl-mcp-governance"
+version = "0.1.0"
+description = "MCP servers exposing HUMMBL governance primitives: kill switch, circuit breaker, cost governor, audit log, compliance, sandbox, identity, agent monitor, reasoning, physical AI"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "HUMMBL, LLC", email = "dev@hummbl.io" }]
+keywords = ["mcp", "model-context-protocol", "hummbl", "governance", "kill-switch", "circuit-breaker", "compliance", "nist", "soc2", "iso27001"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "hummbl-governance>=1.1.0",
+]
+
+[project.scripts]
+# Backwards-compatible entry points (match hummbl-governance naming)
+hummbl-governance-mcp = "mcp_server:main"
+hummbl-compliance-mcp = "mcp_compliance:main"
+hummbl-sandbox-mcp = "mcp_sandbox:main"
+hummbl-identity-mcp = "mcp_identity:main"
+hummbl-agent-monitor-mcp = "mcp_agent_monitor:main"
+hummbl-reasoning-mcp = "mcp_reasoning:main"
+hummbl-physical-mcp = "mcp_physical:main"
+
+[project.urls]
+Homepage = "https://hummbl.io"
+Repository = "https://github.com/hummbl-dev/mcp-server"
+Documentation = "https://github.com/hummbl-dev/mcp-server/tree/main/packages/python/governance"
+
+[tool.setuptools]
+py-modules = [
+    "mcp_server",
+    "mcp_compliance",
+    "mcp_sandbox",
+    "mcp_identity",
+    "mcp_agent_monitor",
+    "mcp_reasoning",
+    "mcp_physical",
+]
