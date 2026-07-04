@@ -30,9 +30,11 @@ const API_CONFIG = {
 } as const;
 
 /**
- * Register all model-related tools with the MCP server.
+ * Register public read-only model tools with the MCP server.
+ * These 7 tools are safe for unauthenticated / public / free-tier access.
+ * No write tools, no internal graph traversal, no user-data tools.
  */
-export function registerModelTools(server: McpServer): void {
+export function registerPublicModelTools(server: McpServer): void {
   // Tool: Get specific model by code
   server.registerTool(
     "get_model",
@@ -895,6 +897,17 @@ export function registerModelTools(server: McpServer): void {
       }
     }
   );
+}
+
+/**
+ * Register all model-related tools with the MCP server.
+ * Includes public read-only tools PLUS internal-only tools
+ * (add_relationship, get_recommendation_history).
+ * Use this for the internal/admin MCP server only.
+ */
+export function registerModelTools(server: McpServer): void {
+  // Register all public read-only tools first
+  registerPublicModelTools(server);
 
   // Tool: Find relationship path (BFS)
   /*

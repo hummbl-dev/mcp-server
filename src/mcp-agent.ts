@@ -28,20 +28,15 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SERVER_VERSION } from "./version.js";
-import { registerModelTools } from "./tools/models.js";
-import { registerMethodologyTools } from "./tools/methodology.js";
+import { registerModelTools, registerPublicModelTools } from "./tools/models.js";
+import { registerMethodologyTools, registerPublicMethodologyTools } from "./tools/methodology.js";
 import { registerExportTools } from "./tools/export.js";
 import { registerWorkflowTools } from "./tools/workflows.js";
 import { registerModelResources } from "./resources/models.js";
 import { registerMethodologyResources } from "./resources/methodology.js";
 import { registerWorkflowPrompts } from "./prompts/workflows.js";
-import {
-  verifyCloudflareAccessJwt,
-  extractAccessJwt,
-} from "./auth/cloudflare-access.js";
-import {
-  serveProtectedResourceMetadata,
-} from "./auth/protected-resource-metadata.js";
+import { verifyCloudflareAccessJwt, extractAccessJwt } from "./auth/cloudflare-access.js";
+import { serveProtectedResourceMetadata } from "./auth/protected-resource-metadata.js";
 import {
   resolveProfile,
   unauthorizedResponse,
@@ -49,8 +44,26 @@ import {
 } from "./auth/authorization.js";
 
 /**
- * Read-only MCP Agent — registers only non-mutating tools.
+ * Public MCP Agent — registers only the 8 public read-only tools.
+ * No write tools, no export, no workflows, no internal graph tools.
+ * Used for the public MCP server (mcp-public.hummbl.io).
+ */
+export class HummblPublicMcpAgent extends McpAgent {
+  server = new McpServer({
+    name: "hummbl-mcp-public",
+    version: SERVER_VERSION,
+  });
+
+  async init() {
+    registerPublicModelTools(this.server);
+    registerPublicMethodologyTools(this.server);
+  }
+}
+
+/**
+ * Read-only MCP Agent — registers all non-workflow tools.
  * Used for authenticated users without the hummbl-mcp-write group.
+ * Note: includes add_relationship, export_models, audit_model_references.
  */
 export class HummblReadOnlyMcpAgent extends McpAgent {
   server = new McpServer({
