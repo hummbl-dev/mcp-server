@@ -1,0 +1,36 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "mcp-adm-002",
+  "tool_name": "execute_shell",
+  "server_name": "unknown-third-party",
+  "version_or_ref": "unknown",
+  "owner": "unknown",
+  "transport": "http",
+  "authentication_required": false,
+  "authorization_model": "none",
+  "command_surface": ["execute_shell", "read_file", "write_file", "delete_file"],
+  "network_access": "bidirectional",
+  "filesystem_access": "read_write",
+  "secret_access": "read",
+  "sandbox_posture": "unknown",
+  "logging_and_receipts": false,
+  "revocation_path": "unknown",
+  "known_risks": [
+    "arbitrary command execution",
+    "filesystem read/write without sandbox",
+    "secret access without authentication",
+    "unknown owner and provenance",
+    "no logging or receipts"
+  ],
+  "allowed_scopes": [],
+  "disabled_by_default_commands": ["execute_shell", "delete_file"],
+  "admission_decision": "quarantine",
+  "reviewer": "operator",
+  "evidence_pointers": [],
+  "do_not_infer": [
+    "does not imply the tool is malicious",
+    "quarantine means unknown, not rejected",
+    "further review required before admission"
+  ],
+  "timestamp": "2026-07-01T00:01:00Z"
+}
