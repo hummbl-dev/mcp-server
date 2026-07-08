@@ -30,6 +30,8 @@ Learn more at [hummbl.io](https://hummbl.io).
 
 ## Installation
 
+**npm is the authoritative public registry for v1.2.0.** The GitHub Packages mirror is pending — see [PACKAGE_PUBLICATION_RECEIPT.md](PACKAGE_PUBLICATION_RECEIPT.md) for details.
+
 ### Global Installation (Recommended)
 
 ```bash
@@ -42,9 +44,11 @@ npm install -g @hummbl/mcp-server
 npx @hummbl/mcp-server
 ```
 
-### From GitHub Packages (alternate registry)
+### From GitHub Packages (alternate registry, v1.2.0 mirror pending)
 
 The same build is mirrored to GitHub Packages as `@hummbl-dev/mcp-server`. GitHub Packages requires a GitHub personal access token with `read:packages` scope even for public installs — create one at <https://github.com/settings/tokens>.
+
+**Note:** The v1.2.0 GitHub Packages mirror is pending. Use npm for the current v1.2.0 release. See [PACKAGE_PUBLICATION_RECEIPT.md](PACKAGE_PUBLICATION_RECEIPT.md) for details.
 
 Add to your project's `.npmrc`:
 
@@ -701,9 +705,9 @@ Apache 2.0 © HUMMBL, LLC
 
 ## Version
 
-1.0.0-beta.2
+1.2.0
 
 ## Repository Health
 
-See [DOCS/REPO_HEALTH.md](DOCS/REPO_HEALTH.md) for health contract, validation
+See [docs/REPO_HEALTH.md](docs/REPO_HEALTH.md) for health contract, validation
 commands, canonical source, and branch-protection expectations.
