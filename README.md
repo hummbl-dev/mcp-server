@@ -42,9 +42,17 @@ npm install -g @hummbl/mcp-server
 npx @hummbl/mcp-server
 ```
 
+### Publication evidence
+
+Current authoritative public route: **npm** (version `1.2.0`).
+
+Publication evidence and route status: [PACKAGE_PUBLICATION_RECEIPT.md](PACKAGE_PUBLICATION_RECEIPT.md)
+
 ### From GitHub Packages (alternate registry)
 
-The same build is mirrored to GitHub Packages as `@hummbl-dev/mcp-server`. GitHub Packages requires a GitHub personal access token with `read:packages` scope even for public installs — create one at <https://github.com/settings/tokens>.
+GitHub Packages is published as `@hummbl-dev/mcp-server` **as a pending mirror only** until the `v1.2.0` tag is released to GitHub Packages.
+
+It also requires a GitHub personal access token with `read:packages` scope even for public installs — create one at <https://github.com/settings/tokens>.
 
 Add to your project's `.npmrc`:
 
@@ -701,7 +709,7 @@ Apache 2.0 © HUMMBL, LLC
 
 ## Version
 
-1.0.0-beta.2
+1.2.0
 
 ## Repository Health
 
