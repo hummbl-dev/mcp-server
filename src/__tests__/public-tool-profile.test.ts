@@ -47,6 +47,17 @@ const EXCLUDED_FROM_PUBLIC = [
   "find_workflow_for_problem",
 ] as const;
 
+const PROHIBITED_PUBLIC_SCHEMA_TERMS = [
+  "user_id",
+  "userid",
+  "user_profile",
+  "private_graph",
+  "personal_observation",
+  "health_state",
+  "relationship_profile",
+  "consent_metadata",
+] as const;
+
 describe("Public MCP tool registration — golden inventory", () => {
   it("public agent registers exactly 8 tools", () => {
     const mock: any = createMockServer();
@@ -75,6 +86,23 @@ describe("Public MCP tool registration — golden inventory", () => {
     for (const name of EXCLUDED_FROM_PUBLIC) {
       const tool = mock.getTool(name);
       expect(tool, `Excluded tool ${name} must NOT be registered on public agent`).toBeUndefined();
+    }
+  });
+
+  it("public tool schemas do not admit private user-model fields", () => {
+    const mock: any = createMockServer();
+    registerPublicModelTools(mock);
+    registerPublicMethodologyTools(mock);
+
+    for (const name of PUBLIC_TOOLS) {
+      const tool = mock.getTool(name);
+      const serializedSchema = JSON.stringify(tool?.schema).toLowerCase();
+      for (const term of PROHIBITED_PUBLIC_SCHEMA_TERMS) {
+        expect(
+          serializedSchema,
+          `Public tool ${name} must not admit private field ${term}`
+        ).not.toContain(term);
+      }
     }
   });
 
