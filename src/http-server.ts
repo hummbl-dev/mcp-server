@@ -3,6 +3,15 @@
 /**
  * HUMMBL MCP Server - HTTP/SSE Transport
  * HTTP entry point for remote MCP server submission
+ *
+ * @deprecated As of 2026-07-11, the SSE transport is deprecated in favor
+ * of the Streamable HTTP transport via Cloudflare Workers
+ * (src/mcp-agent.ts + src/mcp-http.ts). This file is preserved for local
+ * development reference only. No production deployment uses this server.
+ *
+ * See docs/migration/sse-to-streamable-http.md for migration guidance.
+ *
+ * Removal is planned after all clients have migrated to Streamable HTTP.
  */
 
 import express from "express";
