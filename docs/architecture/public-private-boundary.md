@@ -98,11 +98,19 @@ The private runtime requires:
 
 The CI guard (`src/__tests__/public-boundary.test.ts`) enforces:
 
-1. No public tool accepts user-profile or private-graph input fields
-2. No public tool performs durable mutation
-3. No public tool returns user-model fragments
-4. Tool schemas are scanned for prohibited field names
-5. Resource URIs cannot enumerate private identifiers
+1. No public model or methodology tool schema contains prohibited user-data input fields
+2. No public tool name matches prohibited user-data patterns
+3. No public tool has a write or mutation semantic as its primary verb
+4. No public resource URI matches prohibited user-data patterns
+5. Error message fixtures do not echo raw sensitive payloads
+6. Private-world-model tools are not registered on the public agent
+
+**Not yet covered by executable tests** (documented as requirements, not claims):
+
+- Log redaction enforcement (no runtime log capture test)
+- Output schema scanning for user-model fragments (schemas are static, not runtime-tested)
+- Candidate model publication posture enforcement (delegated to `admission.test.ts`)
+- Complete public tool set coverage (only model + methodology tools tested here; see `public-tool-profile.test.ts` for registration separation)
 
 ## Cross-References
 

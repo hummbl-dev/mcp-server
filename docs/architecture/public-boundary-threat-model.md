@@ -54,16 +54,18 @@ Refs: hummbl-dev/mcp-server#377
 
 ## Test Coverage
 
-| Test | Threat addressed |
-|------|-----------------|
-| Public tools remain read-only | Tampering, Elevation |
-| Tool schemas contain no user-profile fields | Information Disclosure |
-| Logging does not persist personal observations | Information Disclosure |
-| Errors do not echo raw sensitive payloads | Information Disclosure |
-| Resource URIs cannot enumerate private identifiers | Information Disclosure |
-| Published candidate model requires explicit public posture | Information Disclosure |
-| Unauthenticated private-world-model request is denied | Elevation |
-| Write/mutation tool cannot register in public set | Tampering, Elevation |
+| Test | Threat addressed | Status |
+|------|-----------------|--------|
+| Public model/methodology tools have no prohibited user-data input fields | Information Disclosure | Executable (`public-boundary.test.ts`) |
+| No public tool name matches prohibited user-data patterns | Information Disclosure | Executable (`public-boundary.test.ts`) |
+| No public tool has write/mutation semantic as primary verb | Tampering, Elevation | Executable (`public-boundary.test.ts`) |
+| No public resource URI matches prohibited patterns | Information Disclosure | Executable (`public-boundary.test.ts`) |
+| Error message fixtures do not echo raw sensitive payloads | Information Disclosure | Executable (fixture-based, `public-boundary.test.ts`) |
+| Private-world-model tools not registered on public agent | Elevation | Executable (`public-boundary.test.ts`) |
+| Logging does not persist personal observations | Information Disclosure | **Not yet executable** — documented requirement |
+| Output schema scanning for user-model fragments | Information Disclosure | **Not yet executable** — schemas are static |
+| Candidate model publication posture | Information Disclosure | **Delegated to `admission.test.ts`** |
+| Complete public tool set registration separation | Tampering, Elevation | **Delegated to `public-tool-profile.test.ts`** |
 
 ## Residual Risks
 

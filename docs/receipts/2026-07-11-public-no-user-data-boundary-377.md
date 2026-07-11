@@ -23,11 +23,17 @@
 1. Public model tools have no prohibited user-data input fields
 2. Public methodology tools have no prohibited user-data input fields
 3. No public tool name matches prohibited user-data patterns
-4. No public tool has a write or mutation semantic
+4. No public tool has a write or mutation semantic as primary verb
 5. No public resource URI matches prohibited user-data patterns
-6. Error messages do not echo raw user input
-7. Candidate models must have explicit public/admitted posture
-8. Private-world-model request is denied without authentication
+6. Error message fixtures do not echo raw sensitive payloads (fixture-based)
+7. Candidate model publication posture (fixture-based principle check)
+8. Private-world-model tools not registered on public agent
+
+## Not yet covered by executable tests
+- Log redaction enforcement (no runtime log capture test)
+- Output schema scanning for user-model fragments (schemas are static)
+- Candidate model publication posture (delegated to `admission.test.ts`)
+- Complete public tool set registration separation (delegated to `public-tool-profile.test.ts`)
 
 ## Existing coverage (pre-existing)
 - `src/__tests__/public-tool-profile.test.ts` — 12 tests for tool registration separation
