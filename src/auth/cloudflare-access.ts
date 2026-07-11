@@ -144,12 +144,8 @@ function parseJwtParts(jwt: string): {
     throw new Error("Invalid JWT format: expected 3 parts");
   }
 
-  const header = JSON.parse(
-    new TextDecoder().decode(base64urlDecode(parts[0]))
-  ) as JwtHeader;
-  const claims = JSON.parse(
-    new TextDecoder().decode(base64urlDecode(parts[1]))
-  ) as AccessClaims;
+  const header = JSON.parse(new TextDecoder().decode(base64urlDecode(parts[0]))) as JwtHeader;
+  const claims = JSON.parse(new TextDecoder().decode(base64urlDecode(parts[1]))) as AccessClaims;
   const signature = base64urlDecode(parts[2]);
   const signingInput = new TextEncoder().encode(`${parts[0]}.${parts[1]}`);
 
@@ -195,13 +191,7 @@ async function importPublicKey(key: PublicKey): Promise<CryptoKey> {
   if (key.y) jwk.y = key.y;
   if (key.crv) jwk.crv = key.crv;
 
-  return crypto.subtle.importKey(
-    "jwk",
-    jwk,
-    algorithm as any,
-    false,
-    ["verify"]
-  );
+  return crypto.subtle.importKey("jwk", jwk, algorithm as any, false, ["verify"]);
 }
 
 /**
@@ -254,12 +244,7 @@ export async function verifyCloudflareAccessJwt(
         ? { name: "ECDSA", hash: "SHA-256" }
         : { name: "RSASSA-PKCS1-v1_5" };
 
-    const valid = await crypto.subtle.verify(
-      algorithm,
-      cryptoKey,
-      signature,
-      signingInput
-    );
+    const valid = await crypto.subtle.verify(algorithm, cryptoKey, signature, signingInput);
 
     if (!valid) {
       return null;

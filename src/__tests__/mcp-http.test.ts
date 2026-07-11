@@ -63,7 +63,10 @@ describe("MCP HTTP entrypoint — read-only tool profile", () => {
 
     for (const name of writeTools) {
       const tool = mock.getTool(name);
-      expect(tool, `Write tool ${name} must NOT be registered in read-only profile`).toBeUndefined();
+      expect(
+        tool,
+        `Write tool ${name} must NOT be registered in read-only profile`
+      ).toBeUndefined();
     }
   });
 

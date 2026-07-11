@@ -55,12 +55,15 @@ export class MetadataConfigError extends Error {
  * In production: all fields are required. Missing fields throw MetadataConfigError.
  * In staging/dev: falls back to placeholder values so the endpoint can be tested.
  */
-export function resolveMetadataConfig(env: Record<string, string | undefined>): ProtectedResourceMetadataConfig {
+export function resolveMetadataConfig(
+  env: Record<string, string | undefined>
+): ProtectedResourceMetadataConfig {
   const isProduction = env.ENVIRONMENT === "production";
 
   const resource = env.MCP_RESOURCE_URL;
   const authServer = env.CF_ACCESS_TEAM_URL;
-  const docs = env.MCP_AUTH_DOCS_URL || "https://github.com/hummbl-dev/mcp-server/blob/main/docs/auth.md";
+  const docs =
+    env.MCP_AUTH_DOCS_URL || "https://github.com/hummbl-dev/mcp-server/blob/main/docs/auth.md";
 
   if (isProduction) {
     const missing: string[] = [];
@@ -85,9 +88,7 @@ export function resolveMetadataConfig(env: Record<string, string | undefined>): 
  * Returns a Response with the metadata JSON, or a 500 if misconfigured
  * in production.
  */
-export function serveProtectedResourceMetadata(
-  env: Record<string, string | undefined>
-): Response {
+export function serveProtectedResourceMetadata(env: Record<string, string | undefined>): Response {
   try {
     const config = resolveMetadataConfig(env);
     const metadata = buildProtectedResourceMetadata(config);
@@ -100,12 +101,9 @@ export function serveProtectedResourceMetadata(
       err instanceof MetadataConfigError
         ? err.message
         : "Failed to build Protected Resource Metadata";
-    return new Response(
-      JSON.stringify({ error: "metadata_misconfiguration", message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return new Response(JSON.stringify({ error: "metadata_misconfiguration", message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }

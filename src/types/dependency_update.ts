@@ -15,7 +15,11 @@ export interface DependencyUpdateReceipt {
   security_fix_claimed: boolean;
   security_source: string | null;
   runtime_surface:
-    "dev_dependency" | "runtime_dependency" | "build_tool" | "type_definition" | "unknown";
+    | "dev_dependency"
+    | "runtime_dependency"
+    | "build_tool"
+    | "type_definition"
+    | "unknown";
   breaking_change_risk: "low" | "medium" | "high" | "unknown";
   tests_required: boolean;
   tests_observed: "passed" | "failed" | "not_run" | "unknown";
