@@ -21,6 +21,7 @@
     "build:api": "tsc --outDir dist --target es2022 --module es2022 --moduleResolution bundler src/api.ts",
     "dev": "tsx src/index.ts",
     "dev:http": "tsx src/http-server.ts",
+    "dev:http:deprecated": "echo 'WARNING: dev:http is deprecated. Use Streamable HTTP via dev:chatgpt instead. See docs/migration/sse-to-streamable-http.md' && tsx src/http-server.ts",
     "dev:api": "wrangler dev src/api.ts",
     "dev:chatgpt": "tsx src/mcp-http.ts",
     "start": "node dist/index.js",
