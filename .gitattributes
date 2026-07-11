@@ -1,0 +1,9 @@
+# Preserve LF line endings for TypeScript source files
+# Prettier requires LF; without this, CRLF checkouts fail format:check
+src/**/*.ts text eol=lf
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf

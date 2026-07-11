@@ -13,5 +13,4 @@
 declare const __SERVER_VERSION__: string | undefined;
 
 export const SERVER_VERSION: string =
-  (typeof __SERVER_VERSION__ !== "undefined" && __SERVER_VERSION__) ||
-  "1.2.0";
+  (typeof __SERVER_VERSION__ !== "undefined" && __SERVER_VERSION__) || "1.2.0";

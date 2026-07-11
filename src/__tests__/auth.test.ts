@@ -43,12 +43,21 @@ let kid: string;
 beforeAll(async () => {
   // Generate RSA key pair for signing test JWTs
   const pair = await crypto.subtle.generateKey(
-    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+    {
+      name: "RSASSA-PKCS1-v1_5",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256",
+    },
     true,
     ["sign", "verify"]
   );
   const keyPair = pair as CryptoKeyPair;
-  testKeyPair = { publicKey: keyPair.publicKey, privateKey: keyPair.privateKey, jwk: { kty: "RSA" } };
+  testKeyPair = {
+    publicKey: keyPair.publicKey,
+    privateKey: keyPair.privateKey,
+    jwk: { kty: "RSA" },
+  };
 
   // Export public key as JWK for mock JWKS
   const pubJwk = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
@@ -59,7 +68,10 @@ beforeAll(async () => {
 /**
  * Sign a JWT with the test private key.
  */
-async function signJwt(claims: Record<string, unknown>, headerOverrides: Record<string, unknown> = {}): Promise<string> {
+async function signJwt(
+  claims: Record<string, unknown>,
+  headerOverrides: Record<string, unknown> = {}
+): Promise<string> {
   const header = { alg: "RS256", typ: "JWT", kid, ...headerOverrides };
   const headerB64 = base64url(JSON.stringify(header));
   const payloadB64 = base64url(JSON.stringify(claims));
@@ -99,10 +111,10 @@ function mockFetchForKeys(groups: string[] = [], name: string = "Test User"): ty
   return (async (input: any) => {
     const url = typeof input === "string" ? input : input.url;
     if (url.includes("/cdn-cgi/access/certs")) {
-      return new Response(
-        JSON.stringify({ keys: [testKeyPair.jwk] }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ keys: [testKeyPair.jwk] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
     if (url.includes("/cdn-cgi/access/get-identity")) {
       return new Response(
@@ -150,12 +162,22 @@ describe("Auth: missing token", () => {
 
 describe("Auth: malformed token", () => {
   it("verifyCloudflareAccessJwt returns null for non-JWT string", async () => {
-    const result = await verifyCloudflareAccessJwt("not.a.jwt", TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    const result = await verifyCloudflareAccessJwt(
+      "not.a.jwt",
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys()
+    );
     expect(result).toBeNull();
   });
 
   it("verifyCloudflareAccessJwt returns null for 2-part string", async () => {
-    const result = await verifyCloudflareAccessJwt("only.two", TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    const result = await verifyCloudflareAccessJwt(
+      "only.two",
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys()
+    );
     expect(result).toBeNull();
   });
 
@@ -176,7 +198,12 @@ describe("Auth: expired token", () => {
       aud: TEST_AUDIENCE,
       iss: TEST_TEAM_URL,
     });
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    const result = await verifyCloudflareAccessJwt(
+      jwt,
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys()
+    );
     expect(result).toBeNull();
   });
 });
@@ -192,7 +219,12 @@ describe("Auth: wrong audience", () => {
       aud: "wrong-audience",
       iss: TEST_TEAM_URL,
     });
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    const result = await verifyCloudflareAccessJwt(
+      jwt,
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys()
+    );
     expect(result).toBeNull();
   });
 
@@ -204,7 +236,12 @@ describe("Auth: wrong audience", () => {
       aud: ["other-aud", "another-aud"],
       iss: TEST_TEAM_URL,
     });
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys());
+    const result = await verifyCloudflareAccessJwt(
+      jwt,
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys()
+    );
     expect(result).toBeNull();
   });
 });
@@ -221,7 +258,12 @@ describe("Auth: valid read-only user", () => {
       iss: TEST_TEAM_URL,
     });
     // Mock get-identity returns no groups
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys([], "Read Only"));
+    const result = await verifyCloudflareAccessJwt(
+      jwt,
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys([], "Read Only")
+    );
     expect(result).not.toBeNull();
     expect(result!.sub).toBe("user-readonly");
     expect(result!.email).toBe("reader@hummbl.io");
@@ -252,7 +294,12 @@ describe("Auth: valid write-group user", () => {
       iss: TEST_TEAM_URL,
     });
     // Mock get-identity returns the write group
-    const result = await verifyCloudflareAccessJwt(jwt, TEST_AUDIENCE, TEST_TEAM_URL, mockFetchForKeys([WRITE_GROUP], "Write User"));
+    const result = await verifyCloudflareAccessJwt(
+      jwt,
+      TEST_AUDIENCE,
+      TEST_TEAM_URL,
+      mockFetchForKeys([WRITE_GROUP], "Write User")
+    );
     expect(result).not.toBeNull();
     expect(result!.groups).toContain(WRITE_GROUP);
   });
@@ -295,10 +342,10 @@ describe("Auth: get-identity failure (fail-safe)", () => {
     const failingMock = (async (input: any) => {
       const url = typeof input === "string" ? input : input.url;
       if (url.includes("/cdn-cgi/access/certs")) {
-        return new Response(
-          JSON.stringify({ keys: [testKeyPair.jwk] }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ keys: [testKeyPair.jwk] }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
       }
       return new Response("Not found", { status: 404 });
     }) as typeof fetch;
@@ -345,9 +392,7 @@ describe("Protected Resource Metadata (RFC 9728)", () => {
   });
 
   it("resolveMetadataConfig throws MetadataConfigError in production with missing config", () => {
-    expect(() =>
-      resolveMetadataConfig({ ENVIRONMENT: "production" })
-    ).toThrow(MetadataConfigError);
+    expect(() => resolveMetadataConfig({ ENVIRONMENT: "production" })).toThrow(MetadataConfigError);
   });
 
   it("resolveMetadataConfig returns placeholder in staging", () => {

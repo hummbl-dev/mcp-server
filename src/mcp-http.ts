@@ -31,8 +31,7 @@ const PORT = process.env.MCP_HTTP_PORT ? parseInt(process.env.MCP_HTTP_PORT, 10)
 const isProduction =
   process.env.NODE_ENV === "production" || process.env.ENVIRONMENT === "production";
 
-const ALLOW_UNAUTHENTICATED =
-  process.env.ALLOW_UNAUTHENTICATED_MCP_HTTP === "true";
+const ALLOW_UNAUTHENTICATED = process.env.ALLOW_UNAUTHENTICATED_MCP_HTTP === "true";
 
 // --- Production refusal guard ---
 // Refuse to start in production unless an explicit unsafe override is set.
