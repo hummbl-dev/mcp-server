@@ -14,36 +14,107 @@ import { registerExportTools } from "./tools/export.js";
 import { SERVER_VERSION } from "./version.js";
 
 /**
- * Create and configure the HUMMBL MCP server
+ * Tool exposure profiles for server-side enforcement.
+ *
+ * Profiles control which tools, resources, and prompts are registered
+ * on the server. This is server-side enforcement, not a client hint.
+ *
+ * - `readonly`: model, methodology, export, resources, prompts; no workflow mutation tools.
+ * - `dev`: local-only, full tool set behind explicit env override.
+ * - `prod`: full or scoped tool set only after auth/authz.
+ * - `full`: all tools including workflow mutation (alias for prod without auth gate).
  */
-export function createServer(): McpServer {
+export type ServerProfile = "readonly" | "dev" | "prod" | "full";
+
+export interface ServerOptions {
+  profile?: ServerProfile;
+}
+
+/**
+ * Create and configure the HUMMBL MCP server.
+ *
+ * Without options, defaults to the full profile (backward compatible).
+ * With `{ profile: "readonly" }`, excludes workflow mutation tools.
+ */
+export function createServer(options?: ServerOptions): McpServer {
+  const profile = options?.profile ?? "full";
+  return createServerWithProfile(profile);
+}
+
+/**
+ * Create a server with an explicit profile.
+ */
+export function createServerWithProfile(profile: ServerProfile): McpServer {
   const server = new McpServer({
     name: "hummbl-mcp-server",
     version: SERVER_VERSION,
   });
 
-  // Register all tools
-  registerModelTools(server);
-  registerMethodologyTools(server);
-  registerWorkflowTools(server); // Phase 2: Guided workflows
-  registerExportTools(server);
-
-  // Register all resources
-  registerModelResources(server);
-  registerMethodologyResources(server);
-
-  // Register all prompts (MCP prompt primitive — user-invocable templates)
-  registerWorkflowPrompts(server);
+  switch (profile) {
+    case "readonly":
+      registerReadOnlyTools(server);
+      break;
+    case "dev":
+      registerDevTools(server);
+      break;
+    case "prod":
+    case "full":
+    default:
+      registerAllTools(server);
+      break;
+  }
 
   return server;
 }
 
 /**
+ * Register all tools (full/prod profile).
+ */
+function registerAllTools(server: McpServer): void {
+  registerModelTools(server);
+  registerMethodologyTools(server);
+  registerWorkflowTools(server);
+  registerExportTools(server);
+
+  registerModelResources(server);
+  registerMethodologyResources(server);
+
+  registerWorkflowPrompts(server);
+}
+
+/**
+ * Register read-only tools (readonly profile).
+ *
+ * Excludes workflow write tools (start_workflow, continue_workflow)
+ * so that unauthenticated HTTP entrypoints cannot trigger stateful
+ * operations.
+ */
+function registerReadOnlyTools(server: McpServer): void {
+  registerModelTools(server);
+  registerMethodologyTools(server);
+  registerExportTools(server);
+
+  registerModelResources(server);
+  registerMethodologyResources(server);
+
+  registerWorkflowPrompts(server);
+}
+
+/**
+ * Register dev tools (dev profile).
+ *
+ * Full tool set for local development. In production, this profile
+ * should only be accessible from localhost.
+ */
+function registerDevTools(server: McpServer): void {
+  registerAllTools(server);
+}
+
+/**
  * Create a read-only HUMMBL MCP server.
  *
- * Registers only non-mutating tools, resources, and prompts. Excludes
- * workflow write tools (start_workflow, continue_workflow) so that
- * unauthenticated HTTP entrypoints cannot trigger stateful operations.
+ * Convenience wrapper for `createServer({ profile: "readonly" })`.
+ * Kept for backward compatibility.
  *
  * Read-only tools registered:
  * - model tools (get_model, list_all_models, search_models, get_transformation, search_problem_patterns)
@@ -53,19 +124,5 @@ export function createServer(): McpServer {
  * - workflow prompts (templates only, not execution)
  */
 export function createReadOnlyServer(): McpServer {
-  const server = new McpServer({
-    name: "hummbl-mcp-server",
-    version: SERVER_VERSION,
-  });
-
-  registerModelTools(server);
-  registerMethodologyTools(server);
-  registerExportTools(server);
-
-  registerModelResources(server);
-  registerMethodologyResources(server);
-
-  registerWorkflowPrompts(server);
-
-  return server;
+  return createServer({ profile: "readonly" });
 }
