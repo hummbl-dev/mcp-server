@@ -56,11 +56,7 @@ export interface AnalysisGuide {
 }
 
 export type DialecticalStageId =
-  | "thesis"
-  | "antithesis"
-  | "synthesis"
-  | "convergence"
-  | "meta_reflection";
+  "thesis" | "antithesis" | "synthesis" | "convergence" | "meta_reflection";
 
 export interface StageModelMapping {
   stage: DialecticalStageId;

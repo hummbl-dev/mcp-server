@@ -28,9 +28,7 @@ async function seedRelationshipsData(env: Env) {
         target_code: relationship.model_b,
         relationship_type: relationship.relationship_type,
         confidence: (relationship.confidence === "U" ? "C" : relationship.confidence) as
-          | "A"
-          | "B"
-          | "C",
+          "A" | "B" | "C",
         evidence: relationship.logical_derivation,
       };
       const result = await db.createRelationship(relationshipInput);

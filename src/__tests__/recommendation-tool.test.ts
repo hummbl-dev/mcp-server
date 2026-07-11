@@ -49,7 +49,6 @@ function mockFetchResponse(status: number, body: unknown): Response {
 }
 
 describe("get_recommendation_history tool", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockServer: any;
   let fetchMock: ReturnType<typeof vi.fn>;
 
