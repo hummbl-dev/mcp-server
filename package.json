@@ -71,7 +71,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
     "@opentelemetry/resources": "^2.9.0",
     "@opentelemetry/sdk-trace-node": "^2.9.0",
-    "@opentelemetry/semantic-conventions": "^1.42.0",
+    "@opentelemetry/semantic-conventions": "^1.43.0",
     "@upstash/redis": "^1.38.0",
     "agents": "^0.17.3",
     "express": "^5.2.1",
