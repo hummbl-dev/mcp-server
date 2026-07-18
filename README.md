@@ -657,12 +657,15 @@ This repo is part of the [HUMMBL](https://github.com/hummbl-dev) cognitive AI ar
 | Repo | Purpose |
 |------|---------|
 | [base120](https://github.com/hummbl-dev/base120) | Authoritative reference for the 120 mental models served by this MCP server |
-| [hummbl-governance](https://github.com/hummbl-dev/hummbl-governance) | Governance primitives (kill switch, circuit breaker, cost governor) |
+| [hummbl-governance](https://github.com/hummbl-dev/hummbl-governance) | First-party governance integration used by this repository's Python governance package |
 | [arbiter](https://github.com/hummbl-dev/arbiter) | Agent-aware code quality scoring and attribution |
 | [agentic-patterns](https://github.com/hummbl-dev/agentic-patterns) | Stdlib-only safety patterns for agentic AI systems |
 | [aaa](https://github.com/hummbl-dev/aaa) | Assured Agentic Architecture — validation-first assurance |
 
 Learn more at [hummbl.io](https://hummbl.io).
+
+The governance package is a HUMMBL-owned integration and discovery path. It is
+not independent validation or evidence of external adoption.
 
 ## Privacy Policy
 
