@@ -4,7 +4,6 @@
  * Hybrid architecture: Local data for fast lookups, REST API for recommendations
  */
 
-/* eslint-disable no-undef */
 // fetch is a global in Cloudflare Workers environment
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

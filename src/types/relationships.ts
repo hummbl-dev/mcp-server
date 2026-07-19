@@ -237,5 +237,4 @@ export interface RelationshipRecordInput {
 }
 
 export type SimpleRelationshipResult<T = SimpleRelationship> =
-  | { ok: true; value: T }
-  | { ok: false; error: string };
+  { ok: true; value: T } | { ok: false; error: string };
