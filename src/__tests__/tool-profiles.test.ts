@@ -18,10 +18,7 @@ import { registerExportTools } from "../tools/export.js";
 /**
  * Write tools that must NOT appear in readonly profile.
  */
-const WRITE_TOOLS = [
-  "start_workflow",
-  "continue_workflow",
-] as const;
+const WRITE_TOOLS = ["start_workflow", "continue_workflow"] as const;
 
 /**
  * Tools that MUST appear in readonly profile.
@@ -80,10 +77,7 @@ describe("Tool exposure profiles", () => {
       registerExportTools(mock);
 
       for (const name of WRITE_TOOLS) {
-        expect(
-          mock.getTool(name),
-          `Write tool "${name}" must be in full profile`
-        ).toBeDefined();
+        expect(mock.getTool(name), `Write tool "${name}" must be in full profile`).toBeDefined();
       }
     });
   });

@@ -138,9 +138,20 @@ describe("Public no-user-data boundary", () => {
       registerPublicMethodologyTools(mock);
 
       const WRITE_SEMANTICS = [
-        "create", "update", "delete", "mutate", "write",
-        "ingest", "import", "store", "save", "insert",
-        "add", "remove", "modify", "set",
+        "create",
+        "update",
+        "delete",
+        "mutate",
+        "write",
+        "ingest",
+        "import",
+        "store",
+        "save",
+        "insert",
+        "add",
+        "remove",
+        "modify",
+        "set",
       ];
 
       for (const name of mock.tools.keys()) {
@@ -150,9 +161,7 @@ describe("Public no-user-data boundary", () => {
           // is the primary verb (first word)
           const parts = lowerName.split("_");
           if (parts[0] === writeWord) {
-            throw new Error(
-              `Tool "${name}" has write semantic "${writeWord}" as primary verb`
-            );
+            throw new Error(`Tool "${name}" has write semantic "${writeWord}" as primary verb`);
           }
         }
       }
@@ -164,11 +173,7 @@ describe("Public no-user-data boundary", () => {
       // Resource URIs are defined in src/resources/
       // We check that the resource URI templates don't contain
       // prohibited patterns
-      const RESOURCE_URIS = [
-        "models://all",
-        "models://{code}",
-        "methodology://{key}",
-      ];
+      const RESOURCE_URIS = ["models://all", "models://{code}", "methodology://{key}"];
 
       for (const uri of RESOURCE_URIS) {
         for (const pattern of PROHIBITED_RESOURCE_PATTERNS) {
@@ -218,12 +223,7 @@ describe("Public no-user-data boundary", () => {
       // explicit posture before publishing a candidate model
       // The admission test in admission.test.ts covers this in detail
       // Here we verify the principle: no implicit publication
-      const POSTURE_VALUES = [
-        "public",
-        "admitted",
-        "private",
-        "candidate",
-      ];
+      const POSTURE_VALUES = ["public", "admitted", "private", "candidate"];
 
       // Every candidate must declare one of these postures
       for (const posture of POSTURE_VALUES) {
