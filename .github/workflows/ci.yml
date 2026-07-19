@@ -12,22 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x, 22.x]
+        node-version: [22.x]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup Node.js ${{ matrix.node-version }} (with cache)
-        if: matrix.node-version != '22.x'
-        uses: actions/setup-node@v7
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-          cache-dependency-path: "package-lock.json"
-
       - name: Setup Node.js ${{ matrix.node-version }} (no cache)
-        if: matrix.node-version == '22.x'
         uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
@@ -43,17 +34,6 @@ jobs:
           npm install --force --package-lock-only
           npm install --force
 
-      - name: Install dependencies
-        if: matrix.node-version != '22.x'
-        run: |
-          npm ci --legacy-peer-deps || {
-            echo "npm ci failed, falling back to a clean lockfile refresh and retry"
-            npm cache clean --force
-            rm -rf node_modules package-lock.json
-            npm install --legacy-peer-deps --package-lock-only
-            npm ci --legacy-peer-deps
-          }
-
       - name: Run type checking
         run: npm run typecheck
 
@@ -61,7 +41,7 @@ jobs:
         run: npm run test:coverage
 
       - name: Upload coverage to Codecov
-        if: matrix.node-version == '20.x'
+        if: matrix.node-version == '22.x'
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -78,7 +58,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           cache: "npm"
 
       - name: Install dependencies
@@ -110,7 +90,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           cache: "npm"
 
       - name: Run npm audit
@@ -128,7 +108,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           cache: "npm"
 
       - name: Install dependencies
