@@ -33,6 +33,7 @@ Tools:
 import json
 import os
 import sys
+import tempfile
 import traceback
 import uuid
 from datetime import datetime, timezone
@@ -61,7 +62,7 @@ SERVER_NAME = "agent-sandbox"
 SERVER_VERSION = "0.1.0"
 PROTOCOL_VERSION = "2024-11-05"
 
-STATE_DIR = Path(os.environ.get("SANDBOX_STATE_DIR", "/tmp/hummbl-sandbox"))
+STATE_DIR = Path(os.environ.get("SANDBOX_STATE_DIR", os.path.join(tempfile.gettempdir(), "hummbl-sandbox")))
 
 # Active sandboxes
 _sandboxes = {}

@@ -39,7 +39,7 @@ Configure in Claude Code settings.json:
     }
 
 Environment variables:
-    GOVERNANCE_STATE_DIR  - Kill switch state persistence (default: /tmp/governance)
+    GOVERNANCE_STATE_DIR  - Kill switch state persistence (default: system temp dir, e.g. /tmp/governance on Linux)
     GOVERNANCE_DB_PATH    - Cost governor SQLite (default: {state_dir}/costs.db)
     GOVERNANCE_AUDIT_DIR  - Audit log JSONL directory (default: {state_dir}/audit)
 """
@@ -47,6 +47,7 @@ Environment variables:
 import json
 import os
 import sys
+import tempfile
 import traceback
 from datetime import datetime, timezone
 from pathlib import Path
@@ -67,7 +68,7 @@ from hummbl_governance import (
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-STATE_DIR = os.environ.get("GOVERNANCE_STATE_DIR", "/tmp/governance")
+STATE_DIR = os.environ.get("GOVERNANCE_STATE_DIR", os.path.join(tempfile.gettempdir(), "governance"))
 DB_PATH = os.environ.get("GOVERNANCE_DB_PATH", os.path.join(STATE_DIR, "costs.db"))
 AUDIT_DIR = os.environ.get("GOVERNANCE_AUDIT_DIR", os.path.join(STATE_DIR, "audit"))
 

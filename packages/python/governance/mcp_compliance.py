@@ -40,12 +40,13 @@ Configure in Claude Code settings.json:
     }
 
 Environment variables:
-    GOVERNANCE_AUDIT_DIR  - Audit log JSONL directory (default: /tmp/governance/audit)
+    GOVERNANCE_AUDIT_DIR  - Audit log JSONL directory (default: system temp dir, e.g. /tmp/governance/audit on Linux)
 """
 
 import json
 import os
 import sys
+import tempfile
 import traceback
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,7 +60,7 @@ from hummbl_governance.stride_mapper import (
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-AUDIT_DIR = os.environ.get("GOVERNANCE_AUDIT_DIR", "/tmp/governance/audit")
+AUDIT_DIR = os.environ.get("GOVERNANCE_AUDIT_DIR", os.path.join(tempfile.gettempdir(), "governance", "audit"))
 
 SERVER_NAME = "hummbl-compliance"
 SERVER_VERSION = "0.1.0"
