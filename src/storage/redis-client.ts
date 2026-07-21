@@ -25,7 +25,7 @@ export class RedisClient {
       const result = await this.client.get<T>(key);
       return result;
     } catch (error) {
-      console.error("Redis GET failed", { key, error });
+      console.error("Redis GET failed", { error });
       return null;
     }
   }
@@ -42,7 +42,7 @@ export class RedisClient {
       }
       return true;
     } catch (error) {
-      console.error("Redis SET failed", { key, error });
+      console.error("Redis SET failed", { error });
       return false;
     }
   }
@@ -55,7 +55,7 @@ export class RedisClient {
       await this.client.del(key);
       return true;
     } catch (error) {
-      console.error("Redis DEL failed", { key, error });
+      console.error("Redis DEL failed", { error });
       return false;
     }
   }
@@ -68,7 +68,7 @@ export class RedisClient {
       await this.client.rpush(key, value);
       return true;
     } catch (error) {
-      console.error("Redis RPUSH failed", { key, error });
+      console.error("Redis RPUSH failed", { error });
       return false;
     }
   }
@@ -81,7 +81,7 @@ export class RedisClient {
       const result = await this.client.lrange<T>(key, start, end);
       return result;
     } catch (error) {
-      console.error("Redis LRANGE failed", { key, error });
+      console.error("Redis LRANGE failed", { error });
       return [];
     }
   }
@@ -94,7 +94,7 @@ export class RedisClient {
       await this.client.ltrim(key, start, end);
       return true;
     } catch (error) {
-      console.error("Redis LTRIM failed", { key, error });
+      console.error("Redis LTRIM failed", { error });
       return false;
     }
   }
@@ -107,7 +107,7 @@ export class RedisClient {
       await this.client.expire(key, seconds);
       return true;
     } catch (error) {
-      console.error("Redis EXPIRE failed", { key, error });
+      console.error("Redis EXPIRE failed", { error });
       return false;
     }
   }
@@ -120,7 +120,7 @@ export class RedisClient {
       const result = await this.client.exists(key);
       return result === 1;
     } catch (error) {
-      console.error("Redis EXISTS failed", { key, error });
+      console.error("Redis EXISTS failed", { error });
       return false;
     }
   }
@@ -133,7 +133,7 @@ export class RedisClient {
       const result = await this.client.ttl(key);
       return result;
     } catch (error) {
-      console.error("Redis TTL failed", { key, error });
+      console.error("Redis TTL failed", { error });
       return -1;
     }
   }

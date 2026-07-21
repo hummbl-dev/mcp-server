@@ -75,7 +75,7 @@ export class D1Client {
       }
       return result.meta.changes;
     } catch (error) {
-      console.error("D1 EXECUTE failed", { sql, params, error });
+      console.error("D1 EXECUTE failed", { sql, error });
       throw error;
     }
   }
@@ -92,7 +92,7 @@ export class D1Client {
       }
       return (result.results || []) as T[];
     } catch (error) {
-      console.error("D1 QUERY failed", { sql, params, error });
+      console.error("D1 QUERY failed", { sql, error });
       throw error;
     }
   }
@@ -106,7 +106,7 @@ export class D1Client {
         .first();
       return (result as T) || null;
     } catch (error) {
-      console.error("D1 QUERY_ONE failed", { sql, params, error });
+      console.error("D1 QUERY_ONE failed", { sql, error });
       throw error;
     }
   }
@@ -118,7 +118,10 @@ export class D1Client {
       await this.db.batch(statements);
       return true;
     } catch (error) {
-      console.error("D1 TRANSACTION failed", { queries, error });
+      console.error("D1 TRANSACTION failed", {
+        statementCount: queries.length,
+        error,
+      });
       return false;
     }
   }
