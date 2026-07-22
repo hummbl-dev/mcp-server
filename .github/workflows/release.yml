@@ -23,7 +23,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
           cache: "npm"
 
@@ -48,7 +48,7 @@ jobs:
       - name: Setup Node.js for GitHub Packages
         uses: actions/setup-node@v7
         with:
-          node-version: "20.x"
+          node-version: "22.x"
           registry-url: "https://npm.pkg.github.com"
           scope: "@hummbl-dev"
 
