@@ -8,7 +8,11 @@ import {
 } from "../framework/self_dialectical.js";
 import { isOk } from "../types/domain.js";
 
-export function registerMethodologyTools(server: McpServer): void {
+/**
+ * Register public read-only methodology tools.
+ * Only get_methodology — safe for unauthenticated / public / free-tier access.
+ */
+export function registerPublicMethodologyTools(server: McpServer): void {
   // Tool: Get Self-Dialectical AI Methodology definition
   server.registerTool(
     "get_methodology",
@@ -65,6 +69,16 @@ export function registerMethodologyTools(server: McpServer): void {
       };
     }
   );
+}
+
+/**
+ * Register all methodology tools with the MCP server.
+ * Includes public get_methodology PLUS internal audit_model_references.
+ * Use this for the internal/admin MCP server only.
+ */
+export function registerMethodologyTools(server: McpServer): void {
+  // Register public read-only methodology tool first
+  registerPublicMethodologyTools(server);
 
   // Tool: Audit model references against HUMMBL Base120 and methodology expectations
   server.registerTool(

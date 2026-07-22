@@ -1,0 +1,58 @@
+name = "hummbl-mcp"
+main = "dist/mcp-agent.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# MCP Streamable HTTP endpoint with Cloudflare Access auth
+#
+# Auth: Cloudflare Access verifies identity and injects CF-Access-Jwt-Assertion.
+# The Worker verifies the JWT via Web Crypto API and selects a tool profile
+# based on the user's Access groups:
+#   - default: read-only profile
+#   - hummbl-mcp-write: full profile (includes workflow tools)
+#
+# ROUTE ENABLEMENT (operator-controlled):
+# The public route below is DISABLED. To enable after auth review:
+# 1. Uncomment the [[routes]] block
+# 2. Set ENVIRONMENT = "production"
+# 3. Set secrets: CF_ACCESS_AUDIENCE, CF_ACCESS_TEAM_URL, MCP_RESOURCE_URL
+# 4. Configure Cloudflare Access policy for mcp.hummbl.io
+# 5. Verify auth tests pass and a real login flow works
+#
+# [[routes]]
+# pattern = "mcp.hummbl.io/*"
+# zone_name = "hummbl.io"
+
+# PRODUCTION ROUTE — enabled 2026-07-04 after operator approval.
+# Rollback: comment out this block and redeploy.
+[[routes]]
+pattern = "mcp.hummbl.io/*"
+zone_name = "hummbl.io"
+
+# Durable Object bindings for the two McpAgent classes.
+# The Agents SDK requires these bindings for McpAgent.serve() to work.
+[[durable_objects.bindings]]
+name = "MCP_OBJECT_READONLY"
+class_name = "HummblReadOnlyMcpAgent"
+
+[[durable_objects.bindings]]
+name = "MCP_OBJECT_FULL"
+class_name = "HummblFullMcpAgent"
+
+# Durable Object migrations — required for first deployment of DO classes.
+# Uses SQLite-backed storage (recommended by Cloudflare).
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["HummblReadOnlyMcpAgent", "HummblFullMcpAgent"]
+
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets (set via `wrangler secret put` — NOT in this file):
+# - CF_ACCESS_AUDIENCE      — Cloudflare Access audience tag for this Worker
+# - CF_ACCESS_TEAM_URL      — e.g., https://hummbl.cloudflareaccess.com
+# - MCP_RESOURCE_URL        — e.g., https://mcp.hummbl.io
+# - MCP_AUTH_DOCS_URL       — (optional) link to auth documentation
+#
+# Dev/staging only (NEVER in production):
+# - ALLOW_UNAUTHENTICATED_MCP_HTTP — set to "true" to bypass auth in non-production

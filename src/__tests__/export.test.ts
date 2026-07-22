@@ -3,7 +3,6 @@ import { createMockServer } from "./setup.js";
 import { registerExportTools } from "../tools/export.js";
 
 describe("export_models tool", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let mockServer: any;
 
   beforeEach(() => {

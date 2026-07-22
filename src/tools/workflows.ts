@@ -75,7 +75,6 @@ export function registerWorkflowTools(server: McpServer): void {
       title: "Start Guided Workflow",
       description:
         "Begin a guided multi-turn workflow for systematic problem-solving using Base120 mental models.",
-      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         workflow_name: z
           .enum(["root_cause_analysis", "strategy_design", "decision_making"])
@@ -166,7 +165,6 @@ export function registerWorkflowTools(server: McpServer): void {
       title: "Continue Workflow",
       description:
         "Proceed to the next step of your guided workflow after completing the current step.",
-      annotations: { readOnlyHint: true },
       inputSchema: z.object({
         workflow_name: z
           .enum(["root_cause_analysis", "strategy_design", "decision_making"])

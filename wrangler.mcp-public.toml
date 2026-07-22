@@ -1,0 +1,34 @@
+name = "hummbl-mcp-public"
+main = "dist/mcp-agent.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Public read-only MCP server — no auth required, 8 tools only.
+# Used by ChatGPT App, Custom GPT, and any unauthenticated MCP client.
+#
+# Safety: HummblPublicMcpAgent registers only registerPublicModelTools
+# and registerPublicMethodologyTools (8 read-only tools total).
+# No write tools, no export, no workflows, no internal graph tools.
+# Golden tests in src/__tests__/public-tool-profile.test.ts enforce this.
+
+[[routes]]
+pattern = "mcp-public.hummbl.io/*"
+zone_name = "hummbl.io"
+
+# Durable Object binding for the public MCP agent.
+[[durable_objects.bindings]]
+name = "MCP_OBJECT_READONLY"
+class_name = "HummblPublicMcpAgent"
+
+[[durable_objects.bindings]]
+name = "MCP_OBJECT_FULL"
+class_name = "HummblFullMcpAgent"
+
+# Durable Object migrations — uses SQLite-backed storage.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["HummblPublicMcpAgent", "HummblFullMcpAgent"]
+
+[vars]
+ENVIRONMENT = "production"
+MCP_PUBLIC_MODE = "true"

@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.1.0-candidate",
+  "receipt_id": "skill-adm-003",
+  "skill_name": "send-email",
+  "skill_source": ".agents/skills/send-email/SKILL.md",
+  "skill_version": "0.5.0",
+  "origin": "fleet",
+  "owner": "hummbl-dev",
+  "permission_model": "gated",
+  "scope": ["email:send"],
+  "prompt_injection_risk_controls": ["operator_approval_required", "content_review_before_send"],
+  "command_surface": ["send_email", "draft_email"],
+  "network_access": "outbound",
+  "filesystem_access": "none",
+  "secret_access": "read",
+  "review_outcome": "admit_with_scope",
+  "review_checklist": {
+    "source_verified": true,
+    "permission_model_reviewed": true,
+    "scope_bounded": true,
+    "prompt_injection_risk_assessed": true,
+    "command_surface_reviewed": true,
+    "network_access_reviewed": true,
+    "filesystem_access_reviewed": true,
+    "secret_access_reviewed": true,
+    "revocation_path_defined": true,
+    "logging_enabled": true
+  },
+  "reviewer": "operator",
+  "evidence_pointers": [".agents/skills/send-email/SKILL.md"],
+  "escalation_path": "disable skill, escalate to operator if unsafe email detected",
+  "do_not_infer": [
+    "admission requires operator approval for each send",
+    "admission is scoped to email:send only",
+    "admission is revocable"
+  ],
+  "timestamp": "2026-07-01T00:02:00Z"
+}

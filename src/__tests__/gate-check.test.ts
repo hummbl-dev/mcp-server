@@ -11,6 +11,7 @@
 
 import { describe, it, expect } from "vitest";
 import { readFileSync, existsSync, statSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -71,10 +72,22 @@ describe("Gate-Check Protocol", () => {
     });
 
     it("gate-check.sh is executable", () => {
-      const stats = statSync(gateCheckScriptPath);
-      // Check if any execute bit is set (owner, group, or others).
-      const isExecutable = Boolean(stats.mode & 0o111);
-      expect(isExecutable).toBe(true);
+      // On Windows, the filesystem doesn't track Unix execute bits.
+      // Use git's file mode (100755 = executable) as the source of truth.
+      const isWindows = process.platform === "win32";
+      if (isWindows) {
+        const gitMode = execSync("git ls-files -s gate-check.sh", {
+          cwd: repoRoot,
+          encoding: "utf-8",
+        }).trim();
+        // git ls-files -s output: "100755 <hash> 0\tgate-check.sh"
+        expect(gitMode.startsWith("100755")).toBe(true);
+      } else {
+        const stats = statSync(gateCheckScriptPath);
+        // Check if any execute bit is set (owner, group, or others).
+        const isExecutable = Boolean(stats.mode & 0o111);
+        expect(isExecutable).toBe(true);
+      }
     });
   });
 

@@ -152,42 +152,9 @@ app.get("/v1/models/:code/relationships", async (c: AppContext) => {
   }
 });
 
-// Create a new relationship (authenticated)
-app.post("/v1/relationships", authenticate, async (c: AppContext) => {
-  try {
-    const body = await c.req.json();
-    const db = createD1Client(c.env.DB);
-
-    // Validate required fields
-    if (!body.source_code || !body.target_code || !body.relationship_type || !body.confidence) {
-      return c.json(
-        {
-          error: "Missing required fields: source_code, target_code, relationship_type, confidence",
-        },
-        400
-      );
-    }
-
-    // Validate confidence
-    if (!["A", "B", "C"].includes(body.confidence)) {
-      return c.json({ error: "Confidence must be A, B, or C" }, 400);
-    }
-
-    const relationshipInput = {
-      source_code: body.source_code.toUpperCase(),
-      target_code: body.target_code.toUpperCase(),
-      relationship_type: body.relationship_type,
-      confidence: body.confidence,
-      evidence: body.evidence,
-    };
-
-    const result = await db.createRelationship(relationshipInput);
-
-    return c.json({ success: true, relationship: result }, 201);
-  } catch {
-    return c.json({ error: "Internal server error" }, 500);
-  }
-});
+// NOTE: POST /v1/relationships is handled by the relationships router
+// mounted at line 534 (app.route("/v1", relationshipsRoutes)).
+// The canonical handler uses model_a/model_b/direction/logical_derivation fields.
 
 // Seed relationships endpoint (admin only)
 app.post("/v1/relationships/seed", authenticate, async (c: AppContext) => {
@@ -530,7 +497,8 @@ app.get("/v1/recommendations", authenticate, async (c: AppContext) => {
   }
 });
 
-// Add relationships routes
+// Add relationships routes — authenticate all relationship mutations
+app.use("/v1/relationships", authenticate);
 app.route("/v1", relationshipsRoutes);
 
 // Error handling

@@ -5,17 +5,17 @@ compatibility_date = "2024-01-01"
 # D1 Database binding
 [[d1_databases]]
 binding = "DB"
-database_name = "hummbl-api"
-database_id = "YOUR_D1_DATABASE_ID"  # Get from: wrangler d1 create hummbl-api
+database_name = "hummbl-base120"
+database_id = "622295ba-2781-42f4-9d17-45da0c7f3bb0"
 
 # KV Namespace bindings
 [[kv_namespaces]]
 binding = "API_KEYS"
-id = "YOUR_API_KEYS_KV_ID"  # Get from: wrangler kv:namespace create "API_KEYS"
+id = "a24da1a63cdc4459aa990d8fbf6fcf3d"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "YOUR_SESSIONS_KV_ID"  # Get from: wrangler kv:namespace create "SESSIONS"
+id = "0fd297ce6781450fbd687100a884241a"
 
 # Environment variables
 [vars]
