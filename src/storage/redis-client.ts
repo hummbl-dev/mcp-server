@@ -5,6 +5,33 @@
 
 import { Redis } from "@upstash/redis";
 
+const SENSITIVE_KEY_PATTERNS = [
+  /(token|secret|password|auth|key|credential)/i,
+  /session.*secret/i,
+  /api.*key/i,
+];
+
+function isSensitiveKey(key: string): boolean {
+  return SENSITIVE_KEY_PATTERNS.some((pattern) => pattern.test(key));
+}
+
+function redactKey(key: string): string {
+  if (isSensitiveKey(key)) {
+    return `<redacted:${key.length}>`;
+  }
+  return key;
+}
+
+function redactError(error: unknown): unknown {
+  if (error instanceof Error) {
+    const message = error.message;
+    // Redact potential secrets in error messages
+    const redacted = message.replace(/(token|secret|password|auth|key|credential)\s*[:=]\s*\S+/gi, '$1=<redacted>');
+    return new Error(redacted, { cause: error.cause });
+  }
+  return error;
+}
+
 export class RedisClient {
   private client: Redis;
 
@@ -25,7 +52,7 @@ export class RedisClient {
       const result = await this.client.get<T>(key);
       return result;
     } catch (error) {
-      console.error("Redis GET failed", { key, error });
+      console.error("Redis GET failed", { key: redactKey(key), error: redactError(error) });
       return null;
     }
   }
@@ -42,7 +69,7 @@ export class RedisClient {
       }
       return true;
     } catch (error) {
-      console.error("Redis SET failed", { key, error });
+      console.error("Redis SET failed", { key: redactKey(key), error: redactError(error) });
       return false;
     }
   }
@@ -55,7 +82,7 @@ export class RedisClient {
       await this.client.del(key);
       return true;
     } catch (error) {
-      console.error("Redis DEL failed", { key, error });
+      console.error("Redis DEL failed", { key: redactKey(key), error: redactError(error) });
       return false;
     }
   }
@@ -68,7 +95,7 @@ export class RedisClient {
       await this.client.rpush(key, value);
       return true;
     } catch (error) {
-      console.error("Redis RPUSH failed", { key, error });
+      console.error("Redis RPUSH failed", { key: redactKey(key), error: redactError(error) });
       return false;
     }
   }
@@ -81,7 +108,7 @@ export class RedisClient {
       const result = await this.client.lrange<T>(key, start, end);
       return result;
     } catch (error) {
-      console.error("Redis LRANGE failed", { key, error });
+      console.error("Redis LRANGE failed", { key: redactKey(key), error: redactError(error) });
       return [];
     }
   }
@@ -94,7 +121,7 @@ export class RedisClient {
       await this.client.ltrim(key, start, end);
       return true;
     } catch (error) {
-      console.error("Redis LTRIM failed", { key, error });
+      console.error("Redis LTRIM failed", { key: redactKey(key), error: redactError(error) });
       return false;
     }
   }
@@ -107,7 +134,7 @@ export class RedisClient {
       await this.client.expire(key, seconds);
       return true;
     } catch (error) {
-      console.error("Redis EXPIRE failed", { key, error });
+      console.error("Redis EXPIRE failed", { key: redactKey(key), error: redactError(error) });
       return false;
     }
   }
@@ -120,7 +147,7 @@ export class RedisClient {
       const result = await this.client.exists(key);
       return result === 1;
     } catch (error) {
-      console.error("Redis EXISTS failed", { key, error });
+      console.error("Redis EXISTS failed", { key: redactKey(key), error: redactError(error) });
       return false;
     }
   }
@@ -133,7 +160,7 @@ export class RedisClient {
       const result = await this.client.ttl(key);
       return result;
     } catch (error) {
-      console.error("Redis TTL failed", { key, error });
+      console.error("Redis TTL failed", { key: redactKey(key), error: redactError(error) });
       return -1;
     }
   }

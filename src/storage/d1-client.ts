@@ -6,6 +6,22 @@
 import type { D1Database } from "@cloudflare/workers-types";
 import type { ModelRelationship, RelationshipRecordInput } from "../types/relationships.js";
 
+const SENSITIVE_PARAM_PATTERNS = [
+  /(token|secret|password|auth|key|credential)/i,
+  /api.*key/i,
+];
+
+function isSensitiveParam(param: unknown): boolean {
+  if (typeof param === "string") {
+    return SENSITIVE_PARAM_PATTERNS.some((pattern) => pattern.test(param));
+  }
+  return false;
+}
+
+function redactParams(params: unknown[]): unknown[] {
+  return params.map((p) => (isSensitiveParam(p) ? `<redacted>` : p));
+}
+
 type DbRelationshipRow = {
   id: string;
   model_a: string;
@@ -75,7 +91,7 @@ export class D1Client {
       }
       return result.meta.changes;
     } catch (error) {
-      console.error("D1 EXECUTE failed", { sql, params, error });
+      console.error("D1 EXECUTE failed", { sql, params: redactParams(params), error });
       throw error;
     }
   }
@@ -92,7 +108,7 @@ export class D1Client {
       }
       return (result.results || []) as T[];
     } catch (error) {
-      console.error("D1 QUERY failed", { sql, params, error });
+      console.error("D1 QUERY failed", { sql, params: redactParams(params), error });
       throw error;
     }
   }
@@ -106,7 +122,7 @@ export class D1Client {
         .first();
       return (result as T) || null;
     } catch (error) {
-      console.error("D1 QUERY_ONE failed", { sql, params, error });
+      console.error("D1 QUERY_ONE failed", { sql, params: redactParams(params), error });
       throw error;
     }
   }
@@ -118,7 +134,11 @@ export class D1Client {
       await this.db.batch(statements);
       return true;
     } catch (error) {
-      console.error("D1 TRANSACTION failed", { queries, error });
+      const redactedQueries = queries.map((q) => ({
+        sql: q.sql,
+        params: redactParams(q.params),
+      }));
+      console.error("D1 TRANSACTION failed", { queries: redactedQueries, error });
       return false;
     }
   }
