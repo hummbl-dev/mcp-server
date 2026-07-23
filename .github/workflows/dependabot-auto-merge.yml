@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Evaluate and squash-merge eligible PRs
-        uses: actions/github-script@v9
+        actions/github-script@373c709c69115d41ff229c7e5df9f8788daa9553 # v9
         with:
           script: |
             const DEPENDABOT_LOGIN = "dependabot[bot]";
